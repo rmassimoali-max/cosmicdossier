@@ -10,33 +10,63 @@
 
 import { Route as rootRouteImport } from './routes/__root'
 import { Route as IndexRouteImport } from './routes/index'
+import { Route as InputRouteImport } from './routes/input'
+import { Route as ReportRouteImport } from './routes/report'
+import { Route as AssessmentKindRouteImport } from './routes/assessment.$kind'
 
 const IndexRoute = IndexRouteImport.update({
   id: '/',
   path: '/',
   getParentRoute: () => rootRouteImport,
 } as any)
+const InputRoute = InputRouteImport.update({
+  id: '/input',
+  path: '/input',
+  getParentRoute: () => rootRouteImport,
+} as any)
+const ReportRoute = ReportRouteImport.update({
+  id: '/report',
+  path: '/report',
+  getParentRoute: () => rootRouteImport,
+} as any)
+const AssessmentKindRoute = AssessmentKindRouteImport.update({
+  id: '/assessment/$kind',
+  path: '/assessment/$kind',
+  getParentRoute: () => rootRouteImport,
+} as any)
 
 export interface FileRoutesByFullPath {
   '/': typeof IndexRoute
+  '/input': typeof InputRoute
+  '/report': typeof ReportRoute
+  '/assessment/$kind': typeof AssessmentKindRoute
 }
 export interface FileRoutesByTo {
   '/': typeof IndexRoute
+  '/input': typeof InputRoute
+  '/report': typeof ReportRoute
+  '/assessment/$kind': typeof AssessmentKindRoute
 }
 export interface FileRoutesById {
   __root__: typeof rootRouteImport
   '/': typeof IndexRoute
+  '/input': typeof InputRoute
+  '/report': typeof ReportRoute
+  '/assessment/$kind': typeof AssessmentKindRoute
 }
 export interface FileRouteTypes {
   fileRoutesByFullPath: FileRoutesByFullPath
-  fullPaths: '/'
+  fullPaths: '/' | '/input' | '/report' | '/assessment/$kind'
   fileRoutesByTo: FileRoutesByTo
-  to: '/'
-  id: '__root__' | '/'
+  to: '/' | '/input' | '/report' | '/assessment/$kind'
+  id: '__root__' | '/' | '/input' | '/report' | '/assessment/$kind'
   fileRoutesById: FileRoutesById
 }
 export interface RootRouteChildren {
   IndexRoute: typeof IndexRoute
+  InputRoute: typeof InputRoute
+  ReportRoute: typeof ReportRoute
+  AssessmentKindRoute: typeof AssessmentKindRoute
 }
 
 declare module '@tanstack/react-router' {
@@ -48,11 +78,35 @@ declare module '@tanstack/react-router' {
       preLoaderRoute: typeof IndexRouteImport
       parentRoute: typeof rootRouteImport
     }
+    '/input': {
+      id: '/input'
+      path: '/input'
+      fullPath: '/input'
+      preLoaderRoute: typeof InputRouteImport
+      parentRoute: typeof rootRouteImport
+    }
+    '/report': {
+      id: '/report'
+      path: '/report'
+      fullPath: '/report'
+      preLoaderRoute: typeof ReportRouteImport
+      parentRoute: typeof rootRouteImport
+    }
+    '/assessment/$kind': {
+      id: '/assessment/$kind'
+      path: '/assessment/$kind'
+      fullPath: '/assessment/$kind'
+      preLoaderRoute: typeof AssessmentKindRouteImport
+      parentRoute: typeof rootRouteImport
+    }
   }
 }
 
 const rootRouteChildren: RootRouteChildren = {
   IndexRoute: IndexRoute,
+  InputRoute: InputRoute,
+  ReportRoute: ReportRoute,
+  AssessmentKindRoute: AssessmentKindRoute,
 }
 export const routeTree = rootRouteImport
   ._addFileChildren(rootRouteChildren)
