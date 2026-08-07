@@ -1,9 +1,9 @@
 import { createServerFn } from "@tanstack/react-start";
 import { z } from "zod";
 import { chartSummaryText, type NatalChart } from "./astro";
+import { callChat } from "./ai-provider.server";
 import type { Dossier, PersonInput } from "./session";
 
-const MODEL = "google/gemini-3.6-flash";
 
 const PersonSchema = z.object({
   name: z.string(),
@@ -32,61 +32,8 @@ Rules:
 - Each section body: 90-160 words of flowing prose. No bullet lists inside bodies.
 Return ONLY valid JSON, no markdown fences.`;
 
-async function callGateway(system: string, user: string): Promise<string> {
-  const key = process.env["LOVABLE_API_KEY"];
-  if (!key) throw new Error("Missing LOVABLE_API_KEY");
 
-  const res = await fetch("https://ai.gateway.lovable.dev/v1/chat/completions", {
-    method: "POST",
-    headers: {
-      "Content-Type": "application/json",
-      "Lovable-API-Key": key,
-      "X-Lovable-AIG-SDK": "fetch",
-    },
-    body: JSON.stringify({
-      model: MODEL,
-      stream: true,
-      messages: [
-        { role: "system", content: system },
-        { role: "user", content: user },
-      ],
-    }),
-  });
 
-  if (!res.ok || !res.body) {
-    const text = await res.text().catch(() => "");
-    if (res.status === 429) throw new Error("The AI is rate limited right now. Try again shortly.");
-    if (res.status === 402)
-      throw new Error("AI credits are exhausted. Add credits in your workspace settings.");
-    throw new Error(`AI request failed (${res.status}): ${text.slice(0, 300)}`);
-  }
-
-  const reader = res.body.getReader();
-  const decoder = new TextDecoder();
-  let buffer = "";
-  let out = "";
-  while (true) {
-    const { done, value } = await reader.read();
-    if (done) break;
-    buffer += decoder.decode(value, { stream: true });
-    const lines = buffer.split("\n");
-    buffer = lines.pop() ?? "";
-    for (const line of lines) {
-      const trimmed = line.trim();
-      if (!trimmed.startsWith("data:")) continue;
-      const payload = trimmed.slice(5).trim();
-      if (!payload || payload === "[DONE]") continue;
-      try {
-        const json = JSON.parse(payload);
-        const delta = json?.choices?.[0]?.delta?.content;
-        if (typeof delta === "string") out += delta;
-      } catch {
-        /* partial chunk */
-      }
-    }
-  }
-  return out;
-}
 
 function parseDossier(raw: string): Dossier {
   const cleaned = raw
@@ -183,7 +130,7 @@ Return JSON of exactly this shape:
   "dominantTraits": ["6-8 short trait phrases, 2-5 words each"],
   "sections": [${DOSSIER_SECTIONS.map((s) => `{"title":"${s}","body":"..."}`).join(",")}]
 }`;
-    return parseDossier(await callGateway(VOICE, user));
+    return parseDossier(await callChat(VOICE, user));
   });
 
 export const generateSynastry = createServerFn({ method: "POST" })
@@ -222,5 +169,5 @@ Return JSON of exactly this shape:
     {"title":"Potential Challenges","body":"..."}
   ]
 }`;
-    return parseDossier(await callGateway(VOICE, user));
+    return parseDossier(await callChat(VOICE, user));
   });
