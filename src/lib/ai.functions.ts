@@ -130,7 +130,7 @@ Return JSON of exactly this shape:
   "dominantTraits": ["6-8 short trait phrases, 2-5 words each"],
   "sections": [${DOSSIER_SECTIONS.map((s) => `{"title":"${s}","body":"..."}`).join(",")}]
 }`;
-    return parseDossier(await callGateway(VOICE, user));
+    return parseDossier(await callChat(VOICE, user));
   });
 
 export const generateSynastry = createServerFn({ method: "POST" })
@@ -169,5 +169,5 @@ Return JSON of exactly this shape:
     {"title":"Potential Challenges","body":"..."}
   ]
 }`;
-    return parseDossier(await callGateway(VOICE, user));
+    return parseDossier(await callChat(VOICE, user));
   });
