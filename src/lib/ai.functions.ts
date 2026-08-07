@@ -1,9 +1,9 @@
 import { createServerFn } from "@tanstack/react-start";
 import { z } from "zod";
 import { chartSummaryText, type NatalChart } from "./astro";
+import { callChat } from "./ai-provider.server";
 import type { Dossier, PersonInput } from "./session";
 
-const MODEL = "google/gemini-3.6-flash";
 
 const PersonSchema = z.object({
   name: z.string(),
