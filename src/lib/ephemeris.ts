@@ -111,12 +111,10 @@ export function angles(time: AstroTime, latitude: number, longitude: number) {
 export function houseCusps(asc: number, mc: number): number[] {
   const ic = norm360(mc + 180);
   const dsc = norm360(asc + 180);
-  const q1 = norm360(mc - asc) || 90; // asc -> ic quadrant span (houses 1-3)
   const spanA = norm360(ic - asc);
   const spanB = norm360(dsc - ic);
   const spanC = norm360(mc - dsc);
   const spanD = norm360(asc - mc);
-  void q1;
   const cusps = new Array<number>(12);
   cusps[0] = asc;
   cusps[1] = norm360(asc + spanA / 3);
