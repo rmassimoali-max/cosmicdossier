@@ -84,12 +84,26 @@ function resolveProvider(): Provider {
     };
   }
 
+  const seen = [
+    "AI_API_KEY",
+    "AI_BASE_URL",
+    "OPENAI_API_KEY",
+    "OPENROUTER_API_KEY",
+    "GEMINI_API_KEY",
+    "GOOGLE_GENERATIVE_AI_API_KEY",
+    "LOVABLE_API_KEY",
+  ]
+    .map((n) => `${n}=${env(n) ? "set" : "missing"}`)
+    .join(", ");
+
   throw new Error(
     "No AI provider is configured. Add one of these environment variables to your " +
       "hosting provider (e.g. Vercel > Project Settings > Environment Variables) and redeploy: " +
-      "OPENAI_API_KEY (OpenAI), OPENROUTER_API_KEY (OpenRouter), or GEMINI_API_KEY (Google AI Studio). " +
-      "Optionally set AI_MODEL to pick a specific model.",
+      "OPENAI_API_KEY (OpenAI), OPENROUTER_API_KEY (OpenRouter), GEMINI_API_KEY (Google AI Studio), " +
+      "or LOVABLE_API_KEY (Lovable AI Gateway). Optionally set AI_MODEL to pick a specific model. " +
+      `Detected on this server: ${seen}.`,
   );
+
 }
 
 export async function callChat(system: string, user: string): Promise<string> {
