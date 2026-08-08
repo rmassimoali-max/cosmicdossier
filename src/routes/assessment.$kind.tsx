@@ -117,7 +117,9 @@ function AssessmentPage() {
     } else {
       const bigFive = scoreBigFive(scale);
       setResult({
-        estimates: BIGFIVE_TRAITS.map((t) => ({ label: t, percent: bigFive[t] ?? 50 })),
+        estimates: BIGFIVE_TRAITS.map((t) => ({ label: t, percent: bigFive[t] ?? 50 })).sort(
+          (a, b) => b.percent - a.percent,
+        ),
         bigFive,
         patch: { bigFive },
       });
