@@ -74,7 +74,7 @@ export const PAIR_RULES: PairRule[] = [
   ),
   P(
     "similarity",
-    (p) => p.a.bigFive && p.b.bigFive ? Math.abs((p.a.bigFive.Openness ?? 50) - (p.b.bigFive.Openness ?? 50)) <= 12 : false,
+    (p) => p.a.bigFive && p.b.bigFive ? Math.abs((p.a.bigFive['Openness'] ?? 50) - (p.b.bigFive['Openness'] ?? 50)) <= 12 : false,
     "You sit close on Openness, which usually means conversation, novelty and taste come easily and rarely need translating.",
   ),
   P(
