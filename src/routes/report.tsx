@@ -4,7 +4,7 @@ import { StarField } from "@/components/cosmic/StarField";
 import { Bar, CButton, GoldLink, SectionTitle } from "@/components/cosmic/ui";
 import { PLANET_GLYPH, SIGN_GLYPH, type NatalChart } from "@/lib/astro";
 import { computeNatalChart } from "@/lib/astro.functions";
-import { generateDossier, generateSynastry } from "@/lib/ai.functions";
+import { buildDossier, buildSynastry } from "@/lib/generate";
 import { downloadDossierPdf } from "@/lib/pdf";
 import {
   ageFrom,
@@ -234,18 +234,13 @@ function ReportPage() {
       setSession((prev) => ({ ...prev, charts: { p1: chart1, p2: chart2 } }));
 
       setStep(2);
-      const d1 = await generateDossier({ data: { person: s.p1, chart: chart1 } });
-      const d2 =
-        s.p2 && chart2
-          ? await generateDossier({ data: { person: s.p2, chart: chart2 } })
-          : undefined;
+      const d1 = buildDossier(s.p1, chart1);
+      const d2 = s.p2 && chart2 ? buildDossier(s.p2, chart2) : undefined;
 
       let syn: Dossier | undefined;
       if (s.p2 && chart2) {
         setStep(3);
-        syn = await generateSynastry({
-          data: { person1: s.p1, chart1, person2: s.p2, chart2 },
-        });
+        syn = buildSynastry(s.p1, chart1, s.p2, chart2);
       }
       setStep(4);
       setSession((prev) => ({ ...prev, dossier: { p1: d1, p2: d2, synastry: syn } }));
@@ -295,8 +290,8 @@ function ReportPage() {
               {STEPS[step] ?? "Working"}…
             </p>
             <p className="mt-3 text-sm text-muted-foreground">
-              Real ephemeris math first, then the AI reads everything together. This takes up to a
-              minute.
+              Real ephemeris math, then the cross-sectional synthesis engine reads every system
+              against the others. No AI, no API keys, nothing leaves your browser.
             </p>
           </div>
         ) : null}
