@@ -70,6 +70,21 @@ function PersonCard({
 
   return (
     <div className="panel p-6 sm:p-8">
+      <div className="mb-6 rounded-xl border border-primary/30 bg-primary/5 p-4">
+        <p className="font-display text-lg text-gold">
+          <span className="text-primary">*</span> Only needed for the natal chart
+        </p>
+        <p className="mt-2 text-xs leading-relaxed text-muted-foreground">
+          Date, time and city of birth are used purely as math inputs: the date fixes the planets'
+          positions, the exact time fixes your rising sign and house cusps, and the city gives the
+          latitude, longitude and time zone. Everything is calculated on your device — nothing is
+          stored on a server.
+        </p>
+        <p className="mt-2 text-xs leading-relaxed text-muted-foreground">
+          Prefer not to share it? Leave all three blank. You'll still get the full MBTI, Big Five,
+          Enneagram and attachment dossier — just without the astrology layer.
+        </p>
+      </div>
       <div className="grid gap-4 sm:grid-cols-2">
         <Field label="Name">
           <TextInput
@@ -78,21 +93,24 @@ function PersonCard({
             placeholder="Full name"
           />
         </Field>
-        <Field label="Date of birth">
+        <Field label="Date of birth *" hint="Sets every planetary position in the chart.">
           <TextInput type="date" value={person.dob} onChange={(e) => set({ dob: e.target.value })} />
         </Field>
-        <Field label="Birth time" hint="Unknown time means houses and rising are approximate.">
+        <Field
+          label="Birth time *"
+          hint="Sets rising sign and houses. Unknown time means both are approximate."
+        >
           <TextInput
             type="time"
             value={person.birthTime}
             onChange={(e) => set({ birthTime: e.target.value })}
           />
         </Field>
-        <Field label="Birth place" hint="City, Country">
+        <Field label="City and state *" hint="Used for latitude, longitude and time zone.">
           <TextInput
             value={person.birthPlace}
             onChange={(e) => set({ birthPlace: e.target.value })}
-            placeholder="Lisbon, Portugal"
+            placeholder="Austin, Texas"
           />
         </Field>
         <Field label="Gender (optional)">
