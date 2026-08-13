@@ -1,11 +1,13 @@
 import { Link, createFileRoute } from "@tanstack/react-router";
 import { useCallback, useEffect, useRef, useState } from "react";
+import { LockedBlock, UnlockCard } from "@/components/cosmic/Paywall";
 import { StarField } from "@/components/cosmic/StarField";
 import { Bar, CButton, GoldLink, SectionTitle } from "@/components/cosmic/ui";
 import { PLANET_GLYPH, SIGN_GLYPH, type NatalChart } from "@/lib/astro";
 import { computeNatalChart } from "@/lib/astro.functions";
 import { buildDossier, buildSynastry } from "@/lib/generate";
 import { downloadDossierPdf } from "@/lib/pdf";
+import { useUnlocked } from "@/lib/unlock";
 import {
   ageFrom,
   getSession,
@@ -44,7 +46,15 @@ const STEPS = [
   "Binding the dossier",
 ];
 
-function ChartPanel({ chart, name }: { chart: NatalChart; name: string }) {
+function ChartPanel({
+  chart,
+  name,
+  locked = false,
+}: {
+  chart: NatalChart;
+  name: string;
+  locked?: boolean;
+}) {
   const elementMax = Math.max(...Object.values(chart.elements), 1);
   const modalMax = Math.max(...Object.values(chart.modalities), 1);
   const domMax = Math.max(...chart.dominantPlanets.map((d) => d.score), 1);
@@ -69,7 +79,16 @@ function ChartPanel({ chart, name }: { chart: NatalChart; name: string }) {
         {chart.place.label} · {chart.local} · Placidus houses
       </p>
 
-      <div className="mt-4 grid gap-x-8 gap-y-1.5 sm:grid-cols-2">
+      {locked ? (
+        <div className="mt-6">
+          <UnlockCard
+            title="Full chart is locked"
+            note="Your Sun, Moon and Rising are free. Unlock to see every placement, house, element balance and aspect."
+          />
+        </div>
+      ) : null}
+
+      <div className={locked ? "hidden" : "mt-4 grid gap-x-8 gap-y-1.5 sm:grid-cols-2"}>
         {chart.placements.map((p) => (
           <div
             key={p.label}
@@ -88,7 +107,7 @@ function ChartPanel({ chart, name }: { chart: NatalChart; name: string }) {
         ))}
       </div>
 
-      <div className="mt-8 grid gap-8 sm:grid-cols-2">
+      <div className={locked ? "hidden" : "mt-8 grid gap-8 sm:grid-cols-2"}>
         <div>
           <p className="mb-3 font-display text-xl">Element balance</p>
           <div className="space-y-2">
@@ -160,14 +179,23 @@ function IdentityStrip({ person, chart }: { person: PersonInput; chart?: NatalCh
   );
 }
 
-function DossierView({ dossier, person }: { dossier: Dossier; person?: PersonInput }) {
+function DossierView({
+  dossier,
+  person,
+  locked = false,
+}: {
+  dossier: Dossier;
+  person?: PersonInput;
+  locked?: boolean;
+}) {
+  const preview = dossier.synthesis.slice(0, 420);
   return (
     <div className="mt-8 space-y-6">
       <div className="panel p-6 sm:p-8">
         <p className="tracking-cosmic text-[0.65rem] text-primary/80">Synthesis</p>
         <h3 className="mt-2 text-3xl text-gold">{dossier.headline}</h3>
         <p className="mt-5 whitespace-pre-line text-[0.95rem] leading-relaxed text-foreground/90">
-          {dossier.synthesis}
+          {locked ? `${preview}…` : dossier.synthesis}
         </p>
         {dossier.dominantTraits.length ? (
           <div className="mt-6 flex flex-wrap gap-2">
@@ -191,20 +219,35 @@ function DossierView({ dossier, person }: { dossier: Dossier; person?: PersonInp
         ) : null}
       </div>
 
-      <div className="grid gap-4 sm:grid-cols-2">
-        {dossier.sections.map((s) => (
-          <article key={s.title} className="panel p-6">
-            <h4 className="font-display text-2xl text-foreground">{s.title}</h4>
-            <p className="mt-3 text-sm leading-relaxed text-muted-foreground">{s.body}</p>
-          </article>
-        ))}
-      </div>
+      {locked ? (
+        <LockedBlock title="Read the rest of your dossier">
+          <div className="grid gap-4 sm:grid-cols-2">
+            {dossier.sections.map((s) => (
+              <article key={s.title} className="panel p-6">
+                <h4 className="font-display text-2xl text-foreground">{s.title}</h4>
+                <p className="mt-3 text-sm leading-relaxed text-muted-foreground">{s.body}</p>
+              </article>
+            ))}
+          </div>
+        </LockedBlock>
+      ) : (
+        <div className="grid gap-4 sm:grid-cols-2">
+          {dossier.sections.map((s) => (
+            <article key={s.title} className="panel p-6">
+              <h4 className="font-display text-2xl text-foreground">{s.title}</h4>
+              <p className="mt-3 text-sm leading-relaxed text-muted-foreground">{s.body}</p>
+            </article>
+          ))}
+        </div>
+      )}
     </div>
   );
 }
 
 function ReportPage() {
   const session = useSession();
+  const unlocked = useUnlocked();
+  const locked = !unlocked;
   const [status, setStatus] = useState<"idle" | "running" | "done" | "error">("idle");
   const [step, setStep] = useState(0);
   const [error, setError] = useState<string | null>(null);
@@ -339,7 +382,7 @@ function ReportPage() {
             {tab === "p1" ? (
               <div className="animate-drift-in mt-6 space-y-6">
                 {chart1 ? (
-                  <ChartPanel chart={chart1} name={session.p1.name || "Person 1"} />
+                  <ChartPanel chart={chart1} name={session.p1.name || "Person 1"} locked={locked} />
                 ) : (
                   <div className="panel p-6 text-sm text-muted-foreground">
                     No natal chart — birth date, time and city were left blank. The psychological
@@ -347,23 +390,29 @@ function ReportPage() {
                     layer.
                   </div>
                 )}
-                <DossierView dossier={d1} person={session.p1} />
+                <DossierView dossier={d1} person={session.p1} locked={locked} />
               </div>
             ) : null}
 
             {tab === "p2" && session.p2 ? (
               <div className="animate-drift-in mt-6 space-y-6">
                 {chart2 ? (
-                  <ChartPanel chart={chart2} name={session.p2.name || "Person 2"} />
+                  <ChartPanel chart={chart2} name={session.p2.name || "Person 2"} locked={locked} />
                 ) : null}
-                {d2 ? <DossierView dossier={d2} person={session.p2} /> : null}
+                {d2 ? <DossierView dossier={d2} person={session.p2} locked={locked} /> : null}
               </div>
             ) : null}
 
             {tab === "synastry" ? (
               syn ? (
                 <div className="animate-drift-in mt-6">
-                  <DossierView dossier={syn} />
+                  {locked ? (
+                    <LockedBlock title="Synastry is part of the full dossier">
+                      <DossierView dossier={syn} />
+                    </LockedBlock>
+                  ) : (
+                    <DossierView dossier={syn} />
+                  )}
                 </div>
               ) : (
                 <p className="mt-6 text-sm text-muted-foreground">
@@ -374,6 +423,8 @@ function ReportPage() {
 
             <div className="mt-12 flex flex-wrap items-center gap-4">
               <CButton
+                disabled={locked}
+                title={locked ? "Unlock the full dossier to export a PDF" : undefined}
                 onClick={() =>
                   void downloadDossierPdf({
                     person: session.p1,
@@ -389,6 +440,11 @@ function ReportPage() {
               <CButton variant="outline" onClick={() => void run()}>
                 Regenerate
               </CButton>
+              {locked ? (
+                <span className="text-xs text-muted-foreground">
+                  PDF export unlocks with the full dossier.
+                </span>
+              ) : null}
               <span className="text-xs text-muted-foreground">
                 Astrology here is symbolic language; the psychology sections are self-report
                 estimates.
