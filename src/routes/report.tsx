@@ -213,32 +213,31 @@ function ReportPage() {
 
   const run = useCallback(async () => {
     const s = getSession();
-    if (!s.p1.dob || !s.p1.birthPlace) {
-      setError("Missing birth details. Go back and fill in Person 1.");
-      setStatus("error");
-      return;
-    }
     setStatus("running");
     setError(null);
     try {
       setStep(0);
-      const chart1 = await computeNatalChart({
-        data: { date: s.p1.dob, time: s.p1.birthTime, place: s.p1.birthPlace },
-      });
+      const chart1 =
+        s.p1.dob && s.p1.birthPlace
+          ? await computeNatalChart({
+              data: { date: s.p1.dob, time: s.p1.birthTime, place: s.p1.birthPlace },
+            })
+          : undefined;
       setStep(1);
-      const chart2 = s.p2?.dob
-        ? await computeNatalChart({
-            data: { date: s.p2.dob, time: s.p2.birthTime, place: s.p2.birthPlace },
-          })
-        : undefined;
+      const chart2 =
+        s.p2?.dob && s.p2.birthPlace
+          ? await computeNatalChart({
+              data: { date: s.p2.dob, time: s.p2.birthTime, place: s.p2.birthPlace },
+            })
+          : undefined;
       setSession((prev) => ({ ...prev, charts: { p1: chart1, p2: chart2 } }));
 
       setStep(2);
       const d1 = buildDossier(s.p1, chart1);
-      const d2 = s.p2 && chart2 ? buildDossier(s.p2, chart2) : undefined;
+      const d2 = s.p2 ? buildDossier(s.p2, chart2) : undefined;
 
       let syn: Dossier | undefined;
-      if (s.p2 && chart2) {
+      if (s.p2) {
         setStep(3);
         syn = buildSynastry(s.p1, chart1, s.p2, chart2);
       }
@@ -255,7 +254,7 @@ function ReportPage() {
     if (started.current) return;
     started.current = true;
     const s = getSession();
-    if (s.dossier?.p1 && s.charts?.p1) {
+    if (s.dossier?.p1) {
       setStatus("done");
       return;
     }
@@ -267,7 +266,7 @@ function ReportPage() {
   const d1 = session.dossier?.p1;
   const d2 = session.dossier?.p2;
   const syn = session.dossier?.synastry;
-  const hasP2 = Boolean(session.p2?.dob);
+  const hasP2 = Boolean(session.p2);
 
   return (
     <main className="relative min-h-screen">
@@ -309,7 +308,7 @@ function ReportPage() {
           </div>
         ) : null}
 
-        {status === "done" && chart1 ? (
+        {status === "done" && d1 ? (
           <>
             <div className="mt-10 flex flex-wrap gap-2">
               {(
@@ -339,14 +338,24 @@ function ReportPage() {
 
             {tab === "p1" ? (
               <div className="animate-drift-in mt-6 space-y-6">
-                <ChartPanel chart={chart1} name={session.p1.name || "Person 1"} />
-                {d1 ? <DossierView dossier={d1} person={session.p1} /> : null}
+                {chart1 ? (
+                  <ChartPanel chart={chart1} name={session.p1.name || "Person 1"} />
+                ) : (
+                  <div className="panel p-6 text-sm text-muted-foreground">
+                    No natal chart — birth date, time and city were left blank. The psychological
+                    sections below are complete; add birth details any time to unlock the astrology
+                    layer.
+                  </div>
+                )}
+                <DossierView dossier={d1} person={session.p1} />
               </div>
             ) : null}
 
-            {tab === "p2" && chart2 && session.p2 ? (
+            {tab === "p2" && session.p2 ? (
               <div className="animate-drift-in mt-6 space-y-6">
-                <ChartPanel chart={chart2} name={session.p2.name || "Person 2"} />
+                {chart2 ? (
+                  <ChartPanel chart={chart2} name={session.p2.name || "Person 2"} />
+                ) : null}
                 {d2 ? <DossierView dossier={d2} person={session.p2} /> : null}
               </div>
             ) : null}

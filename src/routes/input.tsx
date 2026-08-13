@@ -70,6 +70,21 @@ function PersonCard({
 
   return (
     <div className="panel p-6 sm:p-8">
+      <div className="mb-6 rounded-xl border border-primary/30 bg-primary/5 p-4">
+        <p className="font-display text-lg text-gold">
+          <span className="text-primary">*</span> Only needed for the natal chart
+        </p>
+        <p className="mt-2 text-xs leading-relaxed text-muted-foreground">
+          Date, time and city of birth are used purely as math inputs: the date fixes the planets'
+          positions, the exact time fixes your rising sign and house cusps, and the city gives the
+          latitude, longitude and time zone. Everything is calculated on your device — nothing is
+          stored on a server.
+        </p>
+        <p className="mt-2 text-xs leading-relaxed text-muted-foreground">
+          Prefer not to share it? Leave all three blank. You'll still get the full MBTI, Big Five,
+          Enneagram and attachment dossier — just without the astrology layer.
+        </p>
+      </div>
       <div className="grid gap-4 sm:grid-cols-2">
         <Field label="Name">
           <TextInput
@@ -78,21 +93,24 @@ function PersonCard({
             placeholder="Full name"
           />
         </Field>
-        <Field label="Date of birth">
+        <Field label="Date of birth *" hint="Sets every planetary position in the chart.">
           <TextInput type="date" value={person.dob} onChange={(e) => set({ dob: e.target.value })} />
         </Field>
-        <Field label="Birth time" hint="Unknown time means houses and rising are approximate.">
+        <Field
+          label="Birth time *"
+          hint="Sets rising sign and houses. Unknown time means both are approximate."
+        >
           <TextInput
             type="time"
             value={person.birthTime}
             onChange={(e) => set({ birthTime: e.target.value })}
           />
         </Field>
-        <Field label="Birth place" hint="City, Country">
+        <Field label="City and state *" hint="Used for latitude, longitude and time zone.">
           <TextInput
             value={person.birthPlace}
             onChange={(e) => set({ birthPlace: e.target.value })}
-            placeholder="Lisbon, Portugal"
+            placeholder="Austin, Texas"
           />
         </Field>
         <Field label="Gender (optional)">
@@ -185,12 +203,16 @@ function InputPage() {
 
   const submit = () => {
     const p = session.p1;
-    if (!p.name.trim() || !p.dob || !p.birthPlace.trim()) {
-      setError("Name, date of birth and birth place are required for Person 1.");
+    if (!p.name.trim()) {
+      setError("A name is required for Person 1.");
       return;
     }
-    if (session.p2 && (!session.p2.dob || !session.p2.birthPlace.trim())) {
-      setError("Person 2 needs a date of birth and birth place, or remove them.");
+    const partial = (x: { dob: string; birthPlace: string }) =>
+      Boolean(x.dob) !== Boolean(x.birthPlace.trim());
+    if (partial(p) || (session.p2 && partial(session.p2))) {
+      setError(
+        "For a natal chart we need both date of birth and city/state. Fill in both, or leave both blank to skip the astrology section.",
+      );
       return;
     }
     setError(null);
@@ -247,7 +269,8 @@ function InputPage() {
         <div className="mt-10 flex flex-wrap items-center gap-4">
           <CButton onClick={submit}>Generate Report</CButton>
           <span className="text-xs text-muted-foreground">
-            Chart is calculated from real ephemeris data, then read by AI.
+            Chart is calculated from real ephemeris data, then read by the synthesis engine — no AI,
+            no API keys.
           </span>
         </div>
       </div>
