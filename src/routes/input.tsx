@@ -269,7 +269,8 @@ function InputPage() {
         <div className="mt-10 flex flex-wrap items-center gap-4">
           <CButton onClick={submit}>Generate Report</CButton>
           <span className="text-xs text-muted-foreground">
-            Chart is calculated from real ephemeris data, then read by AI.
+            Chart is calculated from real ephemeris data, then read by the synthesis engine — no AI,
+            no API keys.
           </span>
         </div>
       </div>
