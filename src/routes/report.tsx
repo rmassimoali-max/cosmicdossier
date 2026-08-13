@@ -308,7 +308,7 @@ function ReportPage() {
           </div>
         ) : null}
 
-        {status === "done" && chart1 ? (
+        {status === "done" && d1 ? (
           <>
             <div className="mt-10 flex flex-wrap gap-2">
               {(
