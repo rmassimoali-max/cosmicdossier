@@ -213,32 +213,31 @@ function ReportPage() {
 
   const run = useCallback(async () => {
     const s = getSession();
-    if (!s.p1.dob || !s.p1.birthPlace) {
-      setError("Missing birth details. Go back and fill in Person 1.");
-      setStatus("error");
-      return;
-    }
     setStatus("running");
     setError(null);
     try {
       setStep(0);
-      const chart1 = await computeNatalChart({
-        data: { date: s.p1.dob, time: s.p1.birthTime, place: s.p1.birthPlace },
-      });
+      const chart1 =
+        s.p1.dob && s.p1.birthPlace
+          ? await computeNatalChart({
+              data: { date: s.p1.dob, time: s.p1.birthTime, place: s.p1.birthPlace },
+            })
+          : undefined;
       setStep(1);
-      const chart2 = s.p2?.dob
-        ? await computeNatalChart({
-            data: { date: s.p2.dob, time: s.p2.birthTime, place: s.p2.birthPlace },
-          })
-        : undefined;
+      const chart2 =
+        s.p2?.dob && s.p2.birthPlace
+          ? await computeNatalChart({
+              data: { date: s.p2.dob, time: s.p2.birthTime, place: s.p2.birthPlace },
+            })
+          : undefined;
       setSession((prev) => ({ ...prev, charts: { p1: chart1, p2: chart2 } }));
 
       setStep(2);
       const d1 = buildDossier(s.p1, chart1);
-      const d2 = s.p2 && chart2 ? buildDossier(s.p2, chart2) : undefined;
+      const d2 = s.p2 ? buildDossier(s.p2, chart2) : undefined;
 
       let syn: Dossier | undefined;
-      if (s.p2 && chart2) {
+      if (s.p2) {
         setStep(3);
         syn = buildSynastry(s.p1, chart1, s.p2, chart2);
       }
