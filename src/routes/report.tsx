@@ -338,14 +338,24 @@ function ReportPage() {
 
             {tab === "p1" ? (
               <div className="animate-drift-in mt-6 space-y-6">
-                <ChartPanel chart={chart1} name={session.p1.name || "Person 1"} />
-                {d1 ? <DossierView dossier={d1} person={session.p1} /> : null}
+                {chart1 ? (
+                  <ChartPanel chart={chart1} name={session.p1.name || "Person 1"} />
+                ) : (
+                  <div className="panel p-6 text-sm text-muted-foreground">
+                    No natal chart — birth date, time and city were left blank. The psychological
+                    sections below are complete; add birth details any time to unlock the astrology
+                    layer.
+                  </div>
+                )}
+                <DossierView dossier={d1} person={session.p1} />
               </div>
             ) : null}
 
-            {tab === "p2" && chart2 && session.p2 ? (
+            {tab === "p2" && session.p2 ? (
               <div className="animate-drift-in mt-6 space-y-6">
-                <ChartPanel chart={chart2} name={session.p2.name || "Person 2"} />
+                {chart2 ? (
+                  <ChartPanel chart={chart2} name={session.p2.name || "Person 2"} />
+                ) : null}
                 {d2 ? <DossierView dossier={d2} person={session.p2} /> : null}
               </div>
             ) : null}
