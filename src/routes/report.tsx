@@ -254,7 +254,7 @@ function ReportPage() {
     if (started.current) return;
     started.current = true;
     const s = getSession();
-    if (s.dossier?.p1 && s.charts?.p1) {
+    if (s.dossier?.p1) {
       setStatus("done");
       return;
     }
@@ -266,7 +266,7 @@ function ReportPage() {
   const d1 = session.dossier?.p1;
   const d2 = session.dossier?.p2;
   const syn = session.dossier?.synastry;
-  const hasP2 = Boolean(session.p2?.dob);
+  const hasP2 = Boolean(session.p2);
 
   return (
     <main className="relative min-h-screen">
