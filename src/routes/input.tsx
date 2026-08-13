@@ -203,12 +203,16 @@ function InputPage() {
 
   const submit = () => {
     const p = session.p1;
-    if (!p.name.trim() || !p.dob || !p.birthPlace.trim()) {
-      setError("Name, date of birth and birth place are required for Person 1.");
+    if (!p.name.trim()) {
+      setError("A name is required for Person 1.");
       return;
     }
-    if (session.p2 && (!session.p2.dob || !session.p2.birthPlace.trim())) {
-      setError("Person 2 needs a date of birth and birth place, or remove them.");
+    const partial = (x: { dob: string; birthPlace: string }) =>
+      Boolean(x.dob) !== Boolean(x.birthPlace.trim());
+    if (partial(p) || (session.p2 && partial(session.p2))) {
+      setError(
+        "For a natal chart we need both date of birth and city/state. Fill in both, or leave both blank to skip the astrology section.",
+      );
       return;
     }
     setError(null);
