@@ -88,25 +88,13 @@ export function StripeUnlockButton() {
       {error && <p className="mt-2 text-[0.7rem] text-destructive">{error}</p>}
 
       {open && clientSecret && cfg?.publishableKey && (
-        <div className="fixed inset-0 z-50 flex items-start justify-center overflow-y-auto bg-background/85 p-4 backdrop-blur">
-          <div className="panel w-full max-w-xl p-4">
-            <div className="mb-3 flex items-center justify-between">
-              <p className="tracking-cosmic text-[0.65rem] text-primary/80">Secure checkout</p>
-              <button
-                onClick={() => setOpen(false)}
-                className="text-xs text-muted-foreground underline decoration-dotted hover:text-primary"
-              >
-                Close
-              </button>
-            </div>
-            <EmbeddedCheckoutProvider
-              stripe={getStripe(cfg.publishableKey)}
-              options={{ clientSecret, onComplete }}
-            >
-              <EmbeddedCheckout />
-            </EmbeddedCheckoutProvider>
-          </div>
-        </div>
+        <EmbeddedCheckoutProvider
+          stripe={getStripe(cfg.publishableKey)}
+          options={{ clientSecret, onComplete }}
+        >
+          {/* Stripe renders its own centered modal over the page. */}
+          <EmbeddedCheckout />
+        </EmbeddedCheckoutProvider>
       )}
     </>
   );
