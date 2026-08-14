@@ -11,9 +11,9 @@
 import { Route as rootRouteImport } from './routes/__root'
 import { Route as IndexRouteImport } from './routes/index'
 import { Route as InputRouteImport } from './routes/input'
+import { Route as PaywallTestRouteImport } from './routes/paywall-test'
 import { Route as ReportRouteImport } from './routes/report'
 import { Route as AssessmentKindRouteImport } from './routes/assessment.$kind'
-import { Route as ApiPublicStripeSelftestRouteImport } from './routes/api/public/stripe-selftest'
 
 const IndexRoute = IndexRouteImport.update({
   id: '/',
@@ -23,6 +23,11 @@ const IndexRoute = IndexRouteImport.update({
 const InputRoute = InputRouteImport.update({
   id: '/input',
   path: '/input',
+  getParentRoute: () => rootRouteImport,
+} as any)
+const PaywallTestRoute = PaywallTestRouteImport.update({
+  id: '/paywall-test',
+  path: '/paywall-test',
   getParentRoute: () => rootRouteImport,
 } as any)
 const ReportRoute = ReportRouteImport.update({
@@ -35,64 +40,49 @@ const AssessmentKindRoute = AssessmentKindRouteImport.update({
   path: '/assessment/$kind',
   getParentRoute: () => rootRouteImport,
 } as any)
-const ApiPublicStripeSelftestRoute = ApiPublicStripeSelftestRouteImport.update({
-  id: '/api/public/stripe-selftest',
-  path: '/api/public/stripe-selftest',
-  getParentRoute: () => rootRouteImport,
-} as any)
 
 export interface FileRoutesByFullPath {
   '/': typeof IndexRoute
   '/input': typeof InputRoute
+  '/paywall-test': typeof PaywallTestRoute
   '/report': typeof ReportRoute
   '/assessment/$kind': typeof AssessmentKindRoute
-  '/api/public/stripe-selftest': typeof ApiPublicStripeSelftestRoute
 }
 export interface FileRoutesByTo {
   '/': typeof IndexRoute
   '/input': typeof InputRoute
+  '/paywall-test': typeof PaywallTestRoute
   '/report': typeof ReportRoute
   '/assessment/$kind': typeof AssessmentKindRoute
-  '/api/public/stripe-selftest': typeof ApiPublicStripeSelftestRoute
 }
 export interface FileRoutesById {
   __root__: typeof rootRouteImport
   '/': typeof IndexRoute
   '/input': typeof InputRoute
+  '/paywall-test': typeof PaywallTestRoute
   '/report': typeof ReportRoute
   '/assessment/$kind': typeof AssessmentKindRoute
-  '/api/public/stripe-selftest': typeof ApiPublicStripeSelftestRoute
 }
 export interface FileRouteTypes {
   fileRoutesByFullPath: FileRoutesByFullPath
-  fullPaths:
-    | '/'
-    | '/input'
-    | '/report'
-    | '/assessment/$kind'
-    | '/api/public/stripe-selftest'
+  fullPaths: '/' | '/input' | '/paywall-test' | '/report' | '/assessment/$kind'
   fileRoutesByTo: FileRoutesByTo
-  to:
-    | '/'
-    | '/input'
-    | '/report'
-    | '/assessment/$kind'
-    | '/api/public/stripe-selftest'
+  to: '/' | '/input' | '/paywall-test' | '/report' | '/assessment/$kind'
   id:
     | '__root__'
     | '/'
     | '/input'
+    | '/paywall-test'
     | '/report'
     | '/assessment/$kind'
-    | '/api/public/stripe-selftest'
   fileRoutesById: FileRoutesById
 }
 export interface RootRouteChildren {
   IndexRoute: typeof IndexRoute
   InputRoute: typeof InputRoute
+  PaywallTestRoute: typeof PaywallTestRoute
   ReportRoute: typeof ReportRoute
   AssessmentKindRoute: typeof AssessmentKindRoute
-  ApiPublicStripeSelftestRoute: typeof ApiPublicStripeSelftestRoute
 }
 
 declare module '@tanstack/react-router' {
@@ -111,6 +101,13 @@ declare module '@tanstack/react-router' {
       preLoaderRoute: typeof InputRouteImport
       parentRoute: typeof rootRouteImport
     }
+    '/paywall-test': {
+      id: '/paywall-test'
+      path: '/paywall-test'
+      fullPath: '/paywall-test'
+      preLoaderRoute: typeof PaywallTestRouteImport
+      parentRoute: typeof rootRouteImport
+    }
     '/report': {
       id: '/report'
       path: '/report'
@@ -125,22 +122,15 @@ declare module '@tanstack/react-router' {
       preLoaderRoute: typeof AssessmentKindRouteImport
       parentRoute: typeof rootRouteImport
     }
-    '/api/public/stripe-selftest': {
-      id: '/api/public/stripe-selftest'
-      path: '/api/public/stripe-selftest'
-      fullPath: '/api/public/stripe-selftest'
-      preLoaderRoute: typeof ApiPublicStripeSelftestRouteImport
-      parentRoute: typeof rootRouteImport
-    }
   }
 }
 
 const rootRouteChildren: RootRouteChildren = {
   IndexRoute: IndexRoute,
   InputRoute: InputRoute,
+  PaywallTestRoute: PaywallTestRoute,
   ReportRoute: ReportRoute,
   AssessmentKindRoute: AssessmentKindRoute,
-  ApiPublicStripeSelftestRoute: ApiPublicStripeSelftestRoute,
 }
 export const routeTree = rootRouteImport
   ._addFileChildren(rootRouteChildren)
