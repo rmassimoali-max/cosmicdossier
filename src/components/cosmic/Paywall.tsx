@@ -1,6 +1,6 @@
 import type { ReactNode } from "react";
-import { CButton } from "@/components/cosmic/ui";
 import { setUnlocked } from "@/lib/unlock";
+import { StripeUnlockButton } from "@/components/cosmic/StripeCheckout";
 
 /** Blurs gated content and floats an unlock card over it. */
 export function LockedBlock({
