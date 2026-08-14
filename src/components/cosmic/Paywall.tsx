@@ -1,5 +1,4 @@
 import type { ReactNode } from "react";
-import { setUnlocked } from "@/lib/unlock";
 import { StripeUnlockButton } from "@/components/cosmic/StripeCheckout";
 
 /** Blurs gated content and floats an unlock card over it. */
@@ -55,12 +54,6 @@ export function UnlockCard({
       </ul>
       <div className="mt-6 flex flex-col items-center gap-2">
         <StripeUnlockButton />
-        <button
-          onClick={() => setUnlocked(true)}
-          className="text-[0.7rem] text-muted-foreground underline decoration-dotted hover:text-primary"
-        >
-          Unlock demo (no payment)
-        </button>
       </div>
     </div>
   );
