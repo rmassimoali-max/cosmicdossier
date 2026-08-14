@@ -49,7 +49,7 @@ export const getStripeConfig = createServerFn({ method: "GET" }).handler(async (
 export const createUnlockCheckout = createServerFn({ method: "POST" }).handler(async () => {
   const session = await stripeCall("/checkout/sessions", secretKey(), {
     mode: "payment",
-    ui_mode: "embedded",
+    ui_mode: "embedded_page",
     redirect_on_completion: "never",
     "line_items[0][quantity]": "1",
     "line_items[0][price_data][currency]": "usd",

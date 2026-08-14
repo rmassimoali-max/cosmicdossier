@@ -15,7 +15,7 @@ export const Route = createFileRoute("/api/public/stripe-selftest")({
           },
           body: new URLSearchParams({
             mode: "payment",
-            ui_mode: "embedded",
+            ui_mode: "embedded_page",
             redirect_on_completion: "never",
             "line_items[0][quantity]": "1",
             "line_items[0][price_data][currency]": "usd",
