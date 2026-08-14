@@ -1,6 +1,6 @@
 import type { ReactNode } from "react";
-import { CButton } from "@/components/cosmic/ui";
 import { setUnlocked } from "@/lib/unlock";
+import { StripeUnlockButton } from "@/components/cosmic/StripeCheckout";
 
 /** Blurs gated content and floats an unlock card over it. */
 export function LockedBlock({
@@ -54,9 +54,7 @@ export function UnlockCard({
         ))}
       </ul>
       <div className="mt-6 flex flex-col items-center gap-2">
-        <CButton disabled title="Payments not connected yet">
-          Unlock — coming soon
-        </CButton>
+        <StripeUnlockButton />
         <button
           onClick={() => setUnlocked(true)}
           className="text-[0.7rem] text-muted-foreground underline decoration-dotted hover:text-primary"
