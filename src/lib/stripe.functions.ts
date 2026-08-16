@@ -53,7 +53,7 @@ export const createUnlockCheckout = createServerFn({ method: "POST" }).handler(a
     redirect_on_completion: "never",
     "line_items[0][quantity]": "1",
     "line_items[0][price_data][currency]": "usd",
-    "line_items[0][price_data][unit_amount]": "900",
+    "line_items[0][price_data][unit_amount]": "400",
     "line_items[0][price_data][product_data][name]": "Cosmic Dossier — full report unlock",
     "line_items[0][price_data][product_data][description]":
       "Full cross-sectional synthesis, complete natal chart detail, synastry and PDF export.",
