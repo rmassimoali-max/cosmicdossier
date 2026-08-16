@@ -73,7 +73,7 @@ export function StripeUnlockButton() {
   return (
     <>
       <CButton onClick={start} disabled={busy || (cfg !== null && !cfg.configured)}>
-        {busy ? "Opening checkout…" : "Unlock full dossier — $9"}
+        {busy ? "Opening checkout…" : "Unlock full dossier — $4"}
       </CButton>
       {cfg && !cfg.configured && (
         <p className="mt-2 text-[0.7rem] text-muted-foreground">
