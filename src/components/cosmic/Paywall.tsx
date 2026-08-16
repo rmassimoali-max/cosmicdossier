@@ -65,4 +65,4 @@ export function LockedInline({ children }: { children: ReactNode }) {
       {children}
     </span>
   );
-'}'
+}
