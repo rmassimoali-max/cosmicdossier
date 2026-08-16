@@ -237,7 +237,7 @@ function DossierView({
           />
         </div>
       ) : (
-      ) : (
+      
         <div className="grid gap-4 sm:grid-cols-2">
           {dossier.sections.map((s) => (
             <article key={s.title} className="panel p-6">
