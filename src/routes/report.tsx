@@ -398,6 +398,16 @@ function ReportPage() {
                   </div>
                 )}
                 <DossierView dossier={d1} person={session.p1} locked={locked} />
+                <div className="mt-6">
+                  <SectionTitle kicker="Share">Your shareable result</SectionTitle>
+                  <p className="mt-2 text-sm text-muted-foreground">
+                    Curious what your friends are? Share your archetype and make them take the
+                    dossier.
+                  </p>
+                  <div className="mt-6">
+                    <ResultCard dossier={d1} />
+                  </div>
+                </div>
               </div>
             ) : null}
 
