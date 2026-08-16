@@ -1,6 +1,7 @@
 import { Link, createFileRoute } from "@tanstack/react-router";
 import { useCallback, useEffect, useRef, useState } from "react";
 import { LockedBlock, UnlockCard } from "@/components/cosmic/Paywall";
+import { ResultCard } from "@/components/cosmic/ResultCard";
 import { StarField } from "@/components/cosmic/StarField";
 import { Bar, CButton, GoldLink, SectionTitle } from "@/components/cosmic/ui";
 import { PLANET_GLYPH, SIGN_GLYPH, type NatalChart } from "@/lib/astro";
