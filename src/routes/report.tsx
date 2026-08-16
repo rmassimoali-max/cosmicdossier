@@ -220,16 +220,23 @@ function DossierView({
       </div>
 
       {locked ? (
-        <LockedBlock title="Read the rest of your dossier">
+        <div className="space-y-4">
           <div className="grid gap-4 sm:grid-cols-2">
             {dossier.sections.map((s) => (
               <article key={s.title} className="panel p-6">
-                <h4 className="font-display text-2xl text-foreground">{s.title}</h4>
-                <p className="mt-3 text-sm leading-relaxed text-muted-foreground">{s.body}</p>
+                <h4 className="font-display text-2xl text-foreground">🔒 {s.title}</h4>
+                <p className="mt-3 text-sm leading-relaxed text-muted-foreground">
+                  {s.body.slice(0, 110)}…
+                </p>
               </article>
             ))}
           </div>
-        </LockedBlock>
+          <UnlockCard
+            title="You've only seen the surface"
+            note="Your full dossier connects these patterns into one personalized interpretation — the complete synthesis, every deep-dive section, and your full natal chart."
+          />
+        </div>
+      ) : (
       ) : (
         <div className="grid gap-4 sm:grid-cols-2">
           {dossier.sections.map((s) => (
