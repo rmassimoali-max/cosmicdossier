@@ -102,4 +102,4 @@ function Landing() {
     </main>
   );
 }
-}
+
