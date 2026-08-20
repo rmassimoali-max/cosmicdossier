@@ -99,7 +99,26 @@ function Landing() {
           ))}
         </ul>
       </section>
+
+      <section className="relative mx-auto max-w-5xl px-6 pb-24">
+        <div className="panel mx-auto max-w-3xl p-7 text-center sm:p-9">
+          <p className="tracking-cosmic text-xs text-primary/80">THE DOSSIER FILES</p>
+          <h2 className="mt-3 font-display text-3xl text-foreground/95 sm:text-4xl">
+            Psychology, decoded.
+          </h2>
+          <p className="mx-auto mt-3 max-w-xl text-sm leading-relaxed text-muted-foreground">
+            Explore attachment, relationships, personality, and the hidden patterns behind human
+            behavior in our growing collection of psychology case files.
+          </p>
+          <Link
+            to="/articles"
+            className="mt-6 inline-flex items-center gap-2 rounded-full px-7 py-3 font-display text-base text-primary-foreground"
+            style={{ background: "var(--gradient-gold)" }}
+          >
+            Explore the Files →
+          </Link>
+        </div>
+      </section>
     </main>
   );
 }
-
