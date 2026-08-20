@@ -13,6 +13,8 @@ import { Route as IndexRouteImport } from './routes/index'
 import { Route as InputRouteImport } from './routes/input'
 import { Route as ReportRouteImport } from './routes/report'
 import { Route as AssessmentKindRouteImport } from './routes/assessment.$kind'
+import { Route as ArticlesRouteImport } from './routes/articles'
+import { Route as ArticlesSlugRouteImport } from './routes/articles/$slug'
 
 const IndexRoute = IndexRouteImport.update({
   id: '/',
@@ -34,18 +36,32 @@ const AssessmentKindRoute = AssessmentKindRouteImport.update({
   path: '/assessment/$kind',
   getParentRoute: () => rootRouteImport,
 } as any)
+const ArticlesRoute = ArticlesRouteImport.update({
+  id: '/articles',
+  path: '/articles',
+  getParentRoute: () => rootRouteImport,
+} as any)
+const ArticlesSlugRoute = ArticlesSlugRouteImport.update({
+  id: '/articles/$slug',
+  path: '/$slug',
+  getParentRoute: () => ArticlesRoute,
+} as any)
 
 export interface FileRoutesByFullPath {
   '/': typeof IndexRoute
   '/input': typeof InputRoute
   '/report': typeof ReportRoute
   '/assessment/$kind': typeof AssessmentKindRoute
+  '/articles': typeof ArticlesRoute
+  '/articles/$slug': typeof ArticlesSlugRoute
 }
 export interface FileRoutesByTo {
   '/': typeof IndexRoute
   '/input': typeof InputRoute
   '/report': typeof ReportRoute
   '/assessment/$kind': typeof AssessmentKindRoute
+  '/articles': typeof ArticlesRoute
+  '/articles/$slug': typeof ArticlesSlugRoute
 }
 export interface FileRoutesById {
   __root__: typeof rootRouteImport
@@ -53,13 +69,15 @@ export interface FileRoutesById {
   '/input': typeof InputRoute
   '/report': typeof ReportRoute
   '/assessment/$kind': typeof AssessmentKindRoute
+  '/articles': typeof ArticlesRoute
+  '/articles/$slug': typeof ArticlesSlugRoute
 }
 export interface FileRouteTypes {
   fileRoutesByFullPath: FileRoutesByFullPath
-  fullPaths: '/' | '/input' | '/report' | '/assessment/$kind'
+  fullPaths: '/' | '/input' | '/report' | '/assessment/$kind' | '/articles' | '/articles/$slug'
   fileRoutesByTo: FileRoutesByTo
-  to: '/' | '/input' | '/report' | '/assessment/$kind'
-  id: '__root__' | '/' | '/input' | '/report' | '/assessment/$kind'
+  to: '/' | '/input' | '/report' | '/assessment/$kind' | '/articles' | '/articles/$slug'
+  id: '__root__' | '/' | '/input' | '/report' | '/assessment/$kind' | '/articles' | '/articles/$slug'
   fileRoutesById: FileRoutesById
 }
 export interface RootRouteChildren {
@@ -67,6 +85,10 @@ export interface RootRouteChildren {
   InputRoute: typeof InputRoute
   ReportRoute: typeof ReportRoute
   AssessmentKindRoute: typeof AssessmentKindRoute
+  ArticlesRoute: typeof ArticlesRoute
+}
+export interface ArticlesRouteChildren {
+  ArticlesSlugRoute: typeof ArticlesSlugRoute
 }
 
 declare module '@tanstack/react-router' {
@@ -99,7 +121,25 @@ declare module '@tanstack/react-router' {
       preLoaderRoute: typeof AssessmentKindRouteImport
       parentRoute: typeof rootRouteImport
     }
+    '/articles': {
+      id: '/articles'
+      path: '/articles'
+      fullPath: '/articles'
+      preLoaderRoute: typeof ArticlesRouteImport
+      parentRoute: typeof rootRouteImport
+    }
+    '/articles/$slug': {
+      id: '/articles/$slug'
+      path: '/$slug'
+      fullPath: '/articles/$slug'
+      preLoaderRoute: typeof ArticlesSlugRouteImport
+      parentRoute: typeof ArticlesRoute
+    }
   }
+}
+
+const articlesRouteChildren: ArticlesRouteChildren = {
+  ArticlesSlugRoute: ArticlesSlugRoute,
 }
 
 const rootRouteChildren: RootRouteChildren = {
@@ -107,6 +147,7 @@ const rootRouteChildren: RootRouteChildren = {
   InputRoute: InputRoute,
   ReportRoute: ReportRoute,
   AssessmentKindRoute: AssessmentKindRoute,
+  ArticlesRoute: ArticlesRoute._addFileChildren(articlesRouteChildren),
 }
 export const routeTree = rootRouteImport
   ._addFileChildren(rootRouteChildren)
@@ -119,5 +160,5 @@ declare module '@tanstack/react-start' {
     ssr: true
     router: Awaited<ReturnType<typeof getRouter>>
     config: Awaited<ReturnType<typeof startInstance.getOptions>>
-  }
+    }
 }
