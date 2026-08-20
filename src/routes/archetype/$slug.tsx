@@ -9,16 +9,21 @@ export const Route = createFileRoute("/archetype/$slug")({
     if (!archetype) throw notFound();
     return archetype;
   },
-  head: ({ loaderData }) => ({
-    meta: [
-      { title: `${loaderData.name} — Cosmic Dossier Archetype` },
-      { name: "description", content: loaderData.description.slice(0, 155) },
-      { property: "og:title", content: `${loaderData.name} — Cosmic Dossier` },
-      { property: "og:description", content: loaderData.tagline },
-      { property: "og:type", content: "website" },
-      { name: "twitter:card", content: "summary_large_image" },
-    ],
-  }),
+    head: ({ loaderData }) => {
+    if (!loaderData) {
+      return { meta: [{ title: "Archetype not found — Cosmic Dossier" }] };
+    }
+    return {
+      meta: [
+        { title: `${loaderData.name} — Cosmic Dossier Archetype` },
+        { name: "description", content: loaderData.description.slice(0, 155) },
+        { property: "og:title", content: `${loaderData.name} — Cosmic Dossier` },
+        { property: "og:description", content: loaderData.tagline },
+        { property: "og:type", content: "website" },
+        { name: "twitter:card", content: "summary_large_image" },
+      ],
+    };
+  },
   component: ArchetypePage,
 });
 
