@@ -11,6 +11,56 @@
     <priority>0.8</priority>
   </url>
   <url>
+    <loc>https://cosmicdossier.com/articles</loc>
+    <changefreq>weekly</changefreq>
+    <priority>0.8</priority>
+  </url>
+  <url>
+    <loc>https://cosmicdossier.com/articles/why-avoidant-people-pull-away-when-they-care</loc>
+    <changefreq>monthly</changefreq>
+    <priority>0.7</priority>
+  </url>
+  <url>
+    <loc>https://cosmicdossier.com/articles/the-pursuer-distancer-cycle-explained</loc>
+    <changefreq>monthly</changefreq>
+    <priority>0.7</priority>
+  </url>
+  <url>
+    <loc>https://cosmicdossier.com/articles/why-anxious-and-avoidant-people-become-addicted-to-each-other</loc>
+    <changefreq>monthly</changefreq>
+    <priority>0.7</priority>
+  </url>
+  <url>
+    <loc>https://cosmicdossier.com/articles/what-actually-happens-during-an-attachment-trigger</loc>
+    <changefreq>monthly</changefreq>
+    <priority>0.7</priority>
+  </url>
+  <url>
+    <loc>https://cosmicdossier.com/articles/why-someone-can-love-you-and-still-push-you-away</loc>
+    <changefreq>monthly</changefreq>
+    <priority>0.7</priority>
+  </url>
+  <url>
+    <loc>https://cosmicdossier.com/articles/secure-attachment-vs-emotional-detachment</loc>
+    <changefreq>monthly</changefreq>
+    <priority>0.7</priority>
+  </url>
+  <url>
+    <loc>https://cosmicdossier.com/articles/why-some-people-need-reassurance-constantly</loc>
+    <changefreq>monthly</changefreq>
+    <priority>0.7</priority>
+  </url>
+  <url>
+    <loc>https://cosmicdossier.com/articles/avoidance-vs-healthy-independence</loc>
+    <changefreq>monthly</changefreq>
+    <priority>0.7</priority>
+  </url>
+  <url>
+    <loc>https://cosmicdossier.com/articles/why-intermittent-reinforcement-makes-relationships-feel-addictive</loc>
+    <changefreq>monthly</changefreq>
+    <priority>0.7</priority>
+  </url>
+  <url>
     <loc>https://cosmicdossier.com/archetype/the-architect</loc>
     <changefreq>monthly</changefreq>
     <priority>0.6</priority>
