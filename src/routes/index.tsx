@@ -102,9 +102,4 @@ function Landing() {
     </main>
   );
 }
-          Free · no account · astrology treated as symbolic language, not prophecy
-        </p>
-      </section>
-    </main>
-  );
 }
