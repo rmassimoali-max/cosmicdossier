@@ -24,11 +24,11 @@ export const Route = createFileRoute("/")({
   component: Landing,
 });
 const PILLARS = [
-  { glyph: "⭐", label: "Astrology", note: "Full natal chart, aspects, houses" },
-  { glyph: "🧠", label: "MBTI", note: "Known type or 20-question estimate" },
-  { glyph: "🎭", label: "Enneagram", note: "Type, wing, instinct" },
-  { glyph: "❤️", label: "Synastry", note: "Two charts, compared honestly" },
-  { glyph: "📈", label: "AI Analysis", note: "One woven profile, not five silos" },
+  { slug: "astrology", glyph: "⭐", label: "Astrology", note: "Full natal chart, aspects, houses" },
+  { slug: "mbti", glyph: "🧠", label: "MBTI", note: "Known type or 20-question estimate" },
+  { slug: "enneagram", glyph: "🎭", label: "Enneagram", note: "Type, wing, instinct" },
+  { slug: "synastry", glyph: "❤️", label: "Synastry", note: "Two charts, compared honestly" },
+  { slug: "ai-analysis", glyph: "📈", label: "AI Analysis", note: "One woven profile, not five silos" },
 ];
 function Landing() {
   return (
@@ -50,13 +50,16 @@ function Landing() {
         </p>
         <ul className="animate-drift-in mt-12 grid w-full grid-cols-1 gap-3 sm:grid-cols-5">
           {PILLARS.map((p) => (
-            <li
-              key={p.label}
-              className="panel flex flex-col items-center gap-2 px-3 py-5 transition-transform duration-300 hover:-translate-y-1"
-            >
-              <span className="text-2xl">{p.glyph}</span>
-              <span className="font-display text-lg text-foreground">{p.label}</span>
-              <span className="text-[0.7rem] leading-snug text-muted-foreground">{p.note}</span>
+            <li key={p.label}>
+              <Link
+                to="/systems/$slug"
+                params={{ slug: p.slug }}
+                className="panel flex h-full flex-col items-center gap-2 px-3 py-5 transition-transform duration-300 hover:-translate-y-1"
+              >
+                <span className="text-2xl">{p.glyph}</span>
+                <span className="font-display text-lg text-foreground">{p.label}</span>
+                <span className="text-[0.7rem] leading-snug text-muted-foreground">{p.note}</span>
+              </Link>
             </li>
           ))}
         </ul>
