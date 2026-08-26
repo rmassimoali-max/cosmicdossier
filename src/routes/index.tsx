@@ -28,7 +28,7 @@ const PILLARS = [
   { slug: "mbti", glyph: "🧠", label: "MBTI", note: "Known type or 20-question estimate" },
   { slug: "enneagram", glyph: "🎭", label: "Enneagram", note: "Type, wing, instinct" },
   { slug: "synastry", glyph: "❤️", label: "Synastry", note: "Two charts, compared honestly" },
-  { slug: "ai-analysis", glyph: "📈", label: "AI Analysis", note: "One woven profile, not five silos" },
+    { slug: "ai-analysis", glyph: "📈", label: "Synthesis", note: "One woven profile, not five silos" },
 ];
 function Landing() {
   return (
