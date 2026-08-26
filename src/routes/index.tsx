@@ -6,20 +6,17 @@ export const Route = createFileRoute("/")({
   head: () => ({
     meta: [
       { title: "Cosmic Dossier — Your Full Personality Report" },
-      {
+           {
         name: "description",
         content:
-          "One report that braids your natal chart, MBTI, Enneagram, attachment style and Big Five into a single AI-written personality dossier — plus synastry for two.",
+          "One report that braids your natal chart, MBTI, Enneagram, attachment style and Big Five into a single cross-referenced personality dossier — plus synastry for two.",
       },
       { property: "og:title", content: "Cosmic Dossier — Your Full Personality Report" },
       {
         property: "og:description",
         content:
-          "Natal chart, MBTI, Enneagram, attachment style and Big Five woven into one AI personality dossier.",
+          "Natal chart, MBTI, Enneagram, attachment style and Big Five woven into one cross-referenced personality dossier.",
       },
-      { property: "og:type", content: "website" },
-      { name: "twitter:card", content: "summary_large_image" },
-    ],
   }),
   component: Landing,
 });
