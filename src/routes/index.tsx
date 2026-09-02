@@ -75,7 +75,7 @@ function Landing() {
             <li key={p.label}>
               <Link
                 to={p.to}
-                params={p.params}
+                {...(p.params ? { params: p.params } : {})}
                 className="panel flex h-full flex-col items-center gap-2 px-3 py-5 transition-transform duration-300 hover:-translate-y-1"
               >
                 <span className="text-2xl">{p.glyph}</span>
