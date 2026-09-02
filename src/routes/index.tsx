@@ -9,13 +9,13 @@ export const Route = createFileRoute("/")({
       {
         name: "description",
         content:
-          "One report that braids your natal chart, MBTI, Enneagram, attachment style and Big Five into a single AI-written personality dossier — plus synastry for two.",
+          "One report that braids your natal chart, MBTI, Enneagram, attachment style and Big Five into a single cross-referenced personality dossier — plus synastry for two.",
       },
       { property: "og:title", content: "Cosmic Dossier — Your Full Personality Report" },
       {
         property: "og:description",
         content:
-          "Natal chart, MBTI, Enneagram, attachment style and Big Five woven into one AI personality dossier.",
+          "Natal chart, MBTI, Enneagram, attachment style and Big Five woven into one cross-referenced personality dossier.",
       },
       { property: "og:type", content: "website" },
       { name: "twitter:card", content: "summary_large_image" },
@@ -29,6 +29,26 @@ const PILLARS = [
   { slug: "enneagram", glyph: "🎭", label: "Enneagram", note: "Type, wing, instinct" },
   { slug: "synastry", glyph: "❤️", label: "Synastry", note: "Two charts, compared honestly" },
   { slug: "ai-analysis", glyph: "📈", label: "Synthesis", note: "One woven profile, not five silos" },
+];
+const LEARN_CARDS = [
+  {
+    to: "/articles",
+    kicker: "THE DOSSIER FILES",
+    title: "Psychology, decoded.",
+    note: "Attachment, relationships, personality — 19 case files exploring the hidden dynamics between people.",
+  },
+  {
+    to: "/attachment",
+    kicker: "ATTACHMENT THEORY",
+    title: "Why closeness feels the way it does.",
+    note: "How secure, anxious, dismissive avoidant and fearful-avoidant styles develop — and how to start healing.",
+  },
+  {
+    to: "/personality-disorders",
+    kicker: "UNDERSTANDING PD's",
+    title: "The ten personality disorders, explained.",
+    note: "A clear, destigmatizing guide by cluster — what they are, and common misconceptions about each.",
+  },
 ];
 function Landing() {
   return (
@@ -104,22 +124,25 @@ function Landing() {
       </section>
 
       <section className="relative mx-auto max-w-5xl px-6 pb-24">
-        <div className="panel mx-auto max-w-3xl p-7 text-center sm:p-9">
-          <p className="tracking-cosmic text-xs text-primary/80">THE DOSSIER FILES</p>
-          <h2 className="mt-3 font-display text-3xl text-foreground/95 sm:text-4xl">
-            Psychology, decoded.
-          </h2>
-          <p className="mx-auto mt-3 max-w-xl text-sm leading-relaxed text-muted-foreground">
-            Explore attachment, relationships, personality, and the hidden patterns behind human
-            behavior in our growing collection of psychology case files.
-          </p>
-          <Link
-            to="/articles"
-            className="mt-6 inline-flex items-center gap-2 rounded-full px-7 py-3 font-display text-base text-primary-foreground"
-            style={{ background: "var(--gradient-gold)" }}
-          >
-            Explore the Files →
-          </Link>
+        <p className="tracking-cosmic text-center text-xs text-primary/80">Go deeper</p>
+        <h2 className="mt-3 text-center font-display text-3xl text-foreground/95 sm:text-4xl">
+          The Dossier Library
+        </h2>
+        <div className="mt-10 grid gap-4 sm:grid-cols-3">
+          {LEARN_CARDS.map((c) => (
+            <Link
+              key={c.to}
+              to={c.to}
+              className="panel group flex h-full flex-col p-6 transition-transform duration-300 hover:-translate-y-1"
+            >
+              <p className="tracking-cosmic text-[0.65rem] text-primary/80">{c.kicker}</p>
+              <h3 className="mt-3 font-display text-xl text-foreground transition-colors group-hover:text-gold">
+                {c.title}
+              </h3>
+              <p className="mt-3 text-sm leading-relaxed text-muted-foreground">{c.note}</p>
+              <span className="mt-4 inline-block text-xs text-primary">Explore →</span>
+            </Link>
+          ))}
         </div>
       </section>
     </main>
