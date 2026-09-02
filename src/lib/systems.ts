@@ -80,6 +80,20 @@ export const SYSTEMS: System[] = [
     goodToKnow:
       "Because it's rule-based rather than generative, the same inputs always produce the same output — nothing here is invented on the fly. It's best understood as expert-system logic applied to real, established personality frameworks.",
   },
+  {
+    slug: "big-five",
+    glyph: "📊",
+    name: "Big Five",
+    tagline: "The most empirically grounded personality model available.",
+    whatItIs:
+      "The Big Five (also called OCEAN or the Five-Factor Model) measures personality across five broad, statistically independent dimensions: Openness, Conscientiousness, Extraversion, Agreeableness and Neuroticism.",
+    history:
+      "Unlike most personality frameworks, the Big Five wasn't proposed by a single theorist — it emerged from decades of factor-analytic research beginning with Allport and Odbert's 1930s trait lexicon, and converged into its modern five-factor form through the work of researchers including Lewis Goldberg, Paul Costa and Robert McCrae in the 1980s and 90s.",
+    howWeUseIt:
+      "A 15-question estimate scores you across all five traits on a 0–100 scale, read as bands rather than exact values. The synthesis engine treats your Big Five scores as the most reliable anchor point when cross-referencing against MBTI, Enneagram and attachment results.",
+    goodToKnow:
+      "The Big Five has by far the strongest scientific support of the five systems here — it's cross-culturally replicated and predicts real-world outcomes better than most other frameworks. Where it disagrees with a less empirically-grounded system like MBTI or Enneagram in your dossier, the Big Five result is generally the more evidence-based one to weight.",
+  },
 ];
 
 export function systemBySlug(slug: string): System | undefined {
