@@ -23,12 +23,14 @@ export const Route = createFileRoute("/")({
   }),
   component: Landing,
 });
-const PILLARS = [
-  { slug: "astrology", glyph: "⭐", label: "Astrology", note: "Full natal chart, aspects, houses" },
-  { slug: "mbti", glyph: "🧠", label: "MBTI", note: "Known type or 20-question estimate" },
-  { slug: "enneagram", glyph: "🎭", label: "Enneagram", note: "Type, wing, instinct" },
-  { slug: "synastry", glyph: "❤️", label: "Synastry", note: "Two charts, compared honestly" },
-  { slug: "ai-analysis", glyph: "📈", label: "Synthesis", note: "One woven profile, not five silos" },
+const PILLARS: { to: string; params?: { slug: string }; glyph: string; label: string; note: string }[] = [
+  { to: "/systems/$slug", params: { slug: "astrology" }, glyph: "⭐", label: "Astrology", note: "Full natal chart, aspects, houses" },
+  { to: "/systems/$slug", params: { slug: "mbti" }, glyph: "🧠", label: "MBTI", note: "Known type or 20-question estimate" },
+  { to: "/systems/$slug", params: { slug: "enneagram" }, glyph: "🎭", label: "Enneagram", note: "Type, wing, instinct" },
+  { to: "/attachment", glyph: "🔗", label: "Attachment", note: "Secure, anxious, avoidant, fearful-avoidant" },
+  { to: "/systems/$slug", params: { slug: "big-five" }, glyph: "📊", label: "Big Five", note: "The most research-backed model here" },
+  { to: "/systems/$slug", params: { slug: "synastry" }, glyph: "❤️", label: "Synastry", note: "Two charts, compared honestly" },
+  { to: "/systems/$slug", params: { slug: "ai-analysis" }, glyph: "📈", label: "Synthesis", note: "One woven profile, not five silos" },
 ];
 const LEARN_CARDS = [
   {
@@ -72,8 +74,8 @@ function Landing() {
           {PILLARS.map((p) => (
             <li key={p.label}>
               <Link
-                to="/systems/$slug"
-                params={{ slug: p.slug }}
+                to={p.to}
+                {...(p.params ? { params: p.params } : {})}
                 className="panel flex h-full flex-col items-center gap-2 px-3 py-5 transition-transform duration-300 hover:-translate-y-1"
               >
                 <span className="text-2xl">{p.glyph}</span>

@@ -12,9 +12,15 @@ import { Route as rootRouteImport } from './routes/__root'
 import { Route as IndexRouteImport } from './routes/index'
 import { Route as InputRouteImport } from './routes/input'
 import { Route as ReportRouteImport } from './routes/report'
-import { Route as AssessmentKindRouteImport } from './routes/assessment.$kind'
-import { Route as ArticlesRouteImport } from './routes/articles'
+import { Route as ArchetypeSlugRouteImport } from './routes/archetype/$slug'
+import { Route as ArticlesIndexRouteImport } from './routes/articles/index'
 import { Route as ArticlesSlugRouteImport } from './routes/articles/$slug'
+import { Route as AssessmentKindRouteImport } from './routes/assessment.$kind'
+import { Route as AttachmentIndexRouteImport } from './routes/attachment/index'
+import { Route as AttachmentSlugRouteImport } from './routes/attachment/$slug'
+import { Route as PersonalityDisordersIndexRouteImport } from './routes/personality-disorders/index'
+import { Route as PersonalityDisordersSlugRouteImport } from './routes/personality-disorders/$slug'
+import { Route as SystemsSlugRouteImport } from './routes/systems/$slug'
 
 const IndexRoute = IndexRouteImport.update({
   id: '/',
@@ -31,64 +37,155 @@ const ReportRoute = ReportRouteImport.update({
   path: '/report',
   getParentRoute: () => rootRouteImport,
 } as any)
+const ArchetypeSlugRoute = ArchetypeSlugRouteImport.update({
+  id: '/archetype/$slug',
+  path: '/archetype/$slug',
+  getParentRoute: () => rootRouteImport,
+} as any)
+const ArticlesIndexRoute = ArticlesIndexRouteImport.update({
+  id: '/articles/',
+  path: '/articles/',
+  getParentRoute: () => rootRouteImport,
+} as any)
+const ArticlesSlugRoute = ArticlesSlugRouteImport.update({
+  id: '/articles/$slug',
+  path: '/articles/$slug',
+  getParentRoute: () => rootRouteImport,
+} as any)
 const AssessmentKindRoute = AssessmentKindRouteImport.update({
   id: '/assessment/$kind',
   path: '/assessment/$kind',
   getParentRoute: () => rootRouteImport,
 } as any)
-const ArticlesRoute = ArticlesRouteImport.update({
-  id: '/articles',
-  path: '/articles',
+const AttachmentIndexRoute = AttachmentIndexRouteImport.update({
+  id: '/attachment/',
+  path: '/attachment/',
   getParentRoute: () => rootRouteImport,
 } as any)
-const ArticlesSlugRoute = ArticlesSlugRouteImport.update({
-  id: '/articles/$slug',
-  path: '/$slug',
-  getParentRoute: () => ArticlesRoute,
+const AttachmentSlugRoute = AttachmentSlugRouteImport.update({
+  id: '/attachment/$slug',
+  path: '/attachment/$slug',
+  getParentRoute: () => rootRouteImport,
+} as any)
+const PersonalityDisordersIndexRoute =
+  PersonalityDisordersIndexRouteImport.update({
+    id: '/personality-disorders/',
+    path: '/personality-disorders/',
+    getParentRoute: () => rootRouteImport,
+  } as any)
+const PersonalityDisordersSlugRoute =
+  PersonalityDisordersSlugRouteImport.update({
+    id: '/personality-disorders/$slug',
+    path: '/personality-disorders/$slug',
+    getParentRoute: () => rootRouteImport,
+  } as any)
+const SystemsSlugRoute = SystemsSlugRouteImport.update({
+  id: '/systems/$slug',
+  path: '/systems/$slug',
+  getParentRoute: () => rootRouteImport,
 } as any)
 
 export interface FileRoutesByFullPath {
   '/': typeof IndexRoute
   '/input': typeof InputRoute
   '/report': typeof ReportRoute
-  '/assessment/$kind': typeof AssessmentKindRoute
-  '/articles': typeof ArticlesRoute
+  '/archetype/$slug': typeof ArchetypeSlugRoute
   '/articles/$slug': typeof ArticlesSlugRoute
+  '/assessment/$kind': typeof AssessmentKindRoute
+  '/attachment/$slug': typeof AttachmentSlugRoute
+  '/personality-disorders/$slug': typeof PersonalityDisordersSlugRoute
+  '/systems/$slug': typeof SystemsSlugRoute
+  '/articles/': typeof ArticlesIndexRoute
+  '/attachment/': typeof AttachmentIndexRoute
+  '/personality-disorders/': typeof PersonalityDisordersIndexRoute
 }
 export interface FileRoutesByTo {
   '/': typeof IndexRoute
   '/input': typeof InputRoute
   '/report': typeof ReportRoute
-  '/assessment/$kind': typeof AssessmentKindRoute
-  '/articles': typeof ArticlesRoute
+  '/archetype/$slug': typeof ArchetypeSlugRoute
   '/articles/$slug': typeof ArticlesSlugRoute
+  '/assessment/$kind': typeof AssessmentKindRoute
+  '/attachment/$slug': typeof AttachmentSlugRoute
+  '/personality-disorders/$slug': typeof PersonalityDisordersSlugRoute
+  '/systems/$slug': typeof SystemsSlugRoute
+  '/articles': typeof ArticlesIndexRoute
+  '/attachment': typeof AttachmentIndexRoute
+  '/personality-disorders': typeof PersonalityDisordersIndexRoute
 }
 export interface FileRoutesById {
   __root__: typeof rootRouteImport
   '/': typeof IndexRoute
   '/input': typeof InputRoute
   '/report': typeof ReportRoute
-  '/assessment/$kind': typeof AssessmentKindRoute
-  '/articles': typeof ArticlesRoute
+  '/archetype/$slug': typeof ArchetypeSlugRoute
   '/articles/$slug': typeof ArticlesSlugRoute
+  '/assessment/$kind': typeof AssessmentKindRoute
+  '/attachment/$slug': typeof AttachmentSlugRoute
+  '/personality-disorders/$slug': typeof PersonalityDisordersSlugRoute
+  '/systems/$slug': typeof SystemsSlugRoute
+  '/articles/': typeof ArticlesIndexRoute
+  '/attachment/': typeof AttachmentIndexRoute
+  '/personality-disorders/': typeof PersonalityDisordersIndexRoute
 }
 export interface FileRouteTypes {
   fileRoutesByFullPath: FileRoutesByFullPath
-  fullPaths: '/' | '/input' | '/report' | '/assessment/$kind' | '/articles' | '/articles/$slug'
+  fullPaths:
+    | '/'
+    | '/input'
+    | '/report'
+    | '/archetype/$slug'
+    | '/articles/$slug'
+    | '/assessment/$kind'
+    | '/attachment/$slug'
+    | '/personality-disorders/$slug'
+    | '/systems/$slug'
+    | '/articles/'
+    | '/attachment/'
+    | '/personality-disorders/'
   fileRoutesByTo: FileRoutesByTo
-  to: '/' | '/input' | '/report' | '/assessment/$kind' | '/articles' | '/articles/$slug'
-  id: '__root__' | '/' | '/input' | '/report' | '/assessment/$kind' | '/articles' | '/articles/$slug'
+  to:
+    | '/'
+    | '/input'
+    | '/report'
+    | '/archetype/$slug'
+    | '/articles/$slug'
+    | '/assessment/$kind'
+    | '/attachment/$slug'
+    | '/personality-disorders/$slug'
+    | '/systems/$slug'
+    | '/articles'
+    | '/attachment'
+    | '/personality-disorders'
+  id:
+    | '__root__'
+    | '/'
+    | '/input'
+    | '/report'
+    | '/archetype/$slug'
+    | '/articles/$slug'
+    | '/assessment/$kind'
+    | '/attachment/$slug'
+    | '/personality-disorders/$slug'
+    | '/systems/$slug'
+    | '/articles/'
+    | '/attachment/'
+    | '/personality-disorders/'
   fileRoutesById: FileRoutesById
 }
 export interface RootRouteChildren {
   IndexRoute: typeof IndexRoute
   InputRoute: typeof InputRoute
   ReportRoute: typeof ReportRoute
-  AssessmentKindRoute: typeof AssessmentKindRoute
-  ArticlesRoute: typeof ArticlesRoute
-}
-export interface ArticlesRouteChildren {
+  ArchetypeSlugRoute: typeof ArchetypeSlugRoute
   ArticlesSlugRoute: typeof ArticlesSlugRoute
+  AssessmentKindRoute: typeof AssessmentKindRoute
+  AttachmentSlugRoute: typeof AttachmentSlugRoute
+  PersonalityDisordersSlugRoute: typeof PersonalityDisordersSlugRoute
+  SystemsSlugRoute: typeof SystemsSlugRoute
+  ArticlesIndexRoute: typeof ArticlesIndexRoute
+  AttachmentIndexRoute: typeof AttachmentIndexRoute
+  PersonalityDisordersIndexRoute: typeof PersonalityDisordersIndexRoute
 }
 
 declare module '@tanstack/react-router' {
@@ -114,6 +211,27 @@ declare module '@tanstack/react-router' {
       preLoaderRoute: typeof ReportRouteImport
       parentRoute: typeof rootRouteImport
     }
+    '/archetype/$slug': {
+      id: '/archetype/$slug'
+      path: '/archetype/$slug'
+      fullPath: '/archetype/$slug'
+      preLoaderRoute: typeof ArchetypeSlugRouteImport
+      parentRoute: typeof rootRouteImport
+    }
+    '/articles/': {
+      id: '/articles/'
+      path: '/articles'
+      fullPath: '/articles/'
+      preLoaderRoute: typeof ArticlesIndexRouteImport
+      parentRoute: typeof rootRouteImport
+    }
+    '/articles/$slug': {
+      id: '/articles/$slug'
+      path: '/articles/$slug'
+      fullPath: '/articles/$slug'
+      preLoaderRoute: typeof ArticlesSlugRouteImport
+      parentRoute: typeof rootRouteImport
+    }
     '/assessment/$kind': {
       id: '/assessment/$kind'
       path: '/assessment/$kind'
@@ -121,33 +239,57 @@ declare module '@tanstack/react-router' {
       preLoaderRoute: typeof AssessmentKindRouteImport
       parentRoute: typeof rootRouteImport
     }
-    '/articles': {
-      id: '/articles'
-      path: '/articles'
-      fullPath: '/articles'
-      preLoaderRoute: typeof ArticlesRouteImport
+    '/attachment/': {
+      id: '/attachment/'
+      path: '/attachment'
+      fullPath: '/attachment/'
+      preLoaderRoute: typeof AttachmentIndexRouteImport
       parentRoute: typeof rootRouteImport
     }
-    '/articles/$slug': {
-      id: '/articles/$slug'
-      path: '/$slug'
-      fullPath: '/articles/$slug'
-      preLoaderRoute: typeof ArticlesSlugRouteImport
-      parentRoute: typeof ArticlesRoute
+    '/attachment/$slug': {
+      id: '/attachment/$slug'
+      path: '/attachment/$slug'
+      fullPath: '/attachment/$slug'
+      preLoaderRoute: typeof AttachmentSlugRouteImport
+      parentRoute: typeof rootRouteImport
+    }
+    '/personality-disorders/': {
+      id: '/personality-disorders/'
+      path: '/personality-disorders'
+      fullPath: '/personality-disorders/'
+      preLoaderRoute: typeof PersonalityDisordersIndexRouteImport
+      parentRoute: typeof rootRouteImport
+    }
+    '/personality-disorders/$slug': {
+      id: '/personality-disorders/$slug'
+      path: '/personality-disorders/$slug'
+      fullPath: '/personality-disorders/$slug'
+      preLoaderRoute: typeof PersonalityDisordersSlugRouteImport
+      parentRoute: typeof rootRouteImport
+    }
+    '/systems/$slug': {
+      id: '/systems/$slug'
+      path: '/systems/$slug'
+      fullPath: '/systems/$slug'
+      preLoaderRoute: typeof SystemsSlugRouteImport
+      parentRoute: typeof rootRouteImport
     }
   }
-}
-
-const articlesRouteChildren: ArticlesRouteChildren = {
-  ArticlesSlugRoute: ArticlesSlugRoute,
 }
 
 const rootRouteChildren: RootRouteChildren = {
   IndexRoute: IndexRoute,
   InputRoute: InputRoute,
   ReportRoute: ReportRoute,
+  ArchetypeSlugRoute: ArchetypeSlugRoute,
+  ArticlesSlugRoute: ArticlesSlugRoute,
   AssessmentKindRoute: AssessmentKindRoute,
-  ArticlesRoute: ArticlesRoute._addFileChildren(articlesRouteChildren),
+  AttachmentSlugRoute: AttachmentSlugRoute,
+  PersonalityDisordersSlugRoute: PersonalityDisordersSlugRoute,
+  SystemsSlugRoute: SystemsSlugRoute,
+  ArticlesIndexRoute: ArticlesIndexRoute,
+  AttachmentIndexRoute: AttachmentIndexRoute,
+  PersonalityDisordersIndexRoute: PersonalityDisordersIndexRoute,
 }
 export const routeTree = rootRouteImport
   ._addFileChildren(rootRouteChildren)
@@ -160,5 +302,5 @@ declare module '@tanstack/react-start' {
     ssr: true
     router: Awaited<ReturnType<typeof getRouter>>
     config: Awaited<ReturnType<typeof startInstance.getOptions>>
-    }
+  }
 }

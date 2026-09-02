@@ -2,7 +2,7 @@ import { Link, createFileRoute } from "@tanstack/react-router";
 import { StarField } from "@/components/cosmic/StarField";
 import { SectionTitle } from "@/components/cosmic/ui";
 import { articles } from "@/lib/articles";
-export const Route = createFileRoute("/articles")({
+export const Route = createFileRoute("/articles/")({
   head: () => ({
     meta: [
       { title: "Dossier Files — Psychology & Relationships | Cosmic Dossier" },
