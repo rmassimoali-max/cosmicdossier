@@ -100,7 +100,7 @@ const THEMES: Record<
 };
 
 export function PDArt({ theme, className }: ArtProps) {
-  const t = THEMES[theme] ?? THEMES["grid-slate"];
+  const t = THEMES[theme] ?? THEMES["grid-slate"]!;
   return (
     <svg
       viewBox="0 0 200 200"
