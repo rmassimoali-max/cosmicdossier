@@ -66,6 +66,11 @@ function SystemPage() {
 
         <div className="mt-10 flex flex-wrap items-center gap-4">
           <GoldLink to="/input">Start My Report</GoldLink>
+          {system.slug === "mbti" ? (
+            <Link to="/mbti" className="text-xs text-primary hover:text-gold">
+              Explore all 16 types →
+            </Link>
+          ) : null}
           <Link to="/" className="text-xs text-muted-foreground hover:text-primary">
             See all five systems →
           </Link>

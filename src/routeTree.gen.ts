@@ -18,6 +18,8 @@ import { Route as ArticlesSlugRouteImport } from './routes/articles/$slug'
 import { Route as AssessmentKindRouteImport } from './routes/assessment.$kind'
 import { Route as AttachmentIndexRouteImport } from './routes/attachment/index'
 import { Route as AttachmentSlugRouteImport } from './routes/attachment/$slug'
+import { Route as MbtiIndexRouteImport } from './routes/mbti/index'
+import { Route as MbtiTypeRouteImport } from './routes/mbti/$type'
 import { Route as PersonalityDisordersIndexRouteImport } from './routes/personality-disorders/index'
 import { Route as PersonalityDisordersSlugRouteImport } from './routes/personality-disorders/$slug'
 import { Route as SystemsSlugRouteImport } from './routes/systems/$slug'
@@ -67,6 +69,16 @@ const AttachmentSlugRoute = AttachmentSlugRouteImport.update({
   path: '/attachment/$slug',
   getParentRoute: () => rootRouteImport,
 } as any)
+const MbtiIndexRoute = MbtiIndexRouteImport.update({
+  id: '/mbti/',
+  path: '/mbti/',
+  getParentRoute: () => rootRouteImport,
+} as any)
+const MbtiTypeRoute = MbtiTypeRouteImport.update({
+  id: '/mbti/$type',
+  path: '/mbti/$type',
+  getParentRoute: () => rootRouteImport,
+} as any)
 const PersonalityDisordersIndexRoute =
   PersonalityDisordersIndexRouteImport.update({
     id: '/personality-disorders/',
@@ -93,10 +105,12 @@ export interface FileRoutesByFullPath {
   '/articles/$slug': typeof ArticlesSlugRoute
   '/assessment/$kind': typeof AssessmentKindRoute
   '/attachment/$slug': typeof AttachmentSlugRoute
+  '/mbti/$type': typeof MbtiTypeRoute
   '/personality-disorders/$slug': typeof PersonalityDisordersSlugRoute
   '/systems/$slug': typeof SystemsSlugRoute
   '/articles/': typeof ArticlesIndexRoute
   '/attachment/': typeof AttachmentIndexRoute
+  '/mbti/': typeof MbtiIndexRoute
   '/personality-disorders/': typeof PersonalityDisordersIndexRoute
 }
 export interface FileRoutesByTo {
@@ -107,10 +121,12 @@ export interface FileRoutesByTo {
   '/articles/$slug': typeof ArticlesSlugRoute
   '/assessment/$kind': typeof AssessmentKindRoute
   '/attachment/$slug': typeof AttachmentSlugRoute
+  '/mbti/$type': typeof MbtiTypeRoute
   '/personality-disorders/$slug': typeof PersonalityDisordersSlugRoute
   '/systems/$slug': typeof SystemsSlugRoute
   '/articles': typeof ArticlesIndexRoute
   '/attachment': typeof AttachmentIndexRoute
+  '/mbti': typeof MbtiIndexRoute
   '/personality-disorders': typeof PersonalityDisordersIndexRoute
 }
 export interface FileRoutesById {
@@ -122,10 +138,12 @@ export interface FileRoutesById {
   '/articles/$slug': typeof ArticlesSlugRoute
   '/assessment/$kind': typeof AssessmentKindRoute
   '/attachment/$slug': typeof AttachmentSlugRoute
+  '/mbti/$type': typeof MbtiTypeRoute
   '/personality-disorders/$slug': typeof PersonalityDisordersSlugRoute
   '/systems/$slug': typeof SystemsSlugRoute
   '/articles/': typeof ArticlesIndexRoute
   '/attachment/': typeof AttachmentIndexRoute
+  '/mbti/': typeof MbtiIndexRoute
   '/personality-disorders/': typeof PersonalityDisordersIndexRoute
 }
 export interface FileRouteTypes {
@@ -138,10 +156,12 @@ export interface FileRouteTypes {
     | '/articles/$slug'
     | '/assessment/$kind'
     | '/attachment/$slug'
+    | '/mbti/$type'
     | '/personality-disorders/$slug'
     | '/systems/$slug'
     | '/articles/'
     | '/attachment/'
+    | '/mbti/'
     | '/personality-disorders/'
   fileRoutesByTo: FileRoutesByTo
   to:
@@ -152,10 +172,12 @@ export interface FileRouteTypes {
     | '/articles/$slug'
     | '/assessment/$kind'
     | '/attachment/$slug'
+    | '/mbti/$type'
     | '/personality-disorders/$slug'
     | '/systems/$slug'
     | '/articles'
     | '/attachment'
+    | '/mbti'
     | '/personality-disorders'
   id:
     | '__root__'
@@ -166,10 +188,12 @@ export interface FileRouteTypes {
     | '/articles/$slug'
     | '/assessment/$kind'
     | '/attachment/$slug'
+    | '/mbti/$type'
     | '/personality-disorders/$slug'
     | '/systems/$slug'
     | '/articles/'
     | '/attachment/'
+    | '/mbti/'
     | '/personality-disorders/'
   fileRoutesById: FileRoutesById
 }
@@ -181,10 +205,12 @@ export interface RootRouteChildren {
   ArticlesSlugRoute: typeof ArticlesSlugRoute
   AssessmentKindRoute: typeof AssessmentKindRoute
   AttachmentSlugRoute: typeof AttachmentSlugRoute
+  MbtiTypeRoute: typeof MbtiTypeRoute
   PersonalityDisordersSlugRoute: typeof PersonalityDisordersSlugRoute
   SystemsSlugRoute: typeof SystemsSlugRoute
   ArticlesIndexRoute: typeof ArticlesIndexRoute
   AttachmentIndexRoute: typeof AttachmentIndexRoute
+  MbtiIndexRoute: typeof MbtiIndexRoute
   PersonalityDisordersIndexRoute: typeof PersonalityDisordersIndexRoute
 }
 
@@ -253,6 +279,20 @@ declare module '@tanstack/react-router' {
       preLoaderRoute: typeof AttachmentSlugRouteImport
       parentRoute: typeof rootRouteImport
     }
+    '/mbti/': {
+      id: '/mbti/'
+      path: '/mbti'
+      fullPath: '/mbti/'
+      preLoaderRoute: typeof MbtiIndexRouteImport
+      parentRoute: typeof rootRouteImport
+    }
+    '/mbti/$type': {
+      id: '/mbti/$type'
+      path: '/mbti/$type'
+      fullPath: '/mbti/$type'
+      preLoaderRoute: typeof MbtiTypeRouteImport
+      parentRoute: typeof rootRouteImport
+    }
     '/personality-disorders/': {
       id: '/personality-disorders/'
       path: '/personality-disorders'
@@ -285,10 +325,12 @@ const rootRouteChildren: RootRouteChildren = {
   ArticlesSlugRoute: ArticlesSlugRoute,
   AssessmentKindRoute: AssessmentKindRoute,
   AttachmentSlugRoute: AttachmentSlugRoute,
+  MbtiTypeRoute: MbtiTypeRoute,
   PersonalityDisordersSlugRoute: PersonalityDisordersSlugRoute,
   SystemsSlugRoute: SystemsSlugRoute,
   ArticlesIndexRoute: ArticlesIndexRoute,
   AttachmentIndexRoute: AttachmentIndexRoute,
+  MbtiIndexRoute: MbtiIndexRoute,
   PersonalityDisordersIndexRoute: PersonalityDisordersIndexRoute,
 }
 export const routeTree = rootRouteImport
