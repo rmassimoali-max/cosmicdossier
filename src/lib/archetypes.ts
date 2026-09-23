@@ -16,8 +16,8 @@ export type Archetype = {
 
 export const ARCHETYPES: Archetype[] = [
   {
-    slug: "the-architect",
-    name: "The Architect",
+    slug: "the-strategist",
+    name: "The Strategist",
     symbol: "🏛️",
     tagline: "I build the structure before I trust the feeling.",
     description:
@@ -53,8 +53,8 @@ export const ARCHETYPES: Archetype[] = [
     merchId: "arch-02",
   },
   {
-    slug: "the-catalyst",
-    name: "The Catalyst",
+    slug: "the-firestarter",
+    name: "The Firestarter",
     symbol: "🔥",
     tagline: "Momentum is how I outrun the hard feeling.",
     description:
@@ -70,8 +70,8 @@ export const ARCHETYPES: Archetype[] = [
     merchId: "arch-03",
   },
   {
-    slug: "the-guardian",
-    name: "The Guardian",
+    slug: "the-warden",
+    name: "The Warden",
     symbol: "🛡️",
     tagline: "I'd rather be steady than impressive.",
     description:
