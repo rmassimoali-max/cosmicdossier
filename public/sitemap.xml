@@ -18,6 +18,24 @@
   <url><loc>https://cosmicdossier.com/systems/synastry</loc><changefreq>monthly</changefreq><priority>0.6</priority></url>
   <url><loc>https://cosmicdossier.com/systems/ai-analysis</loc><changefreq>monthly</changefreq><priority>0.6</priority></url>
 
+  <url><loc>https://cosmicdossier.com/mbti</loc><changefreq>monthly</changefreq><priority>0.7</priority></url>
+  <url><loc>https://cosmicdossier.com/mbti/infj</loc><changefreq>monthly</changefreq><priority>0.6</priority></url>
+  <url><loc>https://cosmicdossier.com/mbti/infp</loc><changefreq>monthly</changefreq><priority>0.6</priority></url>
+  <url><loc>https://cosmicdossier.com/mbti/intj</loc><changefreq>monthly</changefreq><priority>0.6</priority></url>
+  <url><loc>https://cosmicdossier.com/mbti/intp</loc><changefreq>monthly</changefreq><priority>0.6</priority></url>
+  <url><loc>https://cosmicdossier.com/mbti/isfj</loc><changefreq>monthly</changefreq><priority>0.6</priority></url>
+  <url><loc>https://cosmicdossier.com/mbti/isfp</loc><changefreq>monthly</changefreq><priority>0.6</priority></url>
+  <url><loc>https://cosmicdossier.com/mbti/istj</loc><changefreq>monthly</changefreq><priority>0.6</priority></url>
+  <url><loc>https://cosmicdossier.com/mbti/istp</loc><changefreq>monthly</changefreq><priority>0.6</priority></url>
+  <url><loc>https://cosmicdossier.com/mbti/enfj</loc><changefreq>monthly</changefreq><priority>0.6</priority></url>
+  <url><loc>https://cosmicdossier.com/mbti/enfp</loc><changefreq>monthly</changefreq><priority>0.6</priority></url>
+  <url><loc>https://cosmicdossier.com/mbti/entj</loc><changefreq>monthly</changefreq><priority>0.6</priority></url>
+  <url><loc>https://cosmicdossier.com/mbti/entp</loc><changefreq>monthly</changefreq><priority>0.6</priority></url>
+  <url><loc>https://cosmicdossier.com/mbti/esfj</loc><changefreq>monthly</changefreq><priority>0.6</priority></url>
+  <url><loc>https://cosmicdossier.com/mbti/esfp</loc><changefreq>monthly</changefreq><priority>0.6</priority></url>
+  <url><loc>https://cosmicdossier.com/mbti/estj</loc><changefreq>monthly</changefreq><priority>0.6</priority></url>
+  <url><loc>https://cosmicdossier.com/mbti/estp</loc><changefreq>monthly</changefreq><priority>0.6</priority></url>
+
   <url><loc>https://cosmicdossier.com/attachment</loc><changefreq>monthly</changefreq><priority>0.7</priority></url>
   <url><loc>https://cosmicdossier.com/attachment/secure</loc><changefreq>monthly</changefreq><priority>0.6</priority></url>
   <url><loc>https://cosmicdossier.com/attachment/anxious</loc><changefreq>monthly</changefreq><priority>0.6</priority></url>
