@@ -23,6 +23,8 @@ import { Route as MbtiTypeRouteImport } from './routes/mbti/$type'
 import { Route as PersonalityDisordersIndexRouteImport } from './routes/personality-disorders/index'
 import { Route as PersonalityDisordersSlugRouteImport } from './routes/personality-disorders/$slug'
 import { Route as SystemsSlugRouteImport } from './routes/systems/$slug'
+import { Route as ZodiacIndexRouteImport } from './routes/zodiac/index'
+import { Route as ZodiacSlugRouteImport } from './routes/zodiac/$slug'
 
 const IndexRoute = IndexRouteImport.update({
   id: '/',
@@ -96,6 +98,16 @@ const SystemsSlugRoute = SystemsSlugRouteImport.update({
   path: '/systems/$slug',
   getParentRoute: () => rootRouteImport,
 } as any)
+const ZodiacIndexRoute = ZodiacIndexRouteImport.update({
+  id: '/zodiac/',
+  path: '/zodiac/',
+  getParentRoute: () => rootRouteImport,
+} as any)
+const ZodiacSlugRoute = ZodiacSlugRouteImport.update({
+  id: '/zodiac/$slug',
+  path: '/zodiac/$slug',
+  getParentRoute: () => rootRouteImport,
+} as any)
 
 export interface FileRoutesByFullPath {
   '/': typeof IndexRoute
@@ -108,10 +120,12 @@ export interface FileRoutesByFullPath {
   '/mbti/$type': typeof MbtiTypeRoute
   '/personality-disorders/$slug': typeof PersonalityDisordersSlugRoute
   '/systems/$slug': typeof SystemsSlugRoute
+  '/zodiac/$slug': typeof ZodiacSlugRoute
   '/articles/': typeof ArticlesIndexRoute
   '/attachment/': typeof AttachmentIndexRoute
   '/mbti/': typeof MbtiIndexRoute
   '/personality-disorders/': typeof PersonalityDisordersIndexRoute
+  '/zodiac/': typeof ZodiacIndexRoute
 }
 export interface FileRoutesByTo {
   '/': typeof IndexRoute
@@ -124,10 +138,12 @@ export interface FileRoutesByTo {
   '/mbti/$type': typeof MbtiTypeRoute
   '/personality-disorders/$slug': typeof PersonalityDisordersSlugRoute
   '/systems/$slug': typeof SystemsSlugRoute
+  '/zodiac/$slug': typeof ZodiacSlugRoute
   '/articles': typeof ArticlesIndexRoute
   '/attachment': typeof AttachmentIndexRoute
   '/mbti': typeof MbtiIndexRoute
   '/personality-disorders': typeof PersonalityDisordersIndexRoute
+  '/zodiac': typeof ZodiacIndexRoute
 }
 export interface FileRoutesById {
   __root__: typeof rootRouteImport
@@ -141,10 +157,12 @@ export interface FileRoutesById {
   '/mbti/$type': typeof MbtiTypeRoute
   '/personality-disorders/$slug': typeof PersonalityDisordersSlugRoute
   '/systems/$slug': typeof SystemsSlugRoute
+  '/zodiac/$slug': typeof ZodiacSlugRoute
   '/articles/': typeof ArticlesIndexRoute
   '/attachment/': typeof AttachmentIndexRoute
   '/mbti/': typeof MbtiIndexRoute
   '/personality-disorders/': typeof PersonalityDisordersIndexRoute
+  '/zodiac/': typeof ZodiacIndexRoute
 }
 export interface FileRouteTypes {
   fileRoutesByFullPath: FileRoutesByFullPath
@@ -159,10 +177,12 @@ export interface FileRouteTypes {
     | '/mbti/$type'
     | '/personality-disorders/$slug'
     | '/systems/$slug'
+    | '/zodiac/$slug'
     | '/articles/'
     | '/attachment/'
     | '/mbti/'
     | '/personality-disorders/'
+    | '/zodiac/'
   fileRoutesByTo: FileRoutesByTo
   to:
     | '/'
@@ -175,10 +195,12 @@ export interface FileRouteTypes {
     | '/mbti/$type'
     | '/personality-disorders/$slug'
     | '/systems/$slug'
+    | '/zodiac/$slug'
     | '/articles'
     | '/attachment'
     | '/mbti'
     | '/personality-disorders'
+    | '/zodiac'
   id:
     | '__root__'
     | '/'
@@ -191,10 +213,12 @@ export interface FileRouteTypes {
     | '/mbti/$type'
     | '/personality-disorders/$slug'
     | '/systems/$slug'
+    | '/zodiac/$slug'
     | '/articles/'
     | '/attachment/'
     | '/mbti/'
     | '/personality-disorders/'
+    | '/zodiac/'
   fileRoutesById: FileRoutesById
 }
 export interface RootRouteChildren {
@@ -208,10 +232,12 @@ export interface RootRouteChildren {
   MbtiTypeRoute: typeof MbtiTypeRoute
   PersonalityDisordersSlugRoute: typeof PersonalityDisordersSlugRoute
   SystemsSlugRoute: typeof SystemsSlugRoute
+  ZodiacSlugRoute: typeof ZodiacSlugRoute
   ArticlesIndexRoute: typeof ArticlesIndexRoute
   AttachmentIndexRoute: typeof AttachmentIndexRoute
   MbtiIndexRoute: typeof MbtiIndexRoute
   PersonalityDisordersIndexRoute: typeof PersonalityDisordersIndexRoute
+  ZodiacIndexRoute: typeof ZodiacIndexRoute
 }
 
 declare module '@tanstack/react-router' {
@@ -314,6 +340,20 @@ declare module '@tanstack/react-router' {
       preLoaderRoute: typeof SystemsSlugRouteImport
       parentRoute: typeof rootRouteImport
     }
+    '/zodiac/': {
+      id: '/zodiac/'
+      path: '/zodiac'
+      fullPath: '/zodiac/'
+      preLoaderRoute: typeof ZodiacIndexRouteImport
+      parentRoute: typeof rootRouteImport
+    }
+    '/zodiac/$slug': {
+      id: '/zodiac/$slug'
+      path: '/zodiac/$slug'
+      fullPath: '/zodiac/$slug'
+      preLoaderRoute: typeof ZodiacSlugRouteImport
+      parentRoute: typeof rootRouteImport
+    }
   }
 }
 
@@ -328,10 +368,12 @@ const rootRouteChildren: RootRouteChildren = {
   MbtiTypeRoute: MbtiTypeRoute,
   PersonalityDisordersSlugRoute: PersonalityDisordersSlugRoute,
   SystemsSlugRoute: SystemsSlugRoute,
+  ZodiacSlugRoute: ZodiacSlugRoute,
   ArticlesIndexRoute: ArticlesIndexRoute,
   AttachmentIndexRoute: AttachmentIndexRoute,
   MbtiIndexRoute: MbtiIndexRoute,
   PersonalityDisordersIndexRoute: PersonalityDisordersIndexRoute,
+  ZodiacIndexRoute: ZodiacIndexRoute,
 }
 export const routeTree = rootRouteImport
   ._addFileChildren(rootRouteChildren)
