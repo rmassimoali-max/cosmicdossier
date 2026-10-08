@@ -71,6 +71,11 @@ function SystemPage() {
               Explore all 16 types →
             </Link>
           ) : null}
+          {system.slug === "astrology" ? (
+            <Link to="/zodiac" className="text-xs text-primary hover:text-gold">
+              Explore all 12 signs →
+            </Link>
+          ) : null}
           <Link to="/" className="text-xs text-muted-foreground hover:text-primary">
             See all five systems →
           </Link>
