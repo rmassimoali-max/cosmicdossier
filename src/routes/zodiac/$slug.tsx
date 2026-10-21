@@ -1,4 +1,5 @@
 import { createFileRoute, Link, notFound } from "@tanstack/react-router";
+import { ZodiacArt } from "@/components/cosmic/ZodiacArt";
 import { StarField } from "@/components/cosmic/StarField";
 import { GoldLink, SectionTitle } from "@/components/cosmic/ui";
 import { SIGN_GLYPH } from "@/lib/astro";
@@ -58,7 +59,8 @@ function SignPage() {
   const sameMod = signsByModality(sign.modality).filter((s) => s.slug !== sign.slug);
 
   return (
-    <main className="relative min-h-screen">
+    <main className="relative min-h-screen overflow-x-hidden">
+      <ZodiacArt slug={sign.slug} />
       <StarField count={40} />
       <div className="relative mx-auto max-w-3xl px-5 py-16">
         <Link to="/zodiac" className="text-xs text-muted-foreground hover:text-primary">
