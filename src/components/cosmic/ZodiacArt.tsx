@@ -72,18 +72,23 @@ export function ZodiacArt({ slug, variant = "page", className = "" }: { slug: st
           {SIGN_GLYPH[sign.name]}
         </text>
         <g transform={`translate(${m.x} ${m.y}) scale(${m.s})`} opacity={thumb ? 0.75 : 0.55}>
-          {motif.lines.map(([a, b], i) => (
+          {motif.lines.map(([a, b], i) => {
+            const sa = motif.stars[a];
+            const sb = motif.stars[b];
+            if (!sa || !sb) return null;
+            return (
             <line
               key={i}
-              x1={motif.stars[a][0]}
-              y1={motif.stars[a][1]}
-              x2={motif.stars[b][0]}
-              y2={motif.stars[b][1]}
+              x1={sa[0]}
+              y1={sa[1]}
+              x2={sb[0]}
+              y2={sb[1]}
               stroke={p.line}
               strokeWidth={0.35}
               strokeOpacity={0.6}
             />
-          ))}
+            );
+          })}
           {motif.stars.map(([x, y, r], i) => (
             <g key={i}>
               <circle cx={x} cy={y} r={r * 2.4} fill={`url(#s${uid})`} opacity={0.5} />
