@@ -1,4 +1,5 @@
 import { createFileRoute, Link } from "@tanstack/react-router";
+import { ZodiacArt } from "@/components/cosmic/ZodiacArt";
 import { StarField } from "@/components/cosmic/StarField";
 import { SectionTitle } from "@/components/cosmic/ui";
 import { SIGN_GLYPH } from "@/lib/astro";
@@ -73,8 +74,10 @@ function ZodiacLanding() {
                   key={s.slug}
                   to="/zodiac/$slug"
                   params={{ slug: s.slug }}
-                  className="panel group p-6 transition-transform duration-300 hover:-translate-y-1"
+                  className="panel group relative overflow-hidden p-6 transition-transform duration-300 hover:-translate-y-1"
                 >
+                  <ZodiacArt slug={s.slug} variant="thumb" />
+                  <div className="relative">
                   <p className="text-3xl text-primary">{SIGN_GLYPH[s.name]}</p>
                   <h3 className="mt-2 font-display text-xl text-foreground transition-colors group-hover:text-gold">
                     {s.name}
@@ -83,6 +86,7 @@ function ZodiacLanding() {
                   <p className="mt-2 text-sm italic leading-relaxed text-muted-foreground">
                     "{s.tagline}"
                   </p>
+                  </div>
                 </Link>
               ))}
             </div>
