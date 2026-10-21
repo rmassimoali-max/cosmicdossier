@@ -19,6 +19,20 @@
   <url><loc>https://cosmicdossier.com/systems/ai-analysis</loc><changefreq>monthly</changefreq><priority>0.6</priority></url>
   <url><loc>https://cosmicdossier.com/systems/big-five</loc><changefreq>monthly</changefreq><priority>0.6</priority></url>
 
+  <url><loc>https://cosmicdossier.com/zodiac</loc><changefreq>monthly</changefreq><priority>0.7</priority></url>
+  <url><loc>https://cosmicdossier.com/zodiac/aries</loc><changefreq>monthly</changefreq><priority>0.6</priority></url>
+  <url><loc>https://cosmicdossier.com/zodiac/taurus</loc><changefreq>monthly</changefreq><priority>0.6</priority></url>
+  <url><loc>https://cosmicdossier.com/zodiac/gemini</loc><changefreq>monthly</changefreq><priority>0.6</priority></url>
+  <url><loc>https://cosmicdossier.com/zodiac/cancer</loc><changefreq>monthly</changefreq><priority>0.6</priority></url>
+  <url><loc>https://cosmicdossier.com/zodiac/leo</loc><changefreq>monthly</changefreq><priority>0.6</priority></url>
+  <url><loc>https://cosmicdossier.com/zodiac/virgo</loc><changefreq>monthly</changefreq><priority>0.6</priority></url>
+  <url><loc>https://cosmicdossier.com/zodiac/libra</loc><changefreq>monthly</changefreq><priority>0.6</priority></url>
+  <url><loc>https://cosmicdossier.com/zodiac/scorpio</loc><changefreq>monthly</changefreq><priority>0.6</priority></url>
+  <url><loc>https://cosmicdossier.com/zodiac/sagittarius</loc><changefreq>monthly</changefreq><priority>0.6</priority></url>
+  <url><loc>https://cosmicdossier.com/zodiac/capricorn</loc><changefreq>monthly</changefreq><priority>0.6</priority></url>
+  <url><loc>https://cosmicdossier.com/zodiac/aquarius</loc><changefreq>monthly</changefreq><priority>0.6</priority></url>
+  <url><loc>https://cosmicdossier.com/zodiac/pisces</loc><changefreq>monthly</changefreq><priority>0.6</priority></url>
+
   <url><loc>https://cosmicdossier.com/mbti</loc><changefreq>monthly</changefreq><priority>0.7</priority></url>
   <url><loc>https://cosmicdossier.com/mbti/infj</loc><changefreq>monthly</changefreq><priority>0.6</priority></url>
   <url><loc>https://cosmicdossier.com/mbti/infp</loc><changefreq>monthly</changefreq><priority>0.6</priority></url>
