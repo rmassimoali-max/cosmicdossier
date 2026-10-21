@@ -37,12 +37,12 @@ export function ZodiacArt({ slug, variant = "page", className = "" }: { slug: st
   const p = PALETTE[sign.element];
   const thumb = variant === "thumb";
   // Page: motif sits upper-right; thumb: fills the card.
-  const m = thumb ? { x: 50, y: 4, s: 0.5 } : { x: 46, y: 6, s: 0.52 };
-  const glyphPos = thumb ? { x: 78, y: 92 } : { x: 18, y: 88 };
+  const m = thumb ? { x: 50, y: 4, s: 0.5 } : { x: 26, y: 8, s: 0.5 };
+  const glyphPos = thumb ? { x: 78, y: 92 } : { x: 64, y: 82 };
 
   return (
     <div aria-hidden className={`pointer-events-none absolute inset-0 -z-0 overflow-hidden ${className}`}>
-      <svg className="h-full w-full" viewBox="0 0 100 100" preserveAspectRatio="xMidYMid slice" xmlns="http://www.w3.org/2000/svg">
+      <svg className={thumb ? "h-full w-full" : "h-[100svh] min-h-[560px] w-full"} viewBox="0 0 100 100" preserveAspectRatio="xMidYMid slice" xmlns="http://www.w3.org/2000/svg">
         <defs>
           <radialGradient id={`a${uid}`} cx="78%" cy="22%" r="55%">
             <stop offset="0%" stopColor={p.glowA} stopOpacity={thumb ? 0.35 : 0.28} />
@@ -92,7 +92,7 @@ export function ZodiacArt({ slug, variant = "page", className = "" }: { slug: st
           ))}
         </g>
       </svg>
-      {!thumb && <div className="absolute inset-0 bg-gradient-to-b from-background/10 via-background/40 to-background/70" />}
+      {!thumb && <div className="absolute inset-0 bg-gradient-to-b from-background/10 via-background/35 to-background/80" />}
     </div>
   );
 }
