@@ -8,3 +8,5 @@
 > Commits you push to the connected branch sync back to Lovable and show up in
 > the editor, so keep the branch in a working state.
 <!-- LOVABLE:END -->
+
+- Mount site-wide navigation once in the root provider; keep its links in server-rendered HTML and its browser listeners in effects so navigation stays crawlable and SSR-safe.
