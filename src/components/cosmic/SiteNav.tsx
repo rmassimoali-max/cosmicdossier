@@ -40,7 +40,6 @@ export function SiteNav() {
   const [expanded, setExpanded] = useState<Record<string, boolean>>({});
   const [checkoutActive, setCheckoutActive] = useState(false);
   const rootRef = useRef<HTMLDivElement>(null);
-  const buttonRef = useRef<HTMLButtonElement>(null);
   const panelId = useId();
   const location = useRouterState({ select: (state) => state.location.href });
 
@@ -56,7 +55,7 @@ export function SiteNav() {
     const escape = (event: KeyboardEvent) => {
       if (event.key !== "Escape") return;
       setOpen(false);
-      buttonRef.current?.focus();
+      rootRef.current?.querySelector<HTMLButtonElement>('button[aria-label="Menu"]')?.focus();
     };
     document.addEventListener("pointerdown", outside);
     document.addEventListener("keydown", escape);
@@ -100,7 +99,6 @@ export function SiteNav() {
   return (
     <div ref={rootRef} hidden={checkoutActive} data-html2canvas-ignore="true">
       <CButton
-        ref={buttonRef}
         variant="outline"
         aria-label="Menu"
         aria-expanded={open}
