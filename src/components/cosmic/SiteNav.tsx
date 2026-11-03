@@ -16,6 +16,7 @@ type NavSection = NavLink | { label: string; links: NavLink[] };
 const SECTIONS: NavSection[] = [
   { label: "Start My Report", to: "/input", prominent: true },
   { label: "Home", to: "/" },
+  { label: "Test Library", to: "/tests" },
   { label: "MBTI Types", to: "/mbti" },
   { label: "Zodiac Signs", to: "/zodiac" },
   { label: "Attachment Theory", to: "/attachment" },
