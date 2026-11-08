@@ -19,20 +19,22 @@ export const Route = createFileRoute("/tests/$slug")({
     r: typeof search["r"] === "string" ? search["r"] : undefined,
   }),
   loader: ({ params }) => {
-    const test = testBySlug(params.slug);
-    if (!test) throw notFound();
-    return test;
+    // Only the slug crosses the SSR boundary — the TestDef itself contains
+    // functions, which cannot be serialized through a loader.
+    if (!testBySlug(params.slug)) throw notFound();
+    return { slug: params.slug };
   },
   head: ({ loaderData }) => {
-    if (!loaderData) {
+    const test = loaderData ? testBySlug(loaderData.slug) : undefined;
+    if (!test) {
       return { meta: [{ title: "Test not found — Cosmic Dossier" }] };
     }
     return {
       meta: [
-        { title: `${loaderData.name} Test — Cosmic Dossier` },
-        { name: "description", content: loaderData.tagline },
-        { property: "og:title", content: `${loaderData.name} Test — Cosmic Dossier` },
-        { property: "og:description", content: loaderData.whatItMeasures },
+        { title: `${test.name} Test — Cosmic Dossier` },
+        { name: "description", content: test.tagline },
+        { property: "og:title", content: `${test.name} Test — Cosmic Dossier` },
+        { property: "og:description", content: test.whatItMeasures },
         { property: "og:type", content: "website" },
         { name: "twitter:card", content: "summary_large_image" },
       ],
