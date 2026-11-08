@@ -15,9 +15,13 @@ import {
 } from "@/lib/tests/types";
 
 export const Route = createFileRoute("/tests/$slug")({
-  validateSearch: (search: Record<string, unknown>) => ({
-    r: typeof search["r"] === "string" ? search["r"] : undefined,
-  }),
+  validateSearch: (search: Record<string, unknown>) => {
+    const raw = search["r"];
+    // Accept both the JSON-quoted form the app generates and a bare pasted value.
+    const r =
+      typeof raw === "string" ? raw : typeof raw === "number" ? String(raw) : undefined;
+    return { r };
+  },
   loader: ({ params }) => {
     // Only the slug crosses the SSR boundary — the TestDef itself contains
     // functions, which cannot be serialized through a loader.
