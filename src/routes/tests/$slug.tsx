@@ -376,6 +376,7 @@ function Results({
               key={t.slug}
               to="/tests/$slug"
               params={{ slug: t.slug }}
+              search={{ r: undefined }}
               className="panel p-5 transition-transform duration-300 hover:-translate-y-0.5"
             >
               <h3 className="font-display text-lg text-foreground">{t.name}</h3>
