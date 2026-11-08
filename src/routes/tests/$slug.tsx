@@ -46,7 +46,8 @@ export const Route = createFileRoute("/tests/$slug")({
 type Phase = "intro" | "quiz" | "results";
 
 function TestPage() {
-  const test = Route.useLoaderData();
+  const { slug } = Route.useLoaderData();
+  const test = testBySlug(slug);
   const { r } = Route.useSearch();
   const navigate = useNavigate();
 
