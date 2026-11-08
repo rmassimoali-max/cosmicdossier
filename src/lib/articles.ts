@@ -139,8 +139,9 @@ export const ATTACHMENT_ARTICLES: Article[] = [
 ];
 
 import { PERSONALITY_ARTICLES } from "./personalityArticles";
+import { TEST_ARTICLES } from "./testArticles";
 
-export const articles = [...ATTACHMENT_ARTICLES, ...PERSONALITY_ARTICLES];
+export const articles = [...ATTACHMENT_ARTICLES, ...PERSONALITY_ARTICLES, ...TEST_ARTICLES];
 
 export function articleBySlug(slug: string) {
   return articles.find((article) => article.slug === slug);
