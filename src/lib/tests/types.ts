@@ -87,15 +87,18 @@ export function bandFor(dim: DimensionDef, score: number): Band {
 }
 
 // Compact, URL-safe encoding of answers for shareable result links.
+// The "v1" prefix keeps the value non-numeric so URL search parsers never
+// coerce it to a (precision-losing) number.
 export function encodeAnswers(items: TestItem[], answers: Record<string, number>): string {
-  return items.map((q) => (answers[q.id] ?? 0).toString(36)).join("");
+  return "v1" + items.map((q) => (answers[q.id] ?? 0).toString(36)).join("");
 }
 
 export function decodeAnswers(items: TestItem[], encoded: string): Record<string, number> | null {
-  if (!encoded || encoded.length !== items.length) return null;
+  const digits = encoded.startsWith("v1") ? encoded.slice(2) : encoded;
+  if (!digits || digits.length !== items.length) return null;
   const out: Record<string, number> = {};
   for (let i = 0; i < items.length; i++) {
-    const v = parseInt(encoded[i] ?? "", 36);
+    const v = parseInt(digits[i] ?? "", 36);
     if (!Number.isFinite(v) || v < 1) return null;
     out[items[i]?.id ?? ""] = v;
   }
