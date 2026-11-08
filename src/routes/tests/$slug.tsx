@@ -48,6 +48,7 @@ type Phase = "intro" | "quiz" | "results";
 function TestPage() {
   const { slug } = Route.useLoaderData();
   const test = testBySlug(slug);
+  if (!test) throw notFound();
   const { r } = Route.useSearch();
   const navigate = useNavigate();
 
