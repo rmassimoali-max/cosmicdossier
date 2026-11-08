@@ -15,24 +15,30 @@ import {
 } from "@/lib/tests/types";
 
 export const Route = createFileRoute("/tests/$slug")({
-  validateSearch: (search: Record<string, unknown>) => ({
-    r: typeof search["r"] === "string" ? search["r"] : undefined,
-  }),
+  validateSearch: (search: Record<string, unknown>) => {
+    const raw = search["r"];
+    // Accept both the JSON-quoted form the app generates and a bare pasted value.
+    const r =
+      typeof raw === "string" ? raw : typeof raw === "number" ? String(raw) : undefined;
+    return { r };
+  },
   loader: ({ params }) => {
-    const test = testBySlug(params.slug);
-    if (!test) throw notFound();
-    return test;
+    // Only the slug crosses the SSR boundary — the TestDef itself contains
+    // functions, which cannot be serialized through a loader.
+    if (!testBySlug(params.slug)) throw notFound();
+    return { slug: params.slug };
   },
   head: ({ loaderData }) => {
-    if (!loaderData) {
+    const test = loaderData ? testBySlug(loaderData.slug) : undefined;
+    if (!test) {
       return { meta: [{ title: "Test not found — Cosmic Dossier" }] };
     }
     return {
       meta: [
-        { title: `${loaderData.name} Test — Cosmic Dossier` },
-        { name: "description", content: loaderData.tagline },
-        { property: "og:title", content: `${loaderData.name} Test — Cosmic Dossier` },
-        { property: "og:description", content: loaderData.whatItMeasures },
+        { title: `${test.name} Test — Cosmic Dossier` },
+        { name: "description", content: test.tagline },
+        { property: "og:title", content: `${test.name} Test — Cosmic Dossier` },
+        { property: "og:description", content: test.whatItMeasures },
         { property: "og:type", content: "website" },
         { name: "twitter:card", content: "summary_large_image" },
       ],
@@ -44,7 +50,9 @@ export const Route = createFileRoute("/tests/$slug")({
 type Phase = "intro" | "quiz" | "results";
 
 function TestPage() {
-  const test = Route.useLoaderData();
+  const { slug } = Route.useLoaderData();
+  const test = testBySlug(slug);
+  if (!test) throw notFound();
   const { r } = Route.useSearch();
   const navigate = useNavigate();
 
@@ -368,6 +376,7 @@ function Results({
               key={t.slug}
               to="/tests/$slug"
               params={{ slug: t.slug }}
+              search={{ r: undefined }}
               className="panel p-5 transition-transform duration-300 hover:-translate-y-0.5"
             >
               <h3 className="font-display text-lg text-foreground">{t.name}</h3>
