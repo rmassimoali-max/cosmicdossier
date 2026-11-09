@@ -22,6 +22,7 @@ export const HSP_TEST: TestDef = {
   name: "Highly Sensitive Person",
   category: "Sensitivity & Emotional Style",
   tagline: "A nervous system tuned to notice more — and feel it longer.",
+  metaDescription: "Explore sensory processing sensitivity and how deeply you register sounds, lights, emotions and other stimulation with this short temperament screen.",
   whatItMeasures:
     "This test measures sensory processing sensitivity: how deeply your nervous system registers and processes stimulation — sounds, lights, other people's moods, caffeine, pain, art. High sensitivity is a temperament trait found in roughly 15–20% of people, not a disorder.",
   background:

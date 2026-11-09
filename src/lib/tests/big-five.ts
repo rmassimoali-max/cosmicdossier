@@ -13,6 +13,7 @@ export const BIG_FIVE_TEST: TestDef = {
   name: "Big Five Personality",
   category: "Personality",
   tagline: "The most empirically grounded map of personality we have.",
+  metaDescription: "Measure Openness, Conscientiousness, Extraversion, Agreeableness and Neuroticism on continuous personality scales with this 20-item Big Five test.",
   whatItMeasures:
     "The Big Five measures personality across five broad, statistically independent dimensions: Openness, Conscientiousness, Extraversion, Agreeableness and Neuroticism. Unlike type-based systems, it places you on continuous scales rather than in a box.",
   background:

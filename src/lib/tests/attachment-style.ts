@@ -42,6 +42,7 @@ export const ATTACHMENT_TEST: TestDef = {
   name: "Adult Attachment Style",
   category: "Relationships & Attachment",
   tagline: "How your nervous system learned to do closeness.",
+  metaDescription: "Explore anxiety about rejection and avoidance of closeness, the two dimensions of adult attachment that shape safety in your close relationships.",
   whatItMeasures:
     "This test places you on the two dimensions that define adult attachment: anxiety (fear of rejection and abandonment) and avoidance (discomfort with closeness and dependence). Together they describe your default strategy for staying safe in close relationships.",
   background:

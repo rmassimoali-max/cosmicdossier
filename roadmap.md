@@ -9,3 +9,9 @@
 - [x] Build check + mobile viewport verification
 
 Remaining from the uploaded spec (not yet started): Emotional Intelligence, Love Styles, Resilience, ADHD Trait Screen, AQ short form, HEXACO short (items 5–10).
+
+## MBTI and Enneagram additions
+- [x] Reuse existing question banks and scoring within the test framework; support forced choices and safe shared results.
+- [x] Add both definitions, profile/article/archetype links, and matching Person 1 dossier saving.
+- [x] Add requested guide CTAs and six full-sentence test descriptions.
+- [x] Verify scoring, sharing, saving, existing tests, and phone/desktop layouts (six regression tests; complete flows at 375px and desktop; build OK).
