@@ -116,6 +116,7 @@ function MbtiTypePage() {
 
         <div className="mt-10 flex flex-wrap items-center gap-4">
           <GoldLink to="/input">Start My Report</GoldLink>
+          <Link to="/tests/$slug" params={{ slug: "mbti" }} search={{ r: undefined }} className="text-sm text-primary hover:text-gold">Take the free MBTI-style test</Link>
           <Link to="/mbti" className="text-xs text-muted-foreground hover:text-primary">
             See all 16 types →
           </Link>

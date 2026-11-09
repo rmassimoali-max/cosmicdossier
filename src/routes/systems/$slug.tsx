@@ -66,6 +66,9 @@ function SystemPage() {
 
         <div className="mt-10 flex flex-wrap items-center gap-4">
           <GoldLink to="/input">Start My Report</GoldLink>
+          {["mbti", "enneagram", "big-five"].includes(system.slug) ? (
+            <Link to="/tests/$slug" params={{ slug: system.slug }} search={{ r: undefined }} className="text-sm text-primary hover:text-gold">Take the free test</Link>
+          ) : null}
           {system.slug === "mbti" ? (
             <Link to="/mbti" className="text-xs text-primary hover:text-gold">
               Explore all 16 types →

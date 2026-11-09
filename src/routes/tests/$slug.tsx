@@ -2,6 +2,7 @@ import { createFileRoute, Link, notFound, useNavigate } from "@tanstack/react-ro
 import { useMemo, useState } from "react";
 import { StarField } from "@/components/cosmic/StarField";
 import { Bar, CButton, SectionTitle } from "@/components/cosmic/ui";
+import { Button } from "@/components/ui/button";
 import { ARCHETYPES } from "@/lib/archetypes";
 import { articleBySlug } from "@/lib/articles";
 import { setSession } from "@/lib/session";
@@ -10,7 +11,7 @@ import {
   bandFor,
   decodeAnswers,
   encodeAnswers,
-  scoreDimensions,
+  scoreTest,
   type TestDef,
 } from "@/lib/tests/types";
 
@@ -35,10 +36,10 @@ export const Route = createFileRoute("/tests/$slug")({
     }
     return {
       meta: [
-        { title: `${test.name} Test — Cosmic Dossier` },
-        { name: "description", content: test.tagline },
-        { property: "og:title", content: `${test.name} Test — Cosmic Dossier` },
-        { property: "og:description", content: test.whatItMeasures },
+        { title: `Free ${test.name}${test.name.endsWith("Test") ? "" : " Test"} (${test.items.length} Questions) | Cosmic Dossier` },
+        { name: "description", content: test.metaDescription ?? test.tagline },
+        { property: "og:title", content: `Free ${test.name}${test.name.endsWith("Test") ? "" : " Test"} (${test.items.length} Questions) | Cosmic Dossier` },
+        { property: "og:description", content: test.metaDescription ?? test.whatItMeasures },
         { property: "og:type", content: "website" },
         { name: "twitter:card", content: "summary_large_image" },
       ],
@@ -54,10 +55,14 @@ function TestPage() {
   const test = testBySlug(slug);
   if (!test) throw notFound();
   const { r } = Route.useSearch();
+  return <TestFlow key={`${slug}:${r ?? ""}`} test={test} r={r} />;
+}
+
+function TestFlow({ test, r }: { test: TestDef; r: string | undefined }) {
   const navigate = useNavigate();
 
   const sharedAnswers = useMemo(
-    () => (r ? decodeAnswers(test.items, r) : null),
+    () => (r ? decodeAnswers(test.items, r, test.scale) : null),
     [test, r],
   );
 
@@ -69,7 +74,7 @@ function TestPage() {
   const answered = test.items.filter((q) => answers[q.id] != null).length;
   const complete = answered === test.items.length;
   const scores = useMemo(
-    () => (complete ? scoreDimensions(test.items, test.scale, answers) : null),
+    () => (complete ? scoreTest(test, answers) : null),
     [test, answers, complete],
   );
 
@@ -143,22 +148,24 @@ function TestPage() {
                     </span>
                     {q.text}
                   </p>
-                  <div className="mt-4 flex flex-wrap gap-2">
-                    {test.scale.labels.map((label, idx) => {
+                  <div className={test.answerMode === "choice" ? "mt-4 grid gap-2 sm:grid-cols-2" : "mt-4 flex flex-wrap gap-2"}>
+                    {(test.answerMode === "choice" ? q.choices?.map((choice) => choice.text) ?? [] : test.scale.labels).map((label, idx) => {
                       const value = test.scale.min + idx;
                       const active = answers[q.id] === value;
                       return (
-                        <button
+                        <Button
+                          variant="ghost"
+                          aria-pressed={active}
                           key={label}
                           onClick={() => setAnswers((a) => ({ ...a, [q.id]: value }))}
-                          className={`rounded-full border px-3.5 py-2 text-xs transition-colors ${
+                          className={`${test.answerMode === "choice" ? "h-auto min-h-12 justify-start whitespace-normal rounded-lg px-4 py-3 text-left text-sm" : "h-auto rounded-full px-3.5 py-2 text-xs"} border font-normal transition-colors ${
                             active
                               ? "border-primary/70 bg-primary/10 text-foreground"
                               : "border-border bg-background/40 text-muted-foreground hover:border-primary/40"
                           }`}
                         >
                           {label}
-                        </button>
+                        </Button>
                       );
                     })}
                   </div>
@@ -218,9 +225,9 @@ function Intro({ test, onStart }: { test: TestDef; onStart: () => void }) {
         <div>
           <p className="tracking-cosmic text-[0.65rem] text-primary/80">THE SCIENCE</p>
           <p className="mt-2 text-sm leading-relaxed text-foreground/85">{test.background}</p>
-          <p className="mt-3 text-xs italic leading-relaxed text-muted-foreground">
+          {test.citation ? <p className="mt-3 text-xs italic leading-relaxed text-muted-foreground">
             {test.citation}
-          </p>
+          </p> : null}
         </div>
         <div className="flex flex-wrap gap-x-8 gap-y-2 text-xs text-muted-foreground">
           <span>
@@ -270,7 +277,11 @@ function Results({
   const archetypes = note.slugs
     .map((slug) => ARCHETYPES.find((a) => a.slug === slug))
     .filter((a) => a != null);
-  const article = articleBySlug(test.articleSlug);
+  const articles = (test.articleSlugs ?? (test.articleSlug ? [test.articleSlug] : []))
+    .map(articleBySlug).filter((article) => article != null);
+  const estimates = test.resultEstimates?.(scores);
+  const details = test.resultDetails?.(scores);
+  const profileType = test.resultProfileType?.(scores);
   const related = TESTS.filter((t) => t.slug !== test.slug).slice(0, 3);
 
   return (
@@ -287,6 +298,12 @@ function Results({
         ) : null}
 
         <div className="mx-auto mt-8 max-w-lg space-y-3 text-left">
+          {estimates?.map((estimate) => (
+            <div key={estimate.label}>
+              <p className="mb-1 text-xs text-muted-foreground">{estimate.label}</p>
+              <Bar label={estimate.label.split(" — ")[0] ?? estimate.label} value={estimate.percent} max={100} caption={`${estimate.percent}%`} />
+            </div>
+          ))}
           {test.dimensions.map((dim) => {
             const score = scores[dim.key] ?? 0;
             const band = bandFor(dim, score);
@@ -304,9 +321,21 @@ function Results({
         </div>
       </div>
 
-      <div className="panel p-6 sm:p-8">
+      {profileType ? <div className="flex flex-wrap items-center gap-4">
+        <Link to="/mbti/$type" params={{ type: profileType.toLowerCase() }} className="font-display text-xl text-primary hover:text-gold">
+          Read the full {profileType} profile
+        </Link>
+        <Link to="/mbti" className="text-sm text-primary hover:text-gold">Explore the MBTI guide →</Link>
+      </div> : null}
+      {test.slug === "enneagram" ? <Link to="/systems/$slug" params={{ slug: "enneagram" }} className="inline-flex text-sm text-primary hover:text-gold">Explore the Enneagram guide →</Link> : null}
+
+      {test.dimensions.length > 0 || details?.length ? <div className="panel p-6 sm:p-8">
         <p className="tracking-cosmic text-[0.65rem] text-primary/80">READING THE RESULT</p>
         <div className="mt-4 space-y-6">
+          {details?.map((detail) => <div key={detail.label}>
+            <h3 className="font-display text-xl text-foreground">{detail.label}</h3>
+            <p className="mt-2 text-sm leading-relaxed text-foreground/85">{detail.text}</p>
+          </div>)}
           {test.dimensions.map((dim) => {
             const score = scores[dim.key] ?? 0;
             const band = bandFor(dim, score);
@@ -321,10 +350,11 @@ function Results({
             );
           })}
         </div>
-      </div>
+      </div> : null}
 
       <div className="panel p-6 sm:p-8">
         <p className="tracking-cosmic text-[0.65rem] text-primary/80">THE DOSSIER CONNECTION</p>
+        {archetypes.length > 0 ? <>
         <p className="mt-3 text-sm leading-relaxed text-foreground/85">{note.text}</p>
         <div className="mt-4 flex flex-wrap gap-2">
           {archetypes.map((a) => (
@@ -338,6 +368,7 @@ function Results({
             </Link>
           ))}
         </div>
+        </> : null}
         <div className="mt-6 flex flex-wrap items-center gap-3">
           <CButton onClick={onAdd}>Add this result to my Cosmic Dossier</CButton>
           {added ? <span className="text-xs text-muted-foreground">Saved to your dossier.</span> : null}
@@ -353,8 +384,9 @@ function Results({
         </CButton>
       </div>
 
-      {article ? (
+      {articles.map((article) => (
         <Link
+          key={article.slug}
           to="/articles/$slug"
           params={{ slug: article.slug }}
           className="panel block p-6 transition-transform duration-300 hover:-translate-y-0.5"
@@ -363,7 +395,7 @@ function Results({
           <h3 className="mt-2 font-display text-xl text-foreground">{article.title}</h3>
           <p className="mt-2 text-sm text-muted-foreground">{article.excerpt}</p>
         </Link>
-      ) : null}
+      ))}
 
       <section>
         <div className="flex items-center gap-3 text-xs text-primary/80">

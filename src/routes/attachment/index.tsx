@@ -91,6 +91,7 @@ function AttachmentLanding() {
 
         <div className="panel mt-12 p-6 text-center sm:p-8">
           <p className="font-display text-xl text-foreground">Not sure which one describes you?</p>
+          <Link to="/tests/$slug" params={{ slug: "attachment-style" }} search={{ r: undefined }} className="mt-4 inline-flex text-sm text-primary hover:text-gold">Take the free attachment style test</Link>
           <p className="mx-auto mt-2 max-w-xl text-sm text-muted-foreground">
             Cosmic Dossier includes a short attachment assessment as part of your full personality
             dossier.
