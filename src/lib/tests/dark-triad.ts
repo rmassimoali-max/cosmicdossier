@@ -13,6 +13,7 @@ export const DARK_TRIAD_TEST: TestDef = {
   name: "Dark Triad",
   category: "Dark Traits",
   tagline: "Three socially aversive traits everyone carries in some measure.",
+  metaDescription: "Explore Machiavellianism, Narcissism and Psychopathy as personality tendencies with this 12-item Dark Triad screen, not a clinical diagnosis.",
   whatItMeasures:
     "The Dark Triad measures three related but distinct tendencies: Machiavellianism (strategic manipulation), Narcissism (grandiosity and entitlement) and Psychopathy (callousness and low remorse). Everyone scores somewhere — these are dimensions, not diagnoses.",
   background:

@@ -2,12 +2,14 @@
 // client-side scoring — no accounts, no network, no AI.
 
 import type { PersonInput } from "@/lib/session";
+import type { Estimate } from "@/lib/assessments";
 
 export type TestItem = {
   id: string;
   text: string;
   dimension: string;
   reverse?: boolean;
+  choices?: { text: string; value: string }[];
 };
 
 export type TestScale = {
@@ -37,19 +39,26 @@ export type TestDef = {
   category: string;
   tagline: string;
   whatItMeasures: string;
+  metaDescription?: string;
   background: string;
-  citation: string;
+  citation?: string;
   minutes: string;
   scale: TestScale;
   disclaimer?: string;
   items: TestItem[];
   dimensions: DimensionDef[];
+  answerMode?: "choice" | "likert";
+  scoreAnswers?: (answers: Record<string, number>) => Record<string, number>;
+  resultEstimates?: (scores: Record<string, number>) => Estimate[];
+  resultDetails?: (scores: Record<string, number>) => { label: string; text: string }[];
+  resultProfileType?: (scores: Record<string, number>) => string;
   // Short primary label for the result hero (e.g. an attachment quadrant).
   resultLabel?: (scores: Record<string, number>) => string;
   resultSummary?: (scores: Record<string, number>) => string;
   // Connects the result back to the eight Cosmic Dossier archetypes.
   archetypeNote: (scores: Record<string, number>) => { slugs: string[]; text: string };
-  articleSlug: string;
+  articleSlug?: string;
+  articleSlugs?: string[];
   // Optional patch applied when the user adds the result to their dossier.
   dossierPatch?: (scores: Record<string, number>) => Partial<PersonInput>;
 };
@@ -93,14 +102,21 @@ export function encodeAnswers(items: TestItem[], answers: Record<string, number>
   return "v1" + items.map((q) => (answers[q.id] ?? 0).toString(36)).join("");
 }
 
-export function decodeAnswers(items: TestItem[], encoded: string): Record<string, number> | null {
+export function decodeAnswers(items: TestItem[], encoded: string, scale?: TestScale): Record<string, number> | null {
   const digits = encoded.startsWith("v1") ? encoded.slice(2) : encoded;
   if (!digits || digits.length !== items.length) return null;
   const out: Record<string, number> = {};
   for (let i = 0; i < items.length; i++) {
     const v = parseInt(digits[i] ?? "", 36);
-    if (!Number.isFinite(v) || v < 1) return null;
+    const item = items[i];
+    const min = item?.choices ? 1 : scale?.min ?? 1;
+    const max = item?.choices ? item.choices.length : scale?.max ?? 35;
+    if (!/^[0-9a-z]$/.test(digits[i] ?? "") || !Number.isFinite(v) || v < min || v > max) return null;
     out[items[i]?.id ?? ""] = v;
   }
   return out;
+}
+
+export function scoreTest(test: TestDef, answers: Record<string, number>): Record<string, number> {
+  return test.scoreAnswers?.(answers) ?? scoreDimensions(test.items, test.scale, answers);
 }
