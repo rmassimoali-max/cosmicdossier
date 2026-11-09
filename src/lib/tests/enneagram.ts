@@ -25,9 +25,9 @@ export const ENNEAGRAM_TEST: TestDef = {
     return { core: result.core, wing: result.wing, ...Object.fromEntries(result.estimates.map((e) => [e.label, e.percent])) };
   },
   resultEstimates: estimates,
-  resultLabel: (scores) => `${scores.core}w${scores.wing} — ${ENNEAGRAM_NAMES[scores.core ?? 9]}`,
+  resultLabel: (scores) => `${scores["core"]}w${scores["wing"]} — ${ENNEAGRAM_NAMES[scores["core"] ?? 9]}`,
   resultDetails: (scores) => {
-    const profile = ENNEAGRAM_LIBRARY[scores.core ?? 9];
+    const profile = ENNEAGRAM_LIBRARY[scores["core"] ?? 9];
     return profile ? [
       { label: "Core motivation", text: profile.coreMotivation },
       { label: "Core fear", text: profile.coreFear },
@@ -35,12 +35,12 @@ export const ENNEAGRAM_TEST: TestDef = {
     ] : [];
   },
   archetypeNote: (scores) => ({
-    slugs: ARCHETYPES.filter((a) => new RegExp(`\\b${scores.core}\\b`).test(a.flavor.enneagram)).map((a) => a.slug),
-    text: `Your Type ${scores.core} motivation connects with these Cosmic Dossier archetypes.`,
+    slugs: ARCHETYPES.filter((a) => new RegExp(`\\b${scores["core"]}\\b`).test(a.flavor.enneagram)).map((a) => a.slug),
+    text: `Your Type ${scores["core"]} motivation connects with these Cosmic Dossier archetypes.`,
   }),
   dossierPatch: (scores) => ({
-    enneagramType: String(scores.core),
-    enneagramWing: String(scores.wing),
+    enneagramType: String(scores["core"]),
+    enneagramWing: String(scores["wing"]),
     enneagramEstimates: estimates(scores),
   }),
 };
