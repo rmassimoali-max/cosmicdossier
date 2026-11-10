@@ -120,7 +120,9 @@ function CanonicalTags() {
   const { pathname, isNotFound } = useRouterState({
     select: (s) => ({
       pathname: s.location.pathname,
-      isNotFound: s.statusCode === 404 || s.matches.some((m) => m.status === "notFound"),
+      isNotFound: s.matches.some(
+        (m) => m.status === "notFound" || (m as { _notFound?: boolean })._notFound === true,
+      ),
     }),
   });
   if (isNotFound || !pathname) return null;
