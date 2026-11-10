@@ -5,6 +5,7 @@ import {
   Link,
   createRootRouteWithContext,
   useRouter,
+  useRouterState,
   HeadContent,
   Scripts,
 } from "@tanstack/react-router";
@@ -13,6 +14,7 @@ import { useEffect, type ReactNode } from "react";
 import appCss from "../styles.css?url";
 import { reportLovableError } from "../lib/lovable-error-reporting";
 import { SiteNav } from "@/components/cosmic/SiteNav";
+import { canonicalUrl } from "@/lib/site";
 
 function NotFoundComponent() {
   return (
@@ -114,11 +116,31 @@ export const Route = createRootRouteWithContext<{ queryClient: QueryClient }>()(
   errorComponent: ErrorComponent,
 });
 
+function CanonicalTags() {
+  const { pathname, isNotFound } = useRouterState({
+    select: (s) => ({
+      pathname: s.location.pathname,
+      isNotFound: s.matches.some(
+        (m) => m.status === "notFound" || (m as { _notFound?: boolean })._notFound === true,
+      ),
+    }),
+  });
+  if (isNotFound || !pathname) return null;
+  const url = canonicalUrl(pathname);
+  return (
+    <>
+      <link rel="canonical" href={url} />
+      <meta property="og:url" content={url} />
+    </>
+  );
+}
+
 function RootShell({ children }: { children: ReactNode }) {
   return (
     <html lang="en">
       <head>
         <HeadContent />
+        <CanonicalTags />
       </head>
       <body>
         {children}
