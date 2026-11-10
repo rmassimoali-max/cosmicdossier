@@ -96,6 +96,67 @@ function Landing() {
         <p className="mt-6 text-xs text-muted-foreground/80">
           Free · no account · astrology treated as symbolic language, not prophecy
         </p>
+        <p className="animate-drift-in mt-10 max-w-md text-balance text-sm text-foreground/80">
+          Built for people who've already taken the tests and still feel fragmented.
+        </p>
+        <p className="mt-2 max-w-md text-balance text-xs text-muted-foreground">
+          One synthesized reading across astrology, MBTI, Enneagram, attachment, and Big Five — not
+          five separate verdicts.
+        </p>
+      </section>
+
+      <section className="relative mx-auto max-w-4xl px-6 pb-24">
+        <p className="tracking-cosmic text-center text-xs text-primary/80">What you'll actually get</p>
+        <h2 className="mt-3 text-center font-display text-3xl text-foreground/95 sm:text-4xl">
+          One dossier, read as a whole
+        </h2>
+        <p className="mx-auto mt-3 max-w-lg text-center text-sm text-muted-foreground">
+          Your report isn't a stack of test results. It's a single document where each system is
+          cross-referenced against the others.
+        </p>
+        <ol className="mt-10 grid grid-cols-2 gap-3 sm:grid-cols-3">
+          {DOSSIER_SECTIONS.map((s, i) => (
+            <li key={s.label} className="panel flex flex-col gap-1.5 px-4 py-5">
+              <span className="tracking-cosmic text-[0.6rem] text-primary/70">
+                {String(i + 1).padStart(2, "0")}
+              </span>
+              <span className="font-display text-base text-foreground">{s.label}</span>
+              <span className="text-[0.7rem] leading-snug text-muted-foreground">{s.note}</span>
+            </li>
+          ))}
+        </ol>
+
+        <div className="mt-16">
+          <p className="tracking-cosmic text-center text-xs text-primary/80">
+            Sample — from a fictional dossier
+          </p>
+          <div className="mt-6 grid gap-4 sm:grid-cols-3">
+            {SAMPLE_EXCERPTS.map((e) => (
+              <figure key={e.source} className="panel flex flex-col p-6">
+                <blockquote className="text-sm leading-relaxed text-foreground/90">
+                  “{e.quote}”
+                </blockquote>
+                <figcaption className="mt-4 text-[0.65rem] tracking-wide text-muted-foreground">
+                  — {e.source}
+                </figcaption>
+              </figure>
+            ))}
+          </div>
+          <p className="mt-4 text-center text-[0.65rem] text-muted-foreground/70">
+            Excerpts are illustrative examples, not your actual results.
+          </p>
+        </div>
+
+        <div className="mt-12 text-center">
+          <Link
+            to="/input"
+            className="halo inline-flex items-center gap-3 rounded-full px-8 py-3.5 font-display text-lg text-primary-foreground transition-transform duration-300 hover:scale-[1.03]"
+            style={{ background: "var(--gradient-gold)" }}
+          >
+            Start My Report
+            <span aria-hidden>→</span>
+          </Link>
+        </div>
       </section>
 
       <section className="relative mx-auto max-w-5xl px-6 pb-24">
