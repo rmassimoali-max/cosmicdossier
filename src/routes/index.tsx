@@ -32,6 +32,31 @@ const PILLARS: { to: string; params?: { slug: string }; glyph: string; label: st
   { to: "/systems/$slug", params: { slug: "synastry" }, glyph: "❤️", label: "Synastry", note: "Two charts, compared honestly" },
   { to: "/systems/$slug", params: { slug: "ai-analysis" }, glyph: "📈", label: "Synthesis", note: "One woven profile, not five silos" },
 ];
+const DOSSIER_SECTIONS = [
+  { label: "Core Pattern", note: "The through-line all five systems agree on" },
+  { label: "Cognitive Style", note: "How you take in and decide on information" },
+  { label: "Attachment Lens", note: "How closeness, distance and conflict feel to you" },
+  { label: "Symbolic Layer", note: "Your natal chart read as metaphor, not fate" },
+  { label: "Growth Edges", note: "Where your strengths turn into blind spots" },
+  { label: "Relationship Dynamics", note: "How your pattern plays out with other people" },
+];
+const SAMPLE_EXCERPTS = [
+  {
+    quote:
+      "You build accurate maps of situations before you enter them. The cost is that you can understand a relationship more clearly than you allow yourself to feel it.",
+    source: "Sample dossier · Core Pattern",
+  },
+  {
+    quote:
+      "Your need for closeness and your need for control are the same need wearing two coats. Partners experience this as warmth that occasionally tightens.",
+    source: "Sample dossier · Attachment Lens",
+  },
+  {
+    quote:
+      "You don't avoid conflict because you're easygoing. You avoid it because you've already run the argument in your head and decided it isn't worth the mess.",
+    source: "Sample dossier · Growth Edges",
+  },
+];
 const LEARN_CARDS = [
   {
     to: "/articles",
