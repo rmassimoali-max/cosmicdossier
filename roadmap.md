@@ -8,7 +8,7 @@
 - [x] Session: optional hsp field on PersonInput
 - [x] Build check + mobile viewport verification
 
-Remaining from the uploaded spec (not yet started): Emotional Intelligence, Love Styles, Resilience, ADHD Trait Screen, AQ short form, HEXACO short (items 5–10).
+- [x] Emotional Intelligence, Love Styles, Resilience, ADHD Trait Screen, AQ short form, HEXACO short
 
 ## MBTI and Enneagram additions
 - [x] Reuse existing question banks and scoring within the test framework; support forced choices and safe shared results.
