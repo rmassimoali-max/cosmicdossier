@@ -1,10 +1,20 @@
-import { createFileRoute, Link, notFound } from "@tanstack/react-router";
+import { createFileRoute, Link, notFound, redirect } from "@tanstack/react-router";
 import { StarField } from "@/components/cosmic/StarField";
 import { GoldLink, SectionTitle } from "@/components/cosmic/ui";
 import { archetypeBySlug } from "@/lib/archetypes";
 
+const RENAMED_SLUGS: Record<string, string> = {
+  "the-architect": "the-strategist",
+  "the-catalyst": "the-firestarter",
+  "the-guardian": "the-warden",
+};
+
 export const Route = createFileRoute("/archetype/$slug")({
   loader: ({ params }) => {
+    const renamed = RENAMED_SLUGS[params.slug];
+    if (renamed) {
+      throw redirect({ to: "/archetype/$slug", params: { slug: renamed }, statusCode: 301 });
+    }
     const archetype = archetypeBySlug(params.slug);
     if (!archetype) throw notFound();
     return archetype;
