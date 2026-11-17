@@ -108,7 +108,7 @@ function ArchetypePage() {
         </div>
 
         <div className="mt-10 flex flex-wrap items-center gap-4">
-          <GoldLink to="/input">Take the free assessment</GoldLink>
+          <GoldLink to="/input">Start the free preview</GoldLink>
           <span className="text-xs text-muted-foreground">
             Your actual dossier is a personalized read across five systems — this page is one
             recognizable pattern among many.
