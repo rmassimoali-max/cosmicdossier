@@ -1,11 +1,21 @@
+// Copyright (c) Lovable. All rights reserved.
 import { createFileRoute, Link, notFound } from "@tanstack/react-router";
 import { StarField } from "@/components/cosmic/StarField";
 import { GoldLink, SectionTitle } from "@/components/cosmic/ui";
 import { articleBySlug, articles } from "@/lib/articles";
+import { STANDALONE_TEST_ARTICLES } from "@/lib/standaloneTestArticles";
+
+const allArticles = [...articles, ...STANDALONE_TEST_ARTICLES];
+const relatedSlugs: Record<string, string[]> = {
+  "what-hexaco-adds-to-the-big-five": ["what-the-big-five-actually-measures", "understanding-the-dark-triad"],
+  "the-five-love-languages": ["the-two-dimensions-of-attachment", "avoidance-vs-healthy-independence"],
+  "emotional-intelligence-what-it-is-and-isnt": ["the-orchid-hypothesis-sensitivity-as-temperament", "what-the-big-five-actually-measures"],
+  "what-resilience-really-means": ["the-two-dimensions-of-attachment", "the-orchid-hypothesis-sensitivity-as-temperament"],
+};
 
 export const Route = createFileRoute("/articles/$slug")({
   loader: ({ params }) => {
-    const article = articleBySlug(params.slug);
+    const article = articleBySlug(params.slug) ?? STANDALONE_TEST_ARTICLES.find((item) => item.slug === params.slug);
     if (!article) throw notFound();
     return article;
   },
@@ -29,8 +39,11 @@ export const Route = createFileRoute("/articles/$slug")({
 
 function ArticlePage() {
   const article = Route.useLoaderData();
-  const currentIndex = articles.findIndex((item) => item.slug === article.slug);
-  const related = articles.filter((item) => item.slug !== article.slug).slice(0, 3);
+  const currentIndex = allArticles.findIndex((item) => item.slug === article.slug);
+  const related = allArticles.filter((item) => item.slug !== article.slug).slice(0, 3);
+  const contextualRelated = (relatedSlugs[article.slug] ?? [])
+    .map((slug) => allArticles.find((item) => item.slug === slug))
+    .filter((item) => item !== undefined);
 
   return (
     <main className="relative min-h-screen">
@@ -69,6 +82,29 @@ function ArticlePage() {
             })}
           </div>
         </div>
+
+        {contextualRelated.length > 0 ? (
+          <section className="mt-8">
+            <div className="flex items-center gap-3 text-xs text-primary/80">
+              <span className="tracking-cosmic">RELATED FILES</span>
+              <span className="h-px flex-1 bg-primary/20" />
+            </div>
+            <div className="mt-4 grid gap-3 sm:grid-cols-2">
+              {contextualRelated.map((item) => (
+                <Link
+                  key={item.slug}
+                  to="/articles/$slug"
+                  params={{ slug: item.slug }}
+                  className="panel block p-5 transition-transform duration-300 hover:-translate-y-0.5"
+                >
+                  <p className="text-[0.65rem] uppercase tracking-widest text-primary/70">{item.category}</p>
+                  <h2 className="mt-2 font-display text-lg text-foreground">{item.title}</h2>
+                  <p className="mt-2 text-sm text-muted-foreground">{item.excerpt}</p>
+                </Link>
+              ))}
+            </div>
+          </section>
+        ) : null}
 
         <div className="panel mt-8 p-6 sm:p-8">
           <p className="tracking-cosmic text-xs text-primary/80">THE DOSSIER CONNECTION</p>

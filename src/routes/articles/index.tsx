@@ -1,7 +1,12 @@
+// Copyright (c) Lovable. All rights reserved.
 import { Link, createFileRoute } from "@tanstack/react-router";
 import { StarField } from "@/components/cosmic/StarField";
 import { SectionTitle } from "@/components/cosmic/ui";
 import { articles } from "@/lib/articles";
+import { STANDALONE_TEST_ARTICLES } from "@/lib/standaloneTestArticles";
+
+const allArticles = [...articles, ...STANDALONE_TEST_ARTICLES];
+
 export const Route = createFileRoute("/articles/")({
   head: () => ({
     meta: [
@@ -39,10 +44,10 @@ function ArticlesIndex() {
         <div className="mt-12 flex items-center gap-3 text-xs text-primary/80">
           <span className="tracking-cosmic">CASE FILES</span>
           <span className="h-px flex-1 bg-primary/20" />
-          <span>{articles.length} files</span>
+          <span>{allArticles.length} files</span>
         </div>
         <section className="mt-5 grid gap-4 md:grid-cols-2">
-          {articles.map((article, index) => (
+          {allArticles.map((article, index) => (
             <Link
               key={article.slug}
               to="/articles/$slug"
@@ -66,12 +71,8 @@ function ArticlesIndex() {
           <p className="mx-auto mt-2 max-w-xl text-sm text-muted-foreground">
             Build a personalized Cosmic Dossier across attachment, personality, astrology, and more.
           </p>
-          <Link
-            to="/input"
-            className="mt-5 inline-flex rounded-full px-7 py-3 font-display text-base text-primary-foreground"
-            style={{ background: "var(--gradient-gold)" }}
-          >
-            Start My Report →
+          <Link to="/input" className="mt-5 inline-flex rounded-full border border-primary/50 px-5 py-2 text-sm text-primary hover:bg-primary/10">
+            Build My Dossier →
           </Link>
         </div>
       </div>
