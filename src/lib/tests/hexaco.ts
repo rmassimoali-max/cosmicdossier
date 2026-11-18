@@ -40,4 +40,14 @@ export const HEXACO_TEST: TestDef = {
   items,
   dimensions,
   ...multiDimHelpers(DIMS, "factor"),
+  dossierPatch: (scores) => ({
+    hexaco: {
+      H: scores["H"] ?? 50,
+      E: scores["E"] ?? 50,
+      X: scores["X"] ?? 50,
+      A: scores["A"] ?? 50,
+      C: scores["C"] ?? 50,
+      O: scores["O"] ?? 50,
+    },
+  }),
 };

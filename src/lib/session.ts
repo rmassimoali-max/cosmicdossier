@@ -18,6 +18,7 @@ export type PersonInput = {
   attachment?: string | undefined;
   attachmentEstimates?: Estimate[] | undefined;
   bigFive?: Record<string, number> | undefined;
+  hexaco?: Record<string, number> | undefined;
   hsp?: number | undefined;
 };
 
