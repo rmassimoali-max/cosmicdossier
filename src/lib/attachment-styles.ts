@@ -21,7 +21,8 @@ export const ATTACHMENT_STYLES: AttachmentStyleContent[] = [
   {
     slug: "secure",
     name: "Secure Attachment",
-    tagline: "Closeness doesn't require abandoning independence, and distance doesn't feel like danger.",
+    tagline:
+      "Closeness doesn't require abandoning independence, and distance doesn't feel like danger.",
     overview:
       "Securely attached people tend to trust that others will be responsive to their needs, and trust their own ability to handle it if that's occasionally not the case. Closeness and independence aren't in conflict — both are available at once.",
     howItShowsUp: [

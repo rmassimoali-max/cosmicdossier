@@ -74,7 +74,10 @@ function AttachmentStylePage() {
           </p>
           <ul className="mt-4 space-y-3">
             {style.reflectionPrompts.map((q) => (
-              <li key={q} className="border-l-2 border-primary/40 pl-4 text-sm italic text-foreground/85">
+              <li
+                key={q}
+                className="border-l-2 border-primary/40 pl-4 text-sm italic text-foreground/85"
+              >
                 {q}
               </li>
             ))}
@@ -121,7 +124,9 @@ function AttachmentStylePage() {
             Cosmic Dossier includes a short attachment assessment as part of your full personality
             dossier, read alongside your MBTI, Enneagram, Big Five and astrology.
           </p>
-          <GoldLink to="/input" className="mt-5 inline-flex">Build My Dossier →</GoldLink>
+          <GoldLink to="/input" className="mt-5 inline-flex">
+            Build My Dossier →
+          </GoldLink>
         </div>
 
         <section className="mt-12">

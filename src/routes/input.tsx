@@ -3,12 +3,7 @@ import { useState } from "react";
 import { StarField } from "@/components/cosmic/StarField";
 import { CButton, Field, SectionTitle, SelectInput, TextInput } from "@/components/cosmic/ui";
 import { ENNEAGRAM_NAMES, INSTINCTS, MBTI_TYPES } from "@/lib/assessments";
-import {
-  emptyPerson,
-  setSession,
-  useSession,
-  type PersonInput,
-} from "@/lib/session";
+import { emptyPerson, setSession, useSession, type PersonInput } from "@/lib/session";
 
 export const Route = createFileRoute("/input")({
   head: () => ({
@@ -94,7 +89,11 @@ function PersonCard({
           />
         </Field>
         <Field label="Date of birth *" hint="Sets every planetary position in the chart.">
-          <TextInput type="date" value={person.dob} onChange={(e) => set({ dob: e.target.value })} />
+          <TextInput
+            type="date"
+            value={person.dob}
+            onChange={(e) => set({ dob: e.target.value })}
+          />
         </Field>
         <Field
           label="Birth time *"

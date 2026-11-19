@@ -7,20 +7,13 @@ import { ARCHETYPES } from "@/lib/archetypes";
 import { articleBySlug } from "@/lib/articles";
 import { setSession } from "@/lib/session";
 import { TESTS, testBySlug } from "@/lib/tests";
-import {
-  bandFor,
-  decodeAnswers,
-  encodeAnswers,
-  scoreTest,
-  type TestDef,
-} from "@/lib/tests/types";
+import { bandFor, decodeAnswers, encodeAnswers, scoreTest, type TestDef } from "@/lib/tests/types";
 
 export const Route = createFileRoute("/tests/$slug")({
   validateSearch: (search: Record<string, unknown>) => {
     const raw = search["r"];
     // Accept both the JSON-quoted form the app generates and a bare pasted value.
-    const r =
-      typeof raw === "string" ? raw : typeof raw === "number" ? String(raw) : undefined;
+    const r = typeof raw === "string" ? raw : typeof raw === "number" ? String(raw) : undefined;
     return { r };
   },
   loader: ({ params }) => {
@@ -36,9 +29,14 @@ export const Route = createFileRoute("/tests/$slug")({
     }
     return {
       meta: [
-        { title: `Free ${test.name}${test.name.endsWith("Test") ? "" : " Test"} (${test.items.length} Questions) | Cosmic Dossier` },
+        {
+          title: `Free ${test.name}${test.name.endsWith("Test") ? "" : " Test"} (${test.items.length} Questions) | Cosmic Dossier`,
+        },
         { name: "description", content: test.metaDescription ?? test.tagline },
-        { property: "og:title", content: `Free ${test.name}${test.name.endsWith("Test") ? "" : " Test"} (${test.items.length} Questions) | Cosmic Dossier` },
+        {
+          property: "og:title",
+          content: `Free ${test.name}${test.name.endsWith("Test") ? "" : " Test"} (${test.items.length} Questions) | Cosmic Dossier`,
+        },
         { property: "og:description", content: test.metaDescription ?? test.whatItMeasures },
         { property: "og:type", content: "website" },
         { name: "twitter:card", content: "summary_large_image" },
@@ -148,8 +146,17 @@ function TestFlow({ test, r }: { test: TestDef; r: string | undefined }) {
                     </span>
                     {q.text}
                   </p>
-                  <div className={test.answerMode === "choice" ? "mt-4 grid gap-2 sm:grid-cols-2" : "mt-4 flex flex-wrap gap-2"}>
-                    {(test.answerMode === "choice" ? q.choices?.map((choice) => choice.text) ?? [] : test.scale.labels).map((label, idx) => {
+                  <div
+                    className={
+                      test.answerMode === "choice"
+                        ? "mt-4 grid gap-2 sm:grid-cols-2"
+                        : "mt-4 flex flex-wrap gap-2"
+                    }
+                  >
+                    {(test.answerMode === "choice"
+                      ? (q.choices?.map((choice) => choice.text) ?? [])
+                      : test.scale.labels
+                    ).map((label, idx) => {
                       const value = test.scale.min + idx;
                       const active = answers[q.id] === value;
                       return (
@@ -225,9 +232,11 @@ function Intro({ test, onStart }: { test: TestDef; onStart: () => void }) {
         <div>
           <p className="tracking-cosmic text-[0.65rem] text-primary/80">THE SCIENCE</p>
           <p className="mt-2 text-sm leading-relaxed text-foreground/85">{test.background}</p>
-          {test.citation ? <p className="mt-3 text-xs italic leading-relaxed text-muted-foreground">
-            {test.citation}
-          </p> : null}
+          {test.citation ? (
+            <p className="mt-3 text-xs italic leading-relaxed text-muted-foreground">
+              {test.citation}
+            </p>
+          ) : null}
         </div>
         <div className="flex flex-wrap gap-x-8 gap-y-2 text-xs text-muted-foreground">
           <span>
@@ -278,7 +287,8 @@ function Results({
     .map((slug) => ARCHETYPES.find((a) => a.slug === slug))
     .filter((a) => a != null);
   const articles = (test.articleSlugs ?? (test.articleSlug ? [test.articleSlug] : []))
-    .map(articleBySlug).filter((article) => article != null);
+    .map(articleBySlug)
+    .filter((article) => article != null);
   const estimates = test.resultEstimates?.(scores);
   const details = test.resultDetails?.(scores);
   const profileType = test.resultProfileType?.(scores);
@@ -301,7 +311,12 @@ function Results({
           {estimates?.map((estimate) => (
             <div key={estimate.label}>
               <p className="mb-1 text-xs text-muted-foreground">{estimate.label}</p>
-              <Bar label={estimate.label.split(" — ")[0] ?? estimate.label} value={estimate.percent} max={100} caption={`${estimate.percent}%`} />
+              <Bar
+                label={estimate.label.split(" — ")[0] ?? estimate.label}
+                value={estimate.percent}
+                max={100}
+                caption={`${estimate.percent}%`}
+              />
             </div>
           ))}
           {test.dimensions.map((dim) => {
@@ -321,57 +336,81 @@ function Results({
         </div>
       </div>
 
-      {profileType ? <div className="flex flex-wrap items-center gap-4">
-        <Link to="/mbti/$type" params={{ type: profileType.toLowerCase() }} className="font-display text-xl text-primary hover:text-gold">
-          Read the full {profileType} profile
-        </Link>
-        <Link to="/mbti" className="text-sm text-primary hover:text-gold">Explore the MBTI guide →</Link>
-      </div> : null}
-      {test.slug === "enneagram" ? <Link to="/systems/$slug" params={{ slug: "enneagram" }} className="inline-flex text-sm text-primary hover:text-gold">Explore the Enneagram guide →</Link> : null}
-
-      {test.dimensions.length > 0 || details?.length ? <div className="panel p-6 sm:p-8">
-        <p className="tracking-cosmic text-[0.65rem] text-primary/80">READING THE RESULT</p>
-        <div className="mt-4 space-y-6">
-          {details?.map((detail) => <div key={detail.label}>
-            <h3 className="font-display text-xl text-foreground">{detail.label}</h3>
-            <p className="mt-2 text-sm leading-relaxed text-foreground/85">{detail.text}</p>
-          </div>)}
-          {test.dimensions.map((dim) => {
-            const score = scores[dim.key] ?? 0;
-            const band = bandFor(dim, score);
-            return (
-              <div key={dim.key}>
-                <h3 className="font-display text-xl text-foreground">
-                  {dim.label} <span className="text-sm text-primary/80">— {band.label}</span>
-                </h3>
-                <p className="mt-1 text-xs italic text-muted-foreground">{dim.blurb}</p>
-                <p className="mt-2 text-sm leading-relaxed text-foreground/85">{band.text}</p>
-              </div>
-            );
-          })}
+      {profileType ? (
+        <div className="flex flex-wrap items-center gap-4">
+          <Link
+            to="/mbti/$type"
+            params={{ type: profileType.toLowerCase() }}
+            className="font-display text-xl text-primary hover:text-gold"
+          >
+            Read the full {profileType} profile
+          </Link>
+          <Link to="/mbti" className="text-sm text-primary hover:text-gold">
+            Explore the MBTI guide →
+          </Link>
         </div>
-      </div> : null}
+      ) : null}
+      {test.slug === "enneagram" ? (
+        <Link
+          to="/systems/$slug"
+          params={{ slug: "enneagram" }}
+          className="inline-flex text-sm text-primary hover:text-gold"
+        >
+          Explore the Enneagram guide →
+        </Link>
+      ) : null}
+
+      {test.dimensions.length > 0 || details?.length ? (
+        <div className="panel p-6 sm:p-8">
+          <p className="tracking-cosmic text-[0.65rem] text-primary/80">READING THE RESULT</p>
+          <div className="mt-4 space-y-6">
+            {details?.map((detail) => (
+              <div key={detail.label}>
+                <h3 className="font-display text-xl text-foreground">{detail.label}</h3>
+                <p className="mt-2 text-sm leading-relaxed text-foreground/85">{detail.text}</p>
+              </div>
+            ))}
+            {test.dimensions.map((dim) => {
+              const score = scores[dim.key] ?? 0;
+              const band = bandFor(dim, score);
+              return (
+                <div key={dim.key}>
+                  <h3 className="font-display text-xl text-foreground">
+                    {dim.label} <span className="text-sm text-primary/80">— {band.label}</span>
+                  </h3>
+                  <p className="mt-1 text-xs italic text-muted-foreground">{dim.blurb}</p>
+                  <p className="mt-2 text-sm leading-relaxed text-foreground/85">{band.text}</p>
+                </div>
+              );
+            })}
+          </div>
+        </div>
+      ) : null}
 
       <div className="panel p-6 sm:p-8">
         <p className="tracking-cosmic text-[0.65rem] text-primary/80">THE DOSSIER CONNECTION</p>
-        {archetypes.length > 0 ? <>
-        <p className="mt-3 text-sm leading-relaxed text-foreground/85">{note.text}</p>
-        <div className="mt-4 flex flex-wrap gap-2">
-          {archetypes.map((a) => (
-            <Link
-              key={a.slug}
-              to="/archetype/$slug"
-              params={{ slug: a.slug }}
-              className="rounded-full border border-primary/40 bg-primary/10 px-3 py-1 text-xs text-foreground hover:border-primary/70"
-            >
-              {a.name}
-            </Link>
-          ))}
-        </div>
-        </> : null}
+        {archetypes.length > 0 ? (
+          <>
+            <p className="mt-3 text-sm leading-relaxed text-foreground/85">{note.text}</p>
+            <div className="mt-4 flex flex-wrap gap-2">
+              {archetypes.map((a) => (
+                <Link
+                  key={a.slug}
+                  to="/archetype/$slug"
+                  params={{ slug: a.slug }}
+                  className="rounded-full border border-primary/40 bg-primary/10 px-3 py-1 text-xs text-foreground hover:border-primary/70"
+                >
+                  {a.name}
+                </Link>
+              ))}
+            </div>
+          </>
+        ) : null}
         <div className="mt-6 flex flex-wrap items-center gap-3">
           <CButton onClick={onAdd}>Add this result to my Cosmic Dossier</CButton>
-          {added ? <span className="text-xs text-muted-foreground">Saved to your dossier.</span> : null}
+          {added ? (
+            <span className="text-xs text-muted-foreground">Saved to your dossier.</span>
+          ) : null}
         </div>
       </div>
 

@@ -174,7 +174,8 @@ export const RULES: Rule[] = [
   /* ---- Astrology <-> psychology ---- */
   R(
     "convergence",
-    (p) => Boolean(p.chart) && (p.chart?.elements.Water ?? 0) >= 4 && isBand(p, "Neuroticism", "high"),
+    (p) =>
+      Boolean(p.chart) && (p.chart?.elements.Water ?? 0) >= 4 && isBand(p, "Neuroticism", "high"),
     "A water-weighted chart and high Neuroticism point at the same sensitivity: you register atmosphere early and carry it longer than the people who produced it.",
   ),
   R(
@@ -184,22 +185,31 @@ export const RULES: Rule[] = [
   ),
   R(
     "contradiction",
-    (p) => Boolean(p.chart) && (p.chart?.elements.Fire ?? 0) >= 4 && isBand(p, "Extraversion", "low"),
+    (p) =>
+      Boolean(p.chart) && (p.chart?.elements.Fire ?? 0) >= 4 && isBand(p, "Extraversion", "low"),
     "Fire emphasis with low Extraversion is a genuine internal contradiction: strong drive and appetite, low tolerance for the social exposure that usually carries it. Ambition that prefers to work privately.",
   ),
   R(
     "convergence",
-    (p) => Boolean(p.chart) && (p.chart?.elements.Earth ?? 0) >= 4 && isBand(p, "Conscientiousness", "high"),
+    (p) =>
+      Boolean(p.chart) &&
+      (p.chart?.elements.Earth ?? 0) >= 4 &&
+      isBand(p, "Conscientiousness", "high"),
     "Earth-heavy chart and high Conscientiousness say the same thing in two languages: you are trusted with things because you finish them.",
   ),
   R(
     "hidden",
-    (p) => Boolean(p.chart) && p.chart?.modalities.Fixed !== undefined && (p.chart?.modalities.Fixed ?? 0) >= 5 && isL(p, "P"),
+    (p) =>
+      Boolean(p.chart) &&
+      p.chart?.modalities.Fixed !== undefined &&
+      (p.chart?.modalities.Fixed ?? 0) >= 5 &&
+      isL(p, "P"),
     "A fixed-heavy chart under a Perceiving preference produces someone flexible about plans and immovable about positions.",
   ),
   R(
     "hidden",
-    (p) => Boolean(p.chart) && (p.chart?.aspects.filter((a) => a.type === "square").length ?? 0) >= 5,
+    (p) =>
+      Boolean(p.chart) && (p.chart?.aspects.filter((a) => a.type === "square").length ?? 0) >= 5,
     "Your chart carries an unusual number of squares. Read symbolically, that suggests a life organised around friction that produces capability rather than ease that produces comfort.",
   ),
 
@@ -219,7 +229,8 @@ export const RULES: Rule[] = [
   ),
   R(
     "tension",
-    (p) => isBand(p, "Agreeableness", "high") && isBand(p, "Conscientiousness", "high") && isL(p, "F"),
+    (p) =>
+      isBand(p, "Agreeableness", "high") && isBand(p, "Conscientiousness", "high") && isL(p, "F"),
     "Warmth, duty and value-driven decisions combine into difficulty refusing legitimate requests. The word 'no' feels like a character flaw rather than a boundary.",
   ),
 ];
@@ -235,10 +246,12 @@ const KIND_TITLE: Record<RuleKind, string> = {
 };
 
 const KIND_INTRO: Record<RuleKind, string> = {
-  convergence: "Where two or more of your systems describe the same underlying trait, the reading gets more reliable.",
+  convergence:
+    "Where two or more of your systems describe the same underlying trait, the reading gets more reliable.",
   contradiction: "Where systems disagree, the disagreement itself is usually the interesting part.",
   amplifier: "Some of your traits do not just coexist — they multiply each other.",
-  tension: "These pairs pull you in different directions and are likely to feel like internal argument.",
+  tension:
+    "These pairs pull you in different directions and are likely to feel like internal argument.",
   hidden: "Combinations that none of the five systems would surface on its own.",
 };
 
@@ -272,7 +285,9 @@ function lensSections(p: Profile): ReportSection[] {
   if (p.chart) {
     const c = p.chart;
     const bigThree = ["Sun", "Moon", "Rising"] as const;
-    const core = c.placements.filter((pl) => ["Sun", "Moon", "Mercury", "Venus", "Mars"].includes(pl.label));
+    const core = c.placements.filter((pl) =>
+      ["Sun", "Moon", "Mercury", "Venus", "Mars"].includes(pl.label),
+    );
     out.push({
       group: GROUPS.lenses,
       title: "Astrology — Natal Chart",
@@ -284,7 +299,14 @@ function lensSections(p: Profile): ReportSection[] {
         ASTROLOGY_DISCLAIMER,
       ]),
       bullets: [
-        ...bigThree.map((k) => placementText(k === "Rising" ? "Rising" : k, c[k === "Rising" ? "rising" : k === "Sun" ? "sun" : "moon"], null, false)),
+        ...bigThree.map((k) =>
+          placementText(
+            k === "Rising" ? "Rising" : k,
+            c[k === "Rising" ? "rising" : k === "Sun" ? "sun" : "moon"],
+            null,
+            false,
+          ),
+        ),
         ...core
           .filter((pl) => !["Sun", "Moon"].includes(pl.label))
           .map((pl) => placementText(pl.label, pl.sign, pl.house, pl.retrograde)),
@@ -335,7 +357,9 @@ function lensSections(p: Profile): ReportSection[] {
       body: join([
         `Core motivation: ${e.coreMotivation} Core fear: ${e.coreFear} Core desire: ${e.coreDesire}`,
         p.wing ? wingText(e.type, p.wing) : "",
-        p.instinct ? `Your dominant instinct reads as ${p.instinct}, which sets where the type's attention goes first.` : "",
+        p.instinct
+          ? `Your dominant instinct reads as ${p.instinct}, which sets where the type's attention goes first.`
+          : "",
         "The Enneagram is an interpretive framework for motivation, not a clinical classification.",
       ]),
       bullets: [
@@ -396,7 +420,11 @@ function innerWorld(p: Profile): ReportSection[] {
   const n = p.bands.Neuroticism;
   const emotional = join([
     p.attachment ? p.attachment.read : "",
-    p.mbti ? (isL(p, "F") ? "You process by feeling first and reason second, and a decision that is logically clean but emotionally wrong will not settle." : "You process by reasoning first, which means feelings often arrive after the decision, sometimes days after.") : "",
+    p.mbti
+      ? isL(p, "F")
+        ? "You process by feeling first and reason second, and a decision that is logically clean but emotionally wrong will not settle."
+        : "You process by reasoning first, which means feelings often arrive after the decision, sometimes days after."
+      : "",
     n === "high"
       ? "Your threat system is sensitive: emotion arrives fast, stays longer, and rumination is the main tax you pay."
       : n === "low"
@@ -406,31 +434,54 @@ function innerWorld(p: Profile): ReportSection[] {
   ]);
 
   const motivation = join([
-    p.ennea ? `${p.ennea.coreMotivation} Underneath it sits the fear of ${p.ennea.coreFear.toLowerCase().replace(/\.$/, "")}.` : "",
+    p.ennea
+      ? `${p.ennea.coreMotivation} Underneath it sits the fear of ${p.ennea.coreFear.toLowerCase().replace(/\.$/, "")}.`
+      : "",
     p.mbti ? p.mbti.core : "",
-    p.chart ? `Symbolically, your ${p.chart.sun} Sun frames the same drive as a matter of what you are here to develop rather than what you are avoiding.` : "",
+    p.chart
+      ? `Symbolically, your ${p.chart.sun} Sun frames the same drive as a matter of what you are here to develop rather than what you are avoiding.`
+      : "",
   ]);
 
   const stress = join([
     p.mbti ? p.mbti.stress : "",
     p.ennea ? p.ennea.stress : "",
     p.attachment ? `Relationally, stress shows up as: ${lowerFirst(p.attachment.conflict)}` : "",
-    isBand(p, "Conscientiousness", "high") ? "Your default coping move is to work — which is effective right up until it becomes the problem." : "",
+    isBand(p, "Conscientiousness", "high")
+      ? "Your default coping move is to work — which is effective right up until it becomes the problem."
+      : "",
   ]);
 
   const selfPerception = join([
     isBand(p, "Neuroticism", "high") && isBand(p, "Conscientiousness", "high")
       ? "You likely hold yourself to a standard you would never impose on anyone else, and read meeting it as the minimum rather than an achievement."
       : "",
-    p.ennea?.type === 4 ? "You measure yourself against an internal ideal of authenticity, which makes ordinary contentment feel suspect." : "",
-    p.ennea?.type === 3 ? "Your self-image tracks recent output more closely than you would like to admit." : "",
+    p.ennea?.type === 4
+      ? "You measure yourself against an internal ideal of authenticity, which makes ordinary contentment feel suspect."
+      : "",
+    p.ennea?.type === 3
+      ? "Your self-image tracks recent output more closely than you would like to admit."
+      : "",
     "Where the systems agree about you, the reading is probably accurate. Where they disagree, the contradiction is usually the more useful thing to sit with.",
   ]);
 
   return [
-    { group: GROUPS.inner, title: "Emotional Processing", body: emotional || "Add the attachment and Big Five assessments to unlock this section." },
-    { group: GROUPS.inner, title: "Internal Motivation", body: motivation || "Add the Enneagram assessment to unlock this section." },
-    { group: GROUPS.inner, title: "Stress Response", body: stress || "Add more assessments to unlock this section.", premium: true },
+    {
+      group: GROUPS.inner,
+      title: "Emotional Processing",
+      body: emotional || "Add the attachment and Big Five assessments to unlock this section.",
+    },
+    {
+      group: GROUPS.inner,
+      title: "Internal Motivation",
+      body: motivation || "Add the Enneagram assessment to unlock this section.",
+    },
+    {
+      group: GROUPS.inner,
+      title: "Stress Response",
+      body: stress || "Add more assessments to unlock this section.",
+      premium: true,
+    },
     { group: GROUPS.inner, title: "Self-Perception", body: selfPerception, premium: true },
   ];
 }
@@ -444,8 +495,12 @@ function relationships(p: Profile): ReportSection[] {
       body: join([
         p.mbti ? p.mbti.communication : "",
         a ? a.communication : "",
-        isBand(p, "Agreeableness", "low") ? "Low Agreeableness means your delivery is honest by default; people rarely have to guess, and occasionally wish they could." : "",
-        isBand(p, "Extraversion", "low") ? "Because you process internally, a partner may hear the conclusion without the reasoning that produced it." : "",
+        isBand(p, "Agreeableness", "low")
+          ? "Low Agreeableness means your delivery is honest by default; people rarely have to guess, and occasionally wish they could."
+          : "",
+        isBand(p, "Extraversion", "low")
+          ? "Because you process internally, a partner may hear the conclusion without the reasoning that produced it."
+          : "",
       ]),
     },
     {
@@ -453,8 +508,14 @@ function relationships(p: Profile): ReportSection[] {
       title: "Conflict Style",
       body: join([
         a ? a.conflict : "",
-        p.mbti ? (isL(p, "T") ? "You try to separate the problem from the feelings, which is efficient and can read as dismissive mid-argument." : "You need the relationship to feel intact before the problem can be solved, and cannot think clearly while it is in doubt.") : "",
-        isBand(p, "Agreeableness", "high") ? "Your accommodating default means small grievances tend to be absorbed rather than raised — until they are raised all at once." : "",
+        p.mbti
+          ? isL(p, "T")
+            ? "You try to separate the problem from the feelings, which is efficient and can read as dismissive mid-argument."
+            : "You need the relationship to feel intact before the problem can be solved, and cannot think clearly while it is in doubt."
+          : "",
+        isBand(p, "Agreeableness", "high")
+          ? "Your accommodating default means small grievances tend to be absorbed rather than raised — until they are raised all at once."
+          : "",
       ]),
       premium: true,
     },
@@ -463,7 +524,9 @@ function relationships(p: Profile): ReportSection[] {
       title: "Intimacy Style",
       body: join([
         a ? a.intimacy : "",
-        p.chart ? `Symbolically, Venus in ${p.chart.placements.find((x) => x.label === "Venus")?.sign ?? "your chart"} points at what you find valuable in closeness, while Mars in ${p.chart.placements.find((x) => x.label === "Mars")?.sign ?? "your chart"} describes how you pursue it.` : "",
+        p.chart
+          ? `Symbolically, Venus in ${p.chart.placements.find((x) => x.label === "Venus")?.sign ?? "your chart"} points at what you find valuable in closeness, while Mars in ${p.chart.placements.find((x) => x.label === "Mars")?.sign ?? "your chart"} describes how you pursue it.`
+          : "",
         p.ennea ? p.ennea.interpersonal : "",
       ]),
       premium: true,
@@ -472,12 +535,22 @@ function relationships(p: Profile): ReportSection[] {
       group: GROUPS.rel,
       title: "What You Need From a Partner",
       body: join([
-        a?.style === "Anxious" ? "Predictability stated out loud: not more love, but more legible love — times, plans, explicit reassurance before you have to ask." : "",
-        a?.style === "Avoidant" ? "Room that is granted rather than taken, and a partner who does not read your need for space as a verdict on them." : "",
-        a?.style === "Fearful-Avoidant" ? "Consistency that survives your withdrawal — someone steady enough not to match your oscillation." : "",
-        a?.style === "Secure" ? "A partner whose instability you are not quietly compensating for." : "",
+        a?.style === "Anxious"
+          ? "Predictability stated out loud: not more love, but more legible love — times, plans, explicit reassurance before you have to ask."
+          : "",
+        a?.style === "Avoidant"
+          ? "Room that is granted rather than taken, and a partner who does not read your need for space as a verdict on them."
+          : "",
+        a?.style === "Fearful-Avoidant"
+          ? "Consistency that survives your withdrawal — someone steady enough not to match your oscillation."
+          : "",
+        a?.style === "Secure"
+          ? "A partner whose instability you are not quietly compensating for."
+          : "",
         isBand(p, "Extraversion", "low") ? "Recovery time that is not treated as rejection." : "",
-        isBand(p, "Openness", "high") ? "Conversation that goes somewhere; you can survive most things except being bored." : "",
+        isBand(p, "Openness", "high")
+          ? "Conversation that goes somewhere; you can survive most things except being bored."
+          : "",
       ]),
       premium: true,
     },
@@ -505,13 +578,25 @@ function strengthsAndBlind(p: Profile): ReportSection[] {
   }
 
   const sabotage = join([
-    p.attachment?.style === "Anxious" ? "Seeking reassurance in a form that makes reassurance harder to give — testing rather than asking." : "",
-    p.attachment?.style === "Avoidant" ? "Solving the discomfort of closeness by creating distance, then explaining the distance as circumstance." : "",
-    p.attachment?.style === "Fearful-Avoidant" ? "Leaving right after the moment that went well, because it went well." : "",
-    isBand(p, "Conscientiousness", "high") ? "Using productivity as the answer to feelings that are not productivity problems." : "",
-    isBand(p, "Conscientiousness", "low") ? "Waiting for the pressure that makes action possible, and calling the resulting stress bad luck." : "",
+    p.attachment?.style === "Anxious"
+      ? "Seeking reassurance in a form that makes reassurance harder to give — testing rather than asking."
+      : "",
+    p.attachment?.style === "Avoidant"
+      ? "Solving the discomfort of closeness by creating distance, then explaining the distance as circumstance."
+      : "",
+    p.attachment?.style === "Fearful-Avoidant"
+      ? "Leaving right after the moment that went well, because it went well."
+      : "",
+    isBand(p, "Conscientiousness", "high")
+      ? "Using productivity as the answer to feelings that are not productivity problems."
+      : "",
+    isBand(p, "Conscientiousness", "low")
+      ? "Waiting for the pressure that makes action possible, and calling the resulting stress bad luck."
+      : "",
     p.ennea?.type === 5 ? "Preparing indefinitely so that entry never has to be risked." : "",
-    p.ennea?.type === 9 ? "Agreeing in the moment and withdrawing effort later, so the disagreement never has to be spoken." : "",
+    p.ennea?.type === 9
+      ? "Agreeing in the moment and withdrawing effort later, so the disagreement never has to be spoken."
+      : "",
     p.ennea?.type === 3 ? "Substituting a better result for the harder conversation." : "",
   ]);
 
@@ -530,7 +615,14 @@ function strengthsAndBlind(p: Profile): ReportSection[] {
       premium: true,
     },
     ...(sabotage
-      ? [{ group: GROUPS.strengths, title: "Self-Sabotage Patterns", body: sabotage, premium: true }]
+      ? [
+          {
+            group: GROUPS.strengths,
+            title: "Self-Sabotage Patterns",
+            body: sabotage,
+            premium: true,
+          },
+        ]
       : []),
   ];
 }
@@ -538,23 +630,49 @@ function strengthsAndBlind(p: Profile): ReportSection[] {
 function careerAndGrowth(p: Profile): ReportSection[] {
   const career = join([
     p.mbti ? p.mbti.work : "",
-    isBand(p, "Conscientiousness", "high") ? "High Conscientiousness makes you the person work accretes around; guard scope deliberately." : "",
-    isBand(p, "Openness", "high") ? "High Openness means a role without novel problems will erode you slowly even if everything else is good." : "",
-    isBand(p, "Extraversion", "low") ? "Roles that require constant visibility will cost energy you would rather spend on the work itself." : "",
-    p.chart ? `Symbolically, the Midheaven in ${p.chart.midheaven.sign} suggests a public direction coloured by that sign's register.` : "",
+    isBand(p, "Conscientiousness", "high")
+      ? "High Conscientiousness makes you the person work accretes around; guard scope deliberately."
+      : "",
+    isBand(p, "Openness", "high")
+      ? "High Openness means a role without novel problems will erode you slowly even if everything else is good."
+      : "",
+    isBand(p, "Extraversion", "low")
+      ? "Roles that require constant visibility will cost energy you would rather spend on the work itself."
+      : "",
+    p.chart
+      ? `Symbolically, the Midheaven in ${p.chart.midheaven.sign} suggests a public direction coloured by that sign's register.`
+      : "",
   ]);
 
   const growth = join([
     p.attachment ? `Relationally: ${lowerFirst(p.attachment.growth)}` : "",
-    p.ennea ? `Motivationally: the Type ${p.ennea.type} growth move is to stop solving ${p.ennea.coreFear.toLowerCase().replace(/\.$/, "")} and start tolerating the possibility of it.` : "",
-    isBand(p, "Neuroticism", "high") ? "Practically: the highest-leverage habit for you is anything that shortens rumination — writing it down, saying it out loud, or acting before certainty arrives." : "",
-    isBand(p, "Agreeableness", "high") ? "Practically: practise the small no, in low-stakes situations, before you need the large one." : "",
-    isBand(p, "Conscientiousness", "low") ? "Practically: external structure works better for you than resolve — commitments with other people in them." : "",
+    p.ennea
+      ? `Motivationally: the Type ${p.ennea.type} growth move is to stop solving ${p.ennea.coreFear.toLowerCase().replace(/\.$/, "")} and start tolerating the possibility of it.`
+      : "",
+    isBand(p, "Neuroticism", "high")
+      ? "Practically: the highest-leverage habit for you is anything that shortens rumination — writing it down, saying it out loud, or acting before certainty arrives."
+      : "",
+    isBand(p, "Agreeableness", "high")
+      ? "Practically: practise the small no, in low-stakes situations, before you need the large one."
+      : "",
+    isBand(p, "Conscientiousness", "low")
+      ? "Practically: external structure works better for you than resolve — commitments with other people in them."
+      : "",
   ]);
 
   return [
-    { group: GROUPS.career, title: "Career & Work Style", body: career || "Add the MBTI and Big Five assessments to unlock this section.", premium: true },
-    { group: GROUPS.career, title: "Growth Areas", body: growth || "Add more assessments to unlock this section.", premium: true },
+    {
+      group: GROUPS.career,
+      title: "Career & Work Style",
+      body: career || "Add the MBTI and Big Five assessments to unlock this section.",
+      premium: true,
+    },
+    {
+      group: GROUPS.career,
+      title: "Growth Areas",
+      body: growth || "Add more assessments to unlock this section.",
+      premium: true,
+    },
   ];
 }
 
@@ -585,9 +703,13 @@ function executiveSummary(p: Profile): string {
       : p.mbti
         ? `You come out as ${p.mbti.type}, ${p.mbti.nickname.toLowerCase().replace("the ", "")}.`
         : "",
-    p.attachment ? `Your relational baseline is ${p.attachment.style.toLowerCase()}: ${lowerFirst(p.attachment.read)}` : "",
+    p.attachment
+      ? `Your relational baseline is ${p.attachment.style.toLowerCase()}: ${lowerFirst(p.attachment.read)}`
+      : "",
     p.bigFive ? bigFiveHeadline(p) : "",
-    p.chart ? `Symbolically the chart agrees in its own language: ${p.chart.sun} Sun, ${p.chart.moon} Moon, ${p.chart.rising} Rising.` : "",
+    p.chart
+      ? `Symbolically the chart agrees in its own language: ${p.chart.sun} Sun, ${p.chart.moon} Moon, ${p.chart.rising} Rising.`
+      : "",
     m.convergence.length
       ? `Across systems, ${m.convergence.length} clear convergence${m.convergence.length === 1 ? "" : "s"} and ${m.tension.length + m.contradiction.length} point${m.tension.length + m.contradiction.length === 1 ? "" : "s"} of tension emerged — the tensions are where the interesting reading lives.`
       : "",
@@ -614,7 +736,8 @@ export function generateCrossSection(profile: Profile): ReportSection[] {
 export function generateDossier(profile: Profile): Report {
   return {
     headline: headlineFor(profile),
-    executiveSummary: executiveSummary(profile) || "Complete at least one assessment to generate your dossier.",
+    executiveSummary:
+      executiveSummary(profile) || "Complete at least one assessment to generate your dossier.",
     dominantTraits: dominantTraits(profile),
     sections: [
       ...lensSections(profile),

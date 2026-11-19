@@ -42,7 +42,8 @@ export const ATTACHMENT_TEST: TestDef = {
   name: "Adult Attachment Style",
   category: "Relationships & Attachment",
   tagline: "How your nervous system learned to do closeness.",
-  metaDescription: "Explore anxiety about rejection and avoidance of closeness, the two dimensions of adult attachment that shape safety in your close relationships.",
+  metaDescription:
+    "Explore anxiety about rejection and avoidance of closeness, the two dimensions of adult attachment that shape safety in your close relationships.",
   whatItMeasures:
     "This test places you on the two dimensions that define adult attachment: anxiety (fear of rejection and abandonment) and avoidance (discomfort with closeness and dependence). Together they describe your default strategy for staying safe in close relationships.",
   background:
@@ -55,23 +56,84 @@ export const ATTACHMENT_TEST: TestDef = {
     "Attachment style is a tendency, not a life sentence. Styles shift across relationships and can move toward security with awareness and experience.",
   items: [
     { id: "at1", text: "I worry that people I love will stop wanting me.", dimension: "anxiety" },
-    { id: "at2", text: "I find it easy to depend on a partner.", dimension: "avoidance", reverse: true },
+    {
+      id: "at2",
+      text: "I find it easy to depend on a partner.",
+      dimension: "avoidance",
+      reverse: true,
+    },
     { id: "at3", text: "Slow replies make my mind spiral.", dimension: "anxiety" },
-    { id: "at4", text: "When someone gets too close, I start to need distance.", dimension: "avoidance" },
-    { id: "at5", text: "I need frequent reassurance to feel settled in a relationship.", dimension: "anxiety" },
+    {
+      id: "at4",
+      text: "When someone gets too close, I start to need distance.",
+      dimension: "avoidance",
+    },
+    {
+      id: "at5",
+      text: "I need frequent reassurance to feel settled in a relationship.",
+      dimension: "anxiety",
+    },
     { id: "at6", text: "I rarely ask for help, even when I need it.", dimension: "avoidance" },
-    { id: "at7", text: "I often wonder whether I matter as much to others as they matter to me.", dimension: "anxiety" },
-    { id: "at8", text: "I can be close to someone without losing myself.", dimension: "avoidance", reverse: true },
-    { id: "at9", text: "When a partner is upset with me, it is hard to think about anything else.", dimension: "anxiety" },
-    { id: "at10", text: "I prefer handling problems on my own rather than bringing them to someone.", dimension: "avoidance" },
-    { id: "at11", text: "I read small changes in tone as signs that something is wrong.", dimension: "anxiety" },
-    { id: "at12", text: "Talking about feelings comes naturally to me.", dimension: "avoidance", reverse: true },
-    { id: "at13", text: "I fear that once people really know me, they will leave.", dimension: "anxiety" },
+    {
+      id: "at7",
+      text: "I often wonder whether I matter as much to others as they matter to me.",
+      dimension: "anxiety",
+    },
+    {
+      id: "at8",
+      text: "I can be close to someone without losing myself.",
+      dimension: "avoidance",
+      reverse: true,
+    },
+    {
+      id: "at9",
+      text: "When a partner is upset with me, it is hard to think about anything else.",
+      dimension: "anxiety",
+    },
+    {
+      id: "at10",
+      text: "I prefer handling problems on my own rather than bringing them to someone.",
+      dimension: "avoidance",
+    },
+    {
+      id: "at11",
+      text: "I read small changes in tone as signs that something is wrong.",
+      dimension: "anxiety",
+    },
+    {
+      id: "at12",
+      text: "Talking about feelings comes naturally to me.",
+      dimension: "avoidance",
+      reverse: true,
+    },
+    {
+      id: "at13",
+      text: "I fear that once people really know me, they will leave.",
+      dimension: "anxiety",
+    },
     { id: "at14", text: "Too much togetherness makes me want to escape.", dimension: "avoidance" },
-    { id: "at15", text: "I trust that people who love me will stay.", dimension: "anxiety", reverse: true },
-    { id: "at16", text: "I keep parts of myself private even from people I love.", dimension: "avoidance" },
-    { id: "at17", text: "Conflict in a close relationship feels genuinely threatening to me.", dimension: "anxiety" },
-    { id: "at18", text: "I am comfortable depending on others and having them depend on me.", dimension: "avoidance", reverse: true },
+    {
+      id: "at15",
+      text: "I trust that people who love me will stay.",
+      dimension: "anxiety",
+      reverse: true,
+    },
+    {
+      id: "at16",
+      text: "I keep parts of myself private even from people I love.",
+      dimension: "avoidance",
+    },
+    {
+      id: "at17",
+      text: "Conflict in a close relationship feels genuinely threatening to me.",
+      dimension: "anxiety",
+    },
+    {
+      id: "at18",
+      text: "I am comfortable depending on others and having them depend on me.",
+      dimension: "avoidance",
+      reverse: true,
+    },
   ],
   dimensions: [
     {

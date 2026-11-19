@@ -12,7 +12,8 @@ export const ATTACHMENT_ARTICLES: Article[] = [
     slug: "why-avoidant-people-pull-away-when-they-care",
     title: "Why Avoidant People Pull Away When They Actually Care",
     category: "Attachment & Relationships",
-    excerpt: "When someone creates distance as feelings intensify, the behavior can look like rejection. Attachment theory offers another explanation.",
+    excerpt:
+      "When someone creates distance as feelings intensify, the behavior can look like rejection. Attachment theory offers another explanation.",
     readTime: "5 min read",
     content: [
       "When someone you care about suddenly creates distance—becoming quieter, busier, or emotionally unavailable—it can feel like rejection. For people with an avoidant attachment style, the opposite is often true: the stronger the feelings, the stronger the urge to pull away.",
@@ -27,7 +28,8 @@ export const ATTACHMENT_ARTICLES: Article[] = [
     slug: "the-pursuer-distancer-cycle-explained",
     title: "The Pursuer-Distancer Cycle Explained",
     category: "Attachment & Relationships",
-    excerpt: "Why one person reaches for connection while the other backs away, and how the cycle can become self-reinforcing.",
+    excerpt:
+      "Why one person reaches for connection while the other backs away, and how the cycle can become self-reinforcing.",
     readTime: "5 min read",
     content: [
       "One of the most common and painful dynamics in relationships is the pursuer-distancer cycle. One partner seeks more connection, reassurance, or closeness (the pursuer). The other responds by withdrawing, needing space, or shutting down (the distancer). The more one pursues, the more the other distances—and the cycle intensifies.",
@@ -42,7 +44,8 @@ export const ATTACHMENT_ARTICLES: Article[] = [
     slug: "why-anxious-and-avoidant-people-become-addicted-to-each-other",
     title: "Why Anxious and Avoidant People Become Addicted to Each Other",
     category: "Attachment & Relationships",
-    excerpt: "Anxious and avoidant dynamics can create extraordinary intensity. Here’s why the cycle can feel magnetic and difficult to leave.",
+    excerpt:
+      "Anxious and avoidant dynamics can create extraordinary intensity. Here’s why the cycle can feel magnetic and difficult to leave.",
     readTime: "5 min read",
     content: [
       "Anxious and avoidant attachment styles are frequently drawn to one another, creating relationships that feel intense, magnetic, and difficult to leave—even when they are painful. This is not coincidence. It is a powerful interplay of complementary (and conflicting) needs.",
@@ -56,7 +59,8 @@ export const ATTACHMENT_ARTICLES: Article[] = [
     slug: "what-actually-happens-during-an-attachment-trigger",
     title: "What Actually Happens During an Attachment Trigger",
     category: "Attachment & Relationships",
-    excerpt: "A small event can create a huge reaction when the nervous system interprets the present through an older attachment wound.",
+    excerpt:
+      "A small event can create a huge reaction when the nervous system interprets the present through an older attachment wound.",
     readTime: "5 min read",
     content: [
       "An attachment trigger is a moment when something in the present relationship activates an old emotional wound related to safety, belonging, or worth. It is not simply “overreacting.” It is the nervous system responding as if an earlier threat is happening again.",
@@ -70,7 +74,8 @@ export const ATTACHMENT_ARTICLES: Article[] = [
     slug: "why-someone-can-love-you-and-still-push-you-away",
     title: "Why Someone Can Love You and Still Push You Away",
     category: "Attachment & Relationships",
-    excerpt: "Love and the ability to tolerate emotional intimacy are related, but they are not the same skill.",
+    excerpt:
+      "Love and the ability to tolerate emotional intimacy are related, but they are not the same skill.",
     readTime: "4 min read",
     content: [
       "It is possible—and common—for someone to feel genuine love and still create distance. Love and the capacity to stay emotionally present are not the same skill.",
@@ -84,7 +89,8 @@ export const ATTACHMENT_ARTICLES: Article[] = [
     slug: "secure-attachment-vs-emotional-detachment",
     title: "Secure Attachment vs. Emotional Detachment",
     category: "Attachment & Relationships",
-    excerpt: "Healthy independence can look like distance from the outside. The difference is what happens internally and relationally.",
+    excerpt:
+      "Healthy independence can look like distance from the outside. The difference is what happens internally and relationally.",
     readTime: "5 min read",
     content: [
       "Secure attachment and emotional detachment are sometimes confused, yet they are fundamentally different.",
@@ -98,7 +104,8 @@ export const ATTACHMENT_ARTICLES: Article[] = [
     slug: "why-some-people-need-reassurance-constantly",
     title: "Why Some People Need Reassurance Constantly",
     category: "Attachment & Relationships",
-    excerpt: "Repeated reassurance can be an attempt to regulate an attachment alarm rather than simple neediness.",
+    excerpt:
+      "Repeated reassurance can be an attempt to regulate an attachment alarm rather than simple neediness.",
     readTime: "5 min read",
     content: [
       "Constant need for reassurance is one of the hallmark experiences of anxious attachment. It is not simply “neediness.” It is a nervous system that has learned connection is unreliable.",
@@ -112,7 +119,8 @@ export const ATTACHMENT_ARTICLES: Article[] = [
     slug: "avoidance-vs-healthy-independence",
     title: "The Difference Between Avoidance and Healthy Independence",
     category: "Attachment & Relationships",
-    excerpt: "Both independence and avoidance involve space. The difference is whether that space is flexible and chosen or defensive and rigid.",
+    excerpt:
+      "Both independence and avoidance involve space. The difference is whether that space is flexible and chosen or defensive and rigid.",
     readTime: "5 min read",
     content: [
       "Healthy independence and avoidant distancing are easy to confuse because both involve space and self-reliance. The internal experience and relational impact, however, differ significantly.",
@@ -126,7 +134,8 @@ export const ATTACHMENT_ARTICLES: Article[] = [
     slug: "why-intermittent-reinforcement-makes-relationships-feel-addictive",
     title: "Why Intermittent Reinforcement Makes Relationships Feel Addictive",
     category: "Attachment & Relationships",
-    excerpt: "Unpredictable affection can keep the brain locked onto a relationship long after the relationship stops feeling safe.",
+    excerpt:
+      "Unpredictable affection can keep the brain locked onto a relationship long after the relationship stops feeling safe.",
     readTime: "5 min read",
     content: [
       "Intermittent reinforcement is one of the most powerful ways the brain learns to stay attached to unpredictable rewards. In relationships, it occurs when affection, attention, or emotional availability appears inconsistently—sometimes present and intense, sometimes withdrawn.",

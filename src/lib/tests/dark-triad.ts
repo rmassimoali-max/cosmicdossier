@@ -13,7 +13,8 @@ export const DARK_TRIAD_TEST: TestDef = {
   name: "Dark Triad",
   category: "Dark Traits",
   tagline: "Three socially aversive traits everyone carries in some measure.",
-  metaDescription: "Explore Machiavellianism, Narcissism and Psychopathy as personality tendencies with this 12-item Dark Triad screen, not a clinical diagnosis.",
+  metaDescription:
+    "Explore Machiavellianism, Narcissism and Psychopathy as personality tendencies with this 12-item Dark Triad screen, not a clinical diagnosis.",
   whatItMeasures:
     "The Dark Triad measures three related but distinct tendencies: Machiavellianism (strategic manipulation), Narcissism (grandiosity and entitlement) and Psychopathy (callousness and low remorse). Everyone scores somewhere — these are dimensions, not diagnoses.",
   background:
@@ -25,16 +26,28 @@ export const DARK_TRIAD_TEST: TestDef = {
   disclaimer:
     "This is not a diagnosis. Elevated scores describe tendencies, not character verdicts — and brief self-report screens like this one trade precision for speed.",
   items: [
-    { id: "dt1", text: "I tend to manipulate others to get my way.", dimension: "machiavellianism" },
+    {
+      id: "dt1",
+      text: "I tend to manipulate others to get my way.",
+      dimension: "machiavellianism",
+    },
     { id: "dt2", text: "I tend to lack remorse.", dimension: "psychopathy" },
     { id: "dt3", text: "I tend to want others to admire me.", dimension: "narcissism" },
     { id: "dt4", text: "I have used deceit or lied to get my way.", dimension: "machiavellianism" },
-    { id: "dt5", text: "I tend to be unconcerned with the morality of my actions.", dimension: "psychopathy" },
+    {
+      id: "dt5",
+      text: "I tend to be unconcerned with the morality of my actions.",
+      dimension: "psychopathy",
+    },
     { id: "dt6", text: "I tend to want others to pay attention to me.", dimension: "narcissism" },
     { id: "dt7", text: "I have used flattery to get my way.", dimension: "machiavellianism" },
     { id: "dt8", text: "I tend to be callous or insensitive.", dimension: "psychopathy" },
     { id: "dt9", text: "I tend to seek prestige or status.", dimension: "narcissism" },
-    { id: "dt10", text: "I tend to exploit others towards my own end.", dimension: "machiavellianism" },
+    {
+      id: "dt10",
+      text: "I tend to exploit others towards my own end.",
+      dimension: "machiavellianism",
+    },
     { id: "dt11", text: "I tend to be cynical.", dimension: "psychopathy" },
     { id: "dt12", text: "I tend to expect special favors from others.", dimension: "narcissism" },
   ],

@@ -90,8 +90,7 @@ export function scoreDimensions(
 export function bandFor(dim: DimensionDef, score: number): Band {
   return (
     dim.bands.find((b) => score >= b.min && score <= b.max) ??
-    dim.bands[dim.bands.length - 1] ??
-    { min: 0, max: 100, label: "", text: "" }
+    dim.bands[dim.bands.length - 1] ?? { min: 0, max: 100, label: "", text: "" }
   );
 }
 
@@ -102,16 +101,21 @@ export function encodeAnswers(items: TestItem[], answers: Record<string, number>
   return "v1" + items.map((q) => (answers[q.id] ?? 0).toString(36)).join("");
 }
 
-export function decodeAnswers(items: TestItem[], encoded: string, scale?: TestScale): Record<string, number> | null {
+export function decodeAnswers(
+  items: TestItem[],
+  encoded: string,
+  scale?: TestScale,
+): Record<string, number> | null {
   const digits = encoded.startsWith("v1") ? encoded.slice(2) : encoded;
   if (!digits || digits.length !== items.length) return null;
   const out: Record<string, number> = {};
   for (let i = 0; i < items.length; i++) {
     const v = parseInt(digits[i] ?? "", 36);
     const item = items[i];
-    const min = item?.choices ? 1 : scale?.min ?? 1;
-    const max = item?.choices ? item.choices.length : scale?.max ?? 35;
-    if (!/^[0-9a-z]$/.test(digits[i] ?? "") || !Number.isFinite(v) || v < min || v > max) return null;
+    const min = item?.choices ? 1 : (scale?.min ?? 1);
+    const max = item?.choices ? item.choices.length : (scale?.max ?? 35);
+    if (!/^[0-9a-z]$/.test(digits[i] ?? "") || !Number.isFinite(v) || v < min || v > max)
+      return null;
     out[items[i]?.id ?? ""] = v;
   }
   return out;

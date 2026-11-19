@@ -23,14 +23,61 @@ export const Route = createFileRoute("/")({
   }),
   component: Landing,
 });
-const PILLARS: { to: string; params?: { slug: string }; glyph: string; label: string; note: string }[] = [
-  { to: "/systems/$slug", params: { slug: "astrology" }, glyph: "⭐", label: "Astrology", note: "Full natal chart, aspects, houses" },
-  { to: "/systems/$slug", params: { slug: "mbti" }, glyph: "🧠", label: "MBTI", note: "Known type or 20-question estimate" },
-  { to: "/systems/$slug", params: { slug: "enneagram" }, glyph: "🎭", label: "Enneagram", note: "Type, wing, instinct" },
-  { to: "/attachment", glyph: "🔗", label: "Attachment", note: "Secure, anxious, avoidant, fearful-avoidant" },
-  { to: "/systems/$slug", params: { slug: "big-five" }, glyph: "📊", label: "Big Five", note: "The most research-backed model here" },
-  { to: "/systems/$slug", params: { slug: "synastry" }, glyph: "❤️", label: "Synastry", note: "Two charts, compared honestly" },
-  { to: "/systems/$slug", params: { slug: "ai-analysis" }, glyph: "📈", label: "Synthesis", note: "One woven profile, not five silos" },
+const PILLARS: {
+  to: string;
+  params?: { slug: string };
+  glyph: string;
+  label: string;
+  note: string;
+}[] = [
+  {
+    to: "/systems/$slug",
+    params: { slug: "astrology" },
+    glyph: "⭐",
+    label: "Astrology",
+    note: "Full natal chart, aspects, houses",
+  },
+  {
+    to: "/systems/$slug",
+    params: { slug: "mbti" },
+    glyph: "🧠",
+    label: "MBTI",
+    note: "Known type or 20-question estimate",
+  },
+  {
+    to: "/systems/$slug",
+    params: { slug: "enneagram" },
+    glyph: "🎭",
+    label: "Enneagram",
+    note: "Type, wing, instinct",
+  },
+  {
+    to: "/attachment",
+    glyph: "🔗",
+    label: "Attachment",
+    note: "Secure, anxious, avoidant, fearful-avoidant",
+  },
+  {
+    to: "/systems/$slug",
+    params: { slug: "big-five" },
+    glyph: "📊",
+    label: "Big Five",
+    note: "The most research-backed model here",
+  },
+  {
+    to: "/systems/$slug",
+    params: { slug: "synastry" },
+    glyph: "❤️",
+    label: "Synastry",
+    note: "Two charts, compared honestly",
+  },
+  {
+    to: "/systems/$slug",
+    params: { slug: "ai-analysis" },
+    glyph: "📈",
+    label: "Synthesis",
+    note: "One woven profile, not five silos",
+  },
 ];
 const DOSSIER_SECTIONS = [
   { label: "Core Pattern", note: "The through-line all five systems agree on" },
@@ -119,7 +166,8 @@ function Landing() {
           <span aria-hidden>→</span>
         </Link>
         <p className="mt-6 text-xs text-muted-foreground/80">
-          Free preview · $4 unlocks the full report · no account · astrology treated as symbolic language, not prophecy
+          Free preview · $4 unlocks the full report · no account · astrology treated as symbolic
+          language, not prophecy
         </p>
         <p className="animate-drift-in mt-10 max-w-md text-balance text-sm text-foreground/80">
           Built for people who've already taken the tests and still feel fragmented.
@@ -131,7 +179,9 @@ function Landing() {
       </section>
 
       <section className="relative mx-auto max-w-4xl px-6 pb-24">
-        <p className="tracking-cosmic text-center text-xs text-primary/80">What you'll actually get</p>
+        <p className="tracking-cosmic text-center text-xs text-primary/80">
+          What you'll actually get
+        </p>
         <h2 className="mt-3 text-center font-display text-3xl text-foreground/95 sm:text-4xl">
           One dossier, read as a whole
         </h2>

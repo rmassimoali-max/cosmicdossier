@@ -88,7 +88,8 @@ function MbtiLanding() {
           </ul>
           <p className="mt-4 text-xs leading-relaxed text-muted-foreground">
             MBTI is a useful shared vocabulary rather than a validated clinical instrument. In your
-            dossier it's read alongside the more empirically grounded Big Five, never in place of it.
+            dossier it's read alongside the more empirically grounded Big Five, never in place of
+            it.
           </p>
         </div>
 
@@ -127,7 +128,14 @@ function MbtiLanding() {
 
         <div className="panel mt-12 p-6 text-center sm:p-8">
           <p className="font-display text-xl text-foreground">Not sure which type is yours?</p>
-          <Link to="/tests/$slug" params={{ slug: "mbti" }} search={{ r: undefined }} className="mt-4 inline-flex text-sm text-primary hover:text-gold">Take the free MBTI-style test</Link>
+          <Link
+            to="/tests/$slug"
+            params={{ slug: "mbti" }}
+            search={{ r: undefined }}
+            className="mt-4 inline-flex text-sm text-primary hover:text-gold"
+          >
+            Take the free MBTI-style test
+          </Link>
           <p className="mx-auto mt-2 max-w-xl text-sm text-muted-foreground">
             Cosmic Dossier includes a short MBTI estimate as part of your full personality dossier —
             read alongside Enneagram, attachment style, Big Five and your natal chart.

@@ -1,7 +1,11 @@
 // Small factory for multi-dimension Likert tests that share one band structure.
 import type { DimensionDef, TestDef, TestItem } from "./types";
 
-export const AGREE_5 = { min: 1, max: 5, labels: ["Strongly Disagree", "Disagree", "Neutral", "Agree", "Strongly Agree"] };
+export const AGREE_5 = {
+  min: 1,
+  max: 5,
+  labels: ["Strongly Disagree", "Disagree", "Neutral", "Agree", "Strongly Agree"],
+};
 
 export type DimSpec = {
   key: string;
@@ -15,19 +19,28 @@ export type DimSpec = {
   items: string[];
 };
 
-export function buildDims(prefix: string, dims: DimSpec[]): { items: TestItem[]; dimensions: DimensionDef[] } {
+export function buildDims(
+  prefix: string,
+  dims: DimSpec[],
+): { items: TestItem[]; dimensions: DimensionDef[] } {
   const items: TestItem[] = [];
   let n = 1;
   for (const d of dims) {
     for (const raw of d.items) {
       const reverse = raw.startsWith("-");
-      items.push({ id: `${prefix}${n++}`, text: reverse ? raw.slice(1) : raw, dimension: d.key, ...(reverse ? { reverse: true } : {}) });
+      items.push({
+        id: `${prefix}${n++}`,
+        text: reverse ? raw.slice(1) : raw,
+        dimension: d.key,
+        ...(reverse ? { reverse: true } : {}),
+      });
     }
   }
   // Interleave so consecutive items come from different dimensions.
   const byDim = dims.map((d) => items.filter((i) => i.dimension === d.key));
   const mixed: TestItem[] = [];
-  for (let r = 0; r < Math.max(...byDim.map((b) => b.length)); r++) for (const b of byDim) if (b[r]) mixed.push(b[r]!);
+  for (let r = 0; r < Math.max(...byDim.map((b) => b.length)); r++)
+    for (const b of byDim) if (b[r]) mixed.push(b[r]!);
   return {
     items: mixed,
     dimensions: dims.map((d) => ({
@@ -47,7 +60,10 @@ export function topDim(dims: DimSpec[], scores: Record<string, number>): DimSpec
   return [...dims].sort((a, b) => (scores[b.key] ?? 0) - (scores[a.key] ?? 0))[0]!;
 }
 
-export function multiDimHelpers(dims: DimSpec[], noun: string): Pick<TestDef, "resultLabel" | "resultSummary" | "archetypeNote"> {
+export function multiDimHelpers(
+  dims: DimSpec[],
+  noun: string,
+): Pick<TestDef, "resultLabel" | "resultSummary" | "archetypeNote"> {
   return {
     resultLabel: (s) => topDim(dims, s).label,
     resultSummary: (s) => {
@@ -56,7 +72,17 @@ export function multiDimHelpers(dims: DimSpec[], noun: string): Pick<TestDef, "r
     },
     archetypeNote: (s) => {
       const t = topDim(dims, s);
-      return { slugs: t.archetypes, text: `A leading ${t.label} score often resonates with ${t.archetypes.map((a) => a.replace("the-", "The ").replace(/\b\w/g, (c) => c.toUpperCase()).replace("The The", "The")).join(" or ")} — explore whether that archetype describes how this shows up in you.` };
+      return {
+        slugs: t.archetypes,
+        text: `A leading ${t.label} score often resonates with ${t.archetypes
+          .map((a) =>
+            a
+              .replace("the-", "The ")
+              .replace(/\b\w/g, (c) => c.toUpperCase())
+              .replace("The The", "The"),
+          )
+          .join(" or ")} — explore whether that archetype describes how this shows up in you.`,
+      };
     },
   };
 }

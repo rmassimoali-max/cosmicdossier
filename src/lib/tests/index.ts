@@ -21,7 +21,20 @@ export const TEST_CATEGORIES = [
   "Neurodiversity",
 ] as const;
 
-export const TESTS: TestDef[] = [BIG_FIVE_TEST, MBTI_TEST, ENNEAGRAM_TEST, HEXACO_TEST, ATTACHMENT_TEST, LOVE_STYLES_TEST, DARK_TRIAD_TEST, HSP_TEST, EI_TEST, RESILIENCE_TEST, ADHD_TEST, AQ_TEST];
+export const TESTS: TestDef[] = [
+  BIG_FIVE_TEST,
+  MBTI_TEST,
+  ENNEAGRAM_TEST,
+  HEXACO_TEST,
+  ATTACHMENT_TEST,
+  LOVE_STYLES_TEST,
+  DARK_TRIAD_TEST,
+  HSP_TEST,
+  EI_TEST,
+  RESILIENCE_TEST,
+  ADHD_TEST,
+  AQ_TEST,
+];
 
 export function testBySlug(slug: string): TestDef | undefined {
   return TESTS.find((t) => t.slug === slug);

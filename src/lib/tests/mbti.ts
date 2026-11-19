@@ -12,15 +12,25 @@ export const MBTI_TEST: TestDef = {
   name: "MBTI-Style Personality Test",
   category: "Personality",
   tagline: "Sixteen types, four preferences, one honest estimate.",
-  whatItMeasures: "Your preferences on four pairs (Introversion/Extraversion, Sensing/Intuition, Thinking/Feeling, Judging/Perceiving), combined into a probability spread across the 16 types instead of one forced label.",
-  metaDescription: "Explore four pairs of personality preferences and your likely MBTI types with a probability spread, rather than one forced label, in 20 questions.",
-  background: "The 16-type framework grew out of Carl Jung's theory of psychological types and was developed into a questionnaire by Katharine Briggs and Isabel Briggs Myers. Research suggests its four dimensions overlap with Big Five traits, and type categories are less stable than continuous trait scores, so treat the result as a useful vocabulary for preferences, not a fixed identity. This is an independent MBTI-style estimate. It is not the official MBTI instrument and is not affiliated with or endorsed by The Myers-Briggs Company.",
-  citation: "McCrae, R. R., & Costa, P. T. (1989). Reinterpreting the Myers-Briggs Type Indicator from the perspective of the five-factor model of personality. Journal of Personality, 57(1), 17-40.",
-  disclaimer: "Your type can shift with mood, context and life stage. Retake it on a different day to see how stable your result is.",
+  whatItMeasures:
+    "Your preferences on four pairs (Introversion/Extraversion, Sensing/Intuition, Thinking/Feeling, Judging/Perceiving), combined into a probability spread across the 16 types instead of one forced label.",
+  metaDescription:
+    "Explore four pairs of personality preferences and your likely MBTI types with a probability spread, rather than one forced label, in 20 questions.",
+  background:
+    "The 16-type framework grew out of Carl Jung's theory of psychological types and was developed into a questionnaire by Katharine Briggs and Isabel Briggs Myers. Research suggests its four dimensions overlap with Big Five traits, and type categories are less stable than continuous trait scores, so treat the result as a useful vocabulary for preferences, not a fixed identity. This is an independent MBTI-style estimate. It is not the official MBTI instrument and is not affiliated with or endorsed by The Myers-Briggs Company.",
+  citation:
+    "McCrae, R. R., & Costa, P. T. (1989). Reinterpreting the Myers-Briggs Type Indicator from the perspective of the five-factor model of personality. Journal of Personality, 57(1), 17-40.",
+  disclaimer:
+    "Your type can shift with mood, context and life stage. Retake it on a different day to see how stable your result is.",
   minutes: "~4 minutes",
   answerMode: "choice",
   scale: { min: 1, max: 2, labels: [] },
-  items: MBTI_QUESTIONS.map((q) => ({ id: q.id, text: q.prompt, dimension: "preferences", choices: [q.a, q.b] })),
+  items: MBTI_QUESTIONS.map((q) => ({
+    id: q.id,
+    text: q.prompt,
+    dimension: "preferences",
+    choices: [q.a, q.b],
+  })),
   dimensions: [],
   scoreAnswers: (answers) => {
     const choices: Record<string, string> = {};
@@ -44,6 +54,9 @@ export const MBTI_TEST: TestDef = {
       text: `Your ${code} preferences connect with these Cosmic Dossier archetypes.`,
     };
   },
-  articleSlugs: ["why-your-mbti-type-isnt-your-personality", "mbti-vs-big-five-whats-the-difference"],
+  articleSlugs: [
+    "why-your-mbti-type-isnt-your-personality",
+    "mbti-vs-big-five-whats-the-difference",
+  ],
   dossierPatch: (scores) => ({ mbti: topType(scores), mbtiEstimates: estimates(scores) }),
 };

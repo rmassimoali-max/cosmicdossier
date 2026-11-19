@@ -238,7 +238,6 @@ function DossierView({
           />
         </div>
       ) : (
-      
         <div className="grid gap-4 sm:grid-cols-2">
           {dossier.sections.map((s) => (
             <article key={s.title} className="panel p-6">
@@ -328,9 +327,7 @@ function ReportPage() {
         </Link>
 
         <div className="mt-8">
-          <SectionTitle kicker="Cosmic Dossier">
-            {session.p1.name || "Your dossier"}
-          </SectionTitle>
+          <SectionTitle kicker="Cosmic Dossier">{session.p1.name || "Your dossier"}</SectionTitle>
           <IdentityStrip person={session.p1} chart={chart1} />
         </div>
 

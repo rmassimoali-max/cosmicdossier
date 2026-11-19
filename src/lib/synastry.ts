@@ -22,11 +22,8 @@ const P = (
 ): PairRule => ({ kind, when, text: typeof text === "string" ? () => text : text });
 
 // symmetric helper: true if one side matches x and the other matches y
-const pairMatch = (
-  p: Pair,
-  x: (q: Profile) => boolean,
-  y: (q: Profile) => boolean,
-) => (x(p.a) && y(p.b)) || (x(p.b) && y(p.a));
+const pairMatch = (p: Pair, x: (q: Profile) => boolean, y: (q: Profile) => boolean) =>
+  (x(p.a) && y(p.b)) || (x(p.b) && y(p.a));
 
 const isAtt = (s: string) => (q: Profile) => q.attachment?.style === s;
 
@@ -49,42 +46,80 @@ export const PAIR_RULES: PairRule[] = [
   ),
   P(
     "strength",
-    (p) => pairMatch(p, isAtt("Secure"), (q) => q.attachment?.style !== undefined && q.attachment.style !== "Secure"),
+    (p) =>
+      pairMatch(
+        p,
+        isAtt("Secure"),
+        (q) => q.attachment?.style !== undefined && q.attachment.style !== "Secure",
+      ),
     "One secure partner can meaningfully stabilise the other's pattern, provided the secure one does not slide into managing rather than relating.",
   ),
   P(
     "friction",
-    (p) => pairMatch(p, (q) => isBand(q, "Neuroticism", "high"), (q) => isBand(q, "Neuroticism", "low")),
+    (p) =>
+      pairMatch(
+        p,
+        (q) => isBand(q, "Neuroticism", "high"),
+        (q) => isBand(q, "Neuroticism", "low"),
+      ),
     "One of you is highly sensitive to threat and the other is unusually steady. The steady one may read urgency as overreaction; the sensitive one may read calm as not caring. Both readings are wrong and both are predictable.",
   ),
   P(
     "friction",
-    (p) => pairMatch(p, (q) => isBand(q, "Conscientiousness", "high"), (q) => isBand(q, "Conscientiousness", "low")),
+    (p) =>
+      pairMatch(
+        p,
+        (q) => isBand(q, "Conscientiousness", "high"),
+        (q) => isBand(q, "Conscientiousness", "low"),
+      ),
     "Different structure expectations are likely: one of you experiences plans as commitments, the other as intentions. Most of the resulting arguments will be about respect while appearing to be about logistics.",
   ),
   P(
     "misunderstanding",
-    (p) => pairMatch(p, (q) => isBand(q, "Extraversion", "high"), (q) => isBand(q, "Extraversion", "low")),
+    (p) =>
+      pairMatch(
+        p,
+        (q) => isBand(q, "Extraversion", "high"),
+        (q) => isBand(q, "Extraversion", "low"),
+      ),
     "Differing social-energy needs mean recovery time and stimulation have to be negotiated explicitly rather than assumed. Silence is not withdrawal, and enthusiasm is not pressure.",
   ),
   P(
     "friction",
-    (p) => pairMatch(p, (q) => isBand(q, "Agreeableness", "high"), (q) => isAtt("Avoidant")(q)),
+    (p) =>
+      pairMatch(
+        p,
+        (q) => isBand(q, "Agreeableness", "high"),
+        (q) => isAtt("Avoidant")(q),
+      ),
     "High agreeableness on one side and avoidance on the other can suppress conflict entirely: nothing is raised, nothing is resolved, and distance grows without a single argument.",
   ),
   P(
     "similarity",
-    (p) => p.a.bigFive && p.b.bigFive ? Math.abs((p.a.bigFive['Openness'] ?? 50) - (p.b.bigFive['Openness'] ?? 50)) <= 12 : false,
+    (p) =>
+      p.a.bigFive && p.b.bigFive
+        ? Math.abs((p.a.bigFive["Openness"] ?? 50) - (p.b.bigFive["Openness"] ?? 50)) <= 12
+        : false,
     "You sit close on Openness, which usually means conversation, novelty and taste come easily and rarely need translating.",
   ),
   P(
     "complement",
-    (p) => pairMatch(p, (q) => isL(q, "J"), (q) => isL(q, "P")),
+    (p) =>
+      pairMatch(
+        p,
+        (q) => isL(q, "J"),
+        (q) => isL(q, "P"),
+      ),
     "Judging with Perceiving is a genuine complement: one of you closes decisions, the other keeps them open long enough to find better options. It works when it is deliberate and grinds when it is not.",
   ),
   P(
     "complement",
-    (p) => pairMatch(p, (q) => isL(q, "T"), (q) => isL(q, "F")),
+    (p) =>
+      pairMatch(
+        p,
+        (q) => isL(q, "T"),
+        (q) => isL(q, "F"),
+      ),
     "Thinking with Feeling means one of you brings decision clarity and the other brings relational accuracy. Each will underestimate the other's contribution under stress.",
   ),
   P(
@@ -99,7 +134,12 @@ export const PAIR_RULES: PairRule[] = [
   ),
   P(
     "friction",
-    (p) => pairMatch(p, (q) => q.ennea?.type === 8, (q) => q.ennea?.type === 9),
+    (p) =>
+      pairMatch(
+        p,
+        (q) => q.ennea?.type === 8,
+        (q) => q.ennea?.type === 9,
+      ),
     "Eight and Nine energy: one escalates to make contact, the other withdraws to keep peace. Directness and stillness will each feel like aggression to the other.",
   ),
   P(
@@ -109,7 +149,12 @@ export const PAIR_RULES: PairRule[] = [
   ),
   P(
     "complement",
-    (p) => pairMatch(p, (q) => q.ennea?.type === 2, (q) => q.ennea?.type === 5),
+    (p) =>
+      pairMatch(
+        p,
+        (q) => q.ennea?.type === 2,
+        (q) => q.ennea?.type === 5,
+      ),
     "Two-and-Five pairs the person who moves toward with the person who conserves. Warmth may register as demand; independence may register as rejection.",
   ),
 ];
@@ -144,7 +189,8 @@ function elementMix(a: NatalChart, b: NatalChart) {
   const sunA = ELEMENT_OF[a.sun];
   const sunB = ELEMENT_OF[b.sun];
   if (!sunA || !sunB) return "";
-  if (sunA === sunB) return `Both Suns share the ${sunA} element, which usually reads as instinctive recognition and a shared pace.`;
+  if (sunA === sunB)
+    return `Both Suns share the ${sunA} element, which usually reads as instinctive recognition and a shared pace.`;
   const easy: Record<string, string> = { Fire: "Air", Air: "Fire", Earth: "Water", Water: "Earth" };
   return easy[sunA] === sunB
     ? `${sunA} and ${sunB} Suns are a traditionally easy mix — different registers that feed each other rather than compete.`
@@ -181,7 +227,9 @@ export function generateSynastry(a: Profile, b: Profile): Report {
       matched.friction.length
         ? "The dominant dynamic to watch is described below under friction; it is the pattern most likely to repeat."
         : "No high-friction structural pattern surfaced from the systems you have both completed.",
-      matched.complement.length ? "There are also real complements — differences that function as capability rather than conflict." : "",
+      matched.complement.length
+        ? "There are also real complements — differences that function as capability rather than conflict."
+        : "",
     ]
       .filter(Boolean)
       .join(" "),
@@ -214,7 +262,9 @@ export function generateSynastry(a: Profile, b: Profile): Report {
     title: "Emotional Compatibility",
     body: [
       a.bigFive && b.bigFive ? bigFiveGap(a, b) : "",
-      a.ennea && b.ennea ? `Motivationally, a Type ${a.ennea.type} and a Type ${b.ennea.type} want different things from the same situation: ${lower(a.ennea.coreDesire)} versus ${lower(b.ennea.coreDesire)}` : "",
+      a.ennea && b.ennea
+        ? `Motivationally, a Type ${a.ennea.type} and a Type ${b.ennea.type} want different things from the same situation: ${lower(a.ennea.coreDesire)} versus ${lower(b.ennea.coreDesire)}`
+        : "",
     ]
       .filter(Boolean)
       .join(" "),
@@ -224,7 +274,9 @@ export function generateSynastry(a: Profile, b: Profile): Report {
   sections.push({
     group: G.rel,
     title: "Conflict Dynamic",
-    body: matched.friction.join(" ") || "No structural conflict pattern surfaced from the data provided.",
+    body:
+      matched.friction.join(" ") ||
+      "No structural conflict pattern surfaced from the data provided.",
     premium: true,
   });
 
@@ -254,7 +306,9 @@ export function generateSynastry(a: Profile, b: Profile): Report {
     group: G.strengths,
     title: "Friction Points",
     body: "Interpretive possibilities, not predictions.",
-    bullets: matched.friction.length ? matched.friction : ["No structural friction pattern detected from the data provided."],
+    bullets: matched.friction.length
+      ? matched.friction
+      : ["No structural friction pattern detected from the data provided."],
     premium: true,
   });
 
@@ -262,7 +316,9 @@ export function generateSynastry(a: Profile, b: Profile): Report {
     group: G.strengths,
     title: "Potential Misunderstandings",
     body: "The most likely places to mistranslate each other.",
-    bullets: matched.misunderstanding.length ? matched.misunderstanding : ["None flagged from current data."],
+    bullets: matched.misunderstanding.length
+      ? matched.misunderstanding
+      : ["None flagged from current data."],
     premium: true,
   });
 
@@ -274,7 +330,10 @@ export function generateSynastry(a: Profile, b: Profile): Report {
       ...matched.similarity.map((s) => `Similar: ${s}`),
       ...matched.complement.map((s) => `Complementary: ${s}`),
     ].length
-      ? [...matched.similarity.map((s) => `Similar: ${s}`), ...matched.complement.map((s) => `Complementary: ${s}`)]
+      ? [
+          ...matched.similarity.map((s) => `Similar: ${s}`),
+          ...matched.complement.map((s) => `Complementary: ${s}`),
+        ]
       : ["Complete more assessments for both people to populate this comparison."],
   });
 
@@ -322,7 +381,8 @@ export function generateSynastry(a: Profile, b: Profile): Report {
         const va = a.bigFive?.[t] ?? 50;
         const vb = b.bigFive?.[t] ?? 50;
         const gap = Math.abs(va - vb);
-        const label = gap <= 12 ? "closely matched" : gap <= 30 ? "moderately different" : "sharply different";
+        const label =
+          gap <= 12 ? "closely matched" : gap <= 30 ? "moderately different" : "sharply different";
         return `${t}: ${a.name} ${va} (${band(va)}) vs ${b.name} ${vb} (${band(vb)}) — ${label}.`;
       }),
       premium: true,
@@ -376,9 +436,10 @@ function describe(p: Profile) {
 }
 
 function bigFiveGap(a: Profile, b: Profile) {
-  const gaps = BIG_FIVE.map((t) => ({ t, gap: Math.abs((a.bigFive?.[t] ?? 50) - (b.bigFive?.[t] ?? 50)) })).sort(
-    (x, y) => y.gap - x.gap,
-  );
+  const gaps = BIG_FIVE.map((t) => ({
+    t,
+    gap: Math.abs((a.bigFive?.[t] ?? 50) - (b.bigFive?.[t] ?? 50)),
+  })).sort((x, y) => y.gap - x.gap);
   const biggest = gaps[0];
   const smallest = gaps[gaps.length - 1];
   if (!biggest || !smallest) return "";
@@ -414,7 +475,8 @@ function verdict(m: Record<PairRule["kind"], string[]>) {
   const support = m.strength.length + m.complement.length + m.similarity.length;
   const friction = m.friction.length + m.misunderstanding.length;
   if (support > friction * 1.5) return "workable ease with identifiable edges";
-  if (friction > support * 1.5) return "high-contact intensity that will require explicit skill rather than good intentions";
+  if (friction > support * 1.5)
+    return "high-contact intensity that will require explicit skill rather than good intentions";
   return "a genuine mix: real resonance alongside real structural friction";
 }
 

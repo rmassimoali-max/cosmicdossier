@@ -13,7 +13,12 @@ export const Route = createFileRoute("/zodiac/$slug")({
   },
   head: ({ loaderData }) => {
     if (!loaderData) {
-      return { meta: [{ title: "Sign not found — Cosmic Dossier" }, { name: "robots", content: "noindex" }] };
+      return {
+        meta: [
+          { title: "Sign not found — Cosmic Dossier" },
+          { name: "robots", content: "noindex" },
+        ],
+      };
     }
     const title = `${loaderData.name} Sun Sign: Traits, Strengths & Relationships | Cosmic Dossier`;
     const desc = loaderData.overview.slice(0, 155);
@@ -84,7 +89,10 @@ function SignPage() {
           <h4 className="mt-6 font-display text-xl text-gold">Core traits</h4>
           <div className="mt-3 flex flex-wrap gap-2">
             {sign.coreTraits.map((t) => (
-              <span key={t} className="rounded-full border border-primary/40 bg-primary/10 px-3 py-1 text-xs text-foreground">
+              <span
+                key={t}
+                className="rounded-full border border-primary/40 bg-primary/10 px-3 py-1 text-xs text-foreground"
+              >
                 {t}
               </span>
             ))}
@@ -95,13 +103,17 @@ function SignPage() {
           <div className="panel p-6">
             <h4 className="font-display text-xl text-gold">Strengths</h4>
             <ul className="mt-3 space-y-1.5 text-sm text-muted-foreground">
-              {sign.strengths.map((s) => <li key={s}>✦ {s}</li>)}
+              {sign.strengths.map((s) => (
+                <li key={s}>✦ {s}</li>
+              ))}
             </ul>
           </div>
           <div className="panel p-6">
             <h4 className="font-display text-xl text-gold">Challenges</h4>
             <ul className="mt-3 space-y-1.5 text-sm text-muted-foreground">
-              {sign.challenges.map((s) => <li key={s}>✦ {s}</li>)}
+              {sign.challenges.map((s) => (
+                <li key={s}>✦ {s}</li>
+              ))}
             </ul>
           </div>
         </div>
@@ -109,7 +121,9 @@ function SignPage() {
         <div className="mt-6 space-y-4">
           <div className="panel p-6">
             <h4 className="font-display text-xl text-gold">In relationships</h4>
-            <p className="mt-2 text-sm leading-relaxed text-muted-foreground">{sign.inRelationships}</p>
+            <p className="mt-2 text-sm leading-relaxed text-muted-foreground">
+              {sign.inRelationships}
+            </p>
           </div>
           <div className="panel p-6">
             <h4 className="font-display text-xl text-gold">At work</h4>
@@ -120,7 +134,8 @@ function SignPage() {
           <div className="panel p-6">
             <p className="text-xs leading-relaxed text-muted-foreground">
               Astrology is a symbolic language with no accepted scientific mechanism. A Sun sign
-              alone is a partial picture — your Moon, Rising and other placements matter just as much.
+              alone is a partial picture — your Moon, Rising and other placements matter just as
+              much.
             </p>
           </div>
         </div>

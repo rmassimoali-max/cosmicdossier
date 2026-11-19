@@ -7,15 +7,29 @@ import { STANDALONE_TEST_ARTICLES } from "@/lib/standaloneTestArticles";
 
 const allArticles = [...articles, ...STANDALONE_TEST_ARTICLES];
 const relatedSlugs: Record<string, string[]> = {
-  "what-hexaco-adds-to-the-big-five": ["what-the-big-five-actually-measures", "understanding-the-dark-triad"],
-  "the-five-love-languages": ["the-two-dimensions-of-attachment", "avoidance-vs-healthy-independence"],
-  "emotional-intelligence-what-it-is-and-isnt": ["the-orchid-hypothesis-sensitivity-as-temperament", "what-the-big-five-actually-measures"],
-  "what-resilience-really-means": ["the-two-dimensions-of-attachment", "the-orchid-hypothesis-sensitivity-as-temperament"],
+  "what-hexaco-adds-to-the-big-five": [
+    "what-the-big-five-actually-measures",
+    "understanding-the-dark-triad",
+  ],
+  "the-five-love-languages": [
+    "the-two-dimensions-of-attachment",
+    "avoidance-vs-healthy-independence",
+  ],
+  "emotional-intelligence-what-it-is-and-isnt": [
+    "the-orchid-hypothesis-sensitivity-as-temperament",
+    "what-the-big-five-actually-measures",
+  ],
+  "what-resilience-really-means": [
+    "the-two-dimensions-of-attachment",
+    "the-orchid-hypothesis-sensitivity-as-temperament",
+  ],
 };
 
 export const Route = createFileRoute("/articles/$slug")({
   loader: ({ params }) => {
-    const article = articleBySlug(params.slug) ?? STANDALONE_TEST_ARTICLES.find((item) => item.slug === params.slug);
+    const article =
+      articleBySlug(params.slug) ??
+      STANDALONE_TEST_ARTICLES.find((item) => item.slug === params.slug);
     if (!article) throw notFound();
     return article;
   },
@@ -71,9 +85,14 @@ function ArticlePage() {
                   <div key={index} className="space-y-3">
                     <p>{intro}</p>
                     <ul className="space-y-2 pl-5 text-muted-foreground">
-                      {items.flatMap((item) => item.split("\n")).filter(Boolean).map((item) => (
-                        <li key={item} className="list-disc">{item.replace(/^- /, "")}</li>
-                      ))}
+                      {items
+                        .flatMap((item) => item.split("\n"))
+                        .filter(Boolean)
+                        .map((item) => (
+                          <li key={item} className="list-disc">
+                            {item.replace(/^- /, "")}
+                          </li>
+                        ))}
                     </ul>
                   </div>
                 );
@@ -97,7 +116,9 @@ function ArticlePage() {
                   params={{ slug: item.slug }}
                   className="panel block p-5 transition-transform duration-300 hover:-translate-y-0.5"
                 >
-                  <p className="text-[0.65rem] uppercase tracking-widest text-primary/70">{item.category}</p>
+                  <p className="text-[0.65rem] uppercase tracking-widest text-primary/70">
+                    {item.category}
+                  </p>
                   <h2 className="mt-2 font-display text-lg text-foreground">{item.title}</h2>
                   <p className="mt-2 text-sm text-muted-foreground">{item.excerpt}</p>
                 </Link>
@@ -113,7 +134,9 @@ function ArticlePage() {
             Attachment is only one lens. Cosmic Dossier combines attachment style with personality
             systems and symbolic astrology to create a broader, personalized picture.
           </p>
-          <GoldLink to="/input" className="mt-5 inline-flex">Build My Dossier →</GoldLink>
+          <GoldLink to="/input" className="mt-5 inline-flex">
+            Build My Dossier →
+          </GoldLink>
         </div>
 
         <section className="mt-12">
@@ -129,7 +152,9 @@ function ArticlePage() {
                 params={{ slug: item.slug }}
                 className="panel p-5 transition-transform duration-300 hover:-translate-y-0.5"
               >
-                <p className="text-[0.65rem] uppercase tracking-widest text-primary/70">{item.category}</p>
+                <p className="text-[0.65rem] uppercase tracking-widest text-primary/70">
+                  {item.category}
+                </p>
                 <h3 className="mt-2 font-display text-xl text-foreground">{item.title}</h3>
                 <p className="mt-2 text-sm text-muted-foreground">{item.excerpt}</p>
               </Link>

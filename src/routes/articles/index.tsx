@@ -19,7 +19,8 @@ export const Route = createFileRoute("/articles/")({
       { property: "og:title", content: "Dossier Files — Cosmic Dossier" },
       {
         property: "og:description",
-        content: "Explore psychology, attachment, relationships, and the patterns hiding underneath human behavior.",
+        content:
+          "Explore psychology, attachment, relationships, and the patterns hiding underneath human behavior.",
       },
       { property: "og:type", content: "website" },
     ],
@@ -61,17 +62,24 @@ function ArticlesIndex() {
               <h2 className="mt-4 font-display text-2xl leading-tight text-foreground transition-colors group-hover:text-gold">
                 {article.title}
               </h2>
-              <p className="mt-3 text-sm leading-relaxed text-muted-foreground">{article.excerpt}</p>
+              <p className="mt-3 text-sm leading-relaxed text-muted-foreground">
+                {article.excerpt}
+              </p>
               <span className="mt-5 inline-block text-xs text-primary">Open case file →</span>
             </Link>
           ))}
         </section>
         <div className="panel mt-10 p-6 text-center sm:p-8">
-          <p className="font-display text-xl text-foreground">Curious how these patterns show up in you?</p>
+          <p className="font-display text-xl text-foreground">
+            Curious how these patterns show up in you?
+          </p>
           <p className="mx-auto mt-2 max-w-xl text-sm text-muted-foreground">
             Build a personalized Cosmic Dossier across attachment, personality, astrology, and more.
           </p>
-          <Link to="/input" className="mt-5 inline-flex rounded-full border border-primary/50 px-5 py-2 text-sm text-primary hover:bg-primary/10">
+          <Link
+            to="/input"
+            className="mt-5 inline-flex rounded-full border border-primary/50 px-5 py-2 text-sm text-primary hover:bg-primary/10"
+          >
             Build My Dossier →
           </Link>
         </div>

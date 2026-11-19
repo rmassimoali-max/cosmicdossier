@@ -24,7 +24,8 @@ export const Route = createFileRoute("/zodiac/")({
       { property: "og:title", content: "The 12 Zodiac Signs | Cosmic Dossier" },
       {
         property: "og:description",
-        content: "Explore every Sun sign, from Aries to Pisces, read as symbolic language for self-reflection.",
+        content:
+          "Explore every Sun sign, from Aries to Pisces, read as symbolic language for self-reflection.",
       },
       { property: "og:type", content: "website" },
       { name: "twitter:card", content: "summary_large_image" },
@@ -46,8 +47,8 @@ function ZodiacLanding() {
           <SectionTitle kicker="The Dossier Files">The 12 Zodiac Signs</SectionTitle>
           <p className="mt-4 text-base leading-relaxed text-muted-foreground sm:text-lg">
             Your Sun sign is the zodiac sign the Sun occupied on the day you were born. It's the
-            placement most people know — but it's only one of many in a full natal chart. Your
-            Moon, Rising and every other planet add just as much to the picture.
+            placement most people know — but it's only one of many in a full natal chart. Your Moon,
+            Rising and every other planet add just as much to the picture.
           </p>
         </div>
 
@@ -78,14 +79,14 @@ function ZodiacLanding() {
                 >
                   <ZodiacArt slug={s.slug} variant="thumb" />
                   <div className="relative">
-                  <p className="text-3xl text-primary">{SIGN_GLYPH[s.name]}</p>
-                  <h3 className="mt-2 font-display text-xl text-foreground transition-colors group-hover:text-gold">
-                    {s.name}
-                  </h3>
-                  <p className="text-[0.7rem] text-muted-foreground">{s.dates}</p>
-                  <p className="mt-2 text-sm italic leading-relaxed text-muted-foreground">
-                    "{s.tagline}"
-                  </p>
+                    <p className="text-3xl text-primary">{SIGN_GLYPH[s.name]}</p>
+                    <h3 className="mt-2 font-display text-xl text-foreground transition-colors group-hover:text-gold">
+                      {s.name}
+                    </h3>
+                    <p className="text-[0.7rem] text-muted-foreground">{s.dates}</p>
+                    <p className="mt-2 text-sm italic leading-relaxed text-muted-foreground">
+                      "{s.tagline}"
+                    </p>
                   </div>
                 </Link>
               ))}

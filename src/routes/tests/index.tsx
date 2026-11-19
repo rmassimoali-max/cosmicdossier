@@ -71,7 +71,9 @@ function TestsHub() {
 
         <div className="panel mt-14 p-6 text-center sm:p-8">
           <p className="tracking-cosmic text-xs text-primary/80">THE DOSSIER CONNECTION</p>
-          <h2 className="mt-2 font-display text-2xl text-gold">One test is a data point. Five are a portrait.</h2>
+          <h2 className="mt-2 font-display text-2xl text-gold">
+            One test is a data point. Five are a portrait.
+          </h2>
           <p className="mx-auto mt-3 max-w-xl text-sm leading-relaxed text-muted-foreground">
             Each test here stands alone — but the Cosmic Dossier synthesis cross-reads your results
             against astrology, MBTI, Enneagram, attachment and the Big Five to find the pattern

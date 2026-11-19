@@ -96,7 +96,9 @@ function MbtiTypePage() {
           </div>
           <div className="panel p-6">
             <h3 className="font-display text-xl text-gold">Decision-making</h3>
-            <p className="mt-2 text-sm leading-relaxed text-muted-foreground">{profile.decisions}</p>
+            <p className="mt-2 text-sm leading-relaxed text-muted-foreground">
+              {profile.decisions}
+            </p>
           </div>
           <div className="panel p-6">
             <h3 className="font-display text-xl text-gold">Under stress</h3>
@@ -116,7 +118,14 @@ function MbtiTypePage() {
 
         <div className="mt-10 flex flex-wrap items-center gap-4">
           <GoldLink to="/input">Start My Report</GoldLink>
-          <Link to="/tests/$slug" params={{ slug: "mbti" }} search={{ r: undefined }} className="text-sm text-primary hover:text-gold">Take the free MBTI-style test</Link>
+          <Link
+            to="/tests/$slug"
+            params={{ slug: "mbti" }}
+            search={{ r: undefined }}
+            className="text-sm text-primary hover:text-gold"
+          >
+            Take the free MBTI-style test
+          </Link>
           <Link to="/mbti" className="text-xs text-muted-foreground hover:text-primary">
             See all 16 types →
           </Link>

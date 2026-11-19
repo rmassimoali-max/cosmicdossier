@@ -37,7 +37,9 @@ function PDLanding() {
         </Link>
 
         <div className="mt-10 max-w-3xl">
-          <SectionTitle kicker="The Dossier Files">Understanding Personality Disorders</SectionTitle>
+          <SectionTitle kicker="The Dossier Files">
+            Understanding Personality Disorders
+          </SectionTitle>
           <p className="mt-4 text-base leading-relaxed text-muted-foreground sm:text-lg">
             A personality disorder is a pervasive, long-term pattern of thinking, feeling and
             relating that differs markedly from cultural expectations, is inflexible across
@@ -51,19 +53,19 @@ function PDLanding() {
           <h2 className="font-display text-2xl text-gold">What factors into developing one</h2>
           <p className="mt-3 text-sm leading-relaxed text-muted-foreground">
             No personality disorder has a single cause. The clinical consensus points to a
-            biopsychosocial interaction: an inherited temperament (sensitivity to threat, reward,
-            or novelty) meeting an environment during childhood and adolescence — inconsistent
-            caregiving, chronic invalidation, trauma, or the opposite extreme of over-control —
-            that shapes which coping strategies become durable, generalized patterns rather than
-            situational responses. The same temperament in a different environment often produces
-            a very different outcome, which is part of why these patterns aren't a matter of
-            choice or character.
+            biopsychosocial interaction: an inherited temperament (sensitivity to threat, reward, or
+            novelty) meeting an environment during childhood and adolescence — inconsistent
+            caregiving, chronic invalidation, trauma, or the opposite extreme of over-control — that
+            shapes which coping strategies become durable, generalized patterns rather than
+            situational responses. The same temperament in a different environment often produces a
+            very different outcome, which is part of why these patterns aren't a matter of choice or
+            character.
           </p>
           <p className="mt-4 text-xs leading-relaxed text-muted-foreground">
-            This page is educational, not a diagnostic tool. Personality disorders are diagnosed
-            by qualified clinicians through structured assessment, not self-identification against
-            a list of traits. If anything here resonates strongly, a conversation with a mental
-            health professional is the right next step.
+            This page is educational, not a diagnostic tool. Personality disorders are diagnosed by
+            qualified clinicians through structured assessment, not self-identification against a
+            list of traits. If anything here resonates strongly, a conversation with a mental health
+            professional is the right next step.
           </p>
         </div>
 
@@ -126,7 +128,9 @@ function PDLanding() {
         </section>
 
         <div className="panel mt-12 p-6 text-center sm:p-8">
-          <p className="font-display text-xl text-foreground">Curious how your own patterns show up?</p>
+          <p className="font-display text-xl text-foreground">
+            Curious how your own patterns show up?
+          </p>
           <p className="mx-auto mt-2 max-w-xl text-sm text-muted-foreground">
             Cosmic Dossier isn't a clinical tool, but it does map healthy-range personality across
             MBTI, Enneagram, attachment style, Big Five and astrology in one dossier.

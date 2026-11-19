@@ -44,7 +44,7 @@ const META: Record<Kind, { title: string; kicker: string; blurb: string }> = {
 
 export const Route = createFileRoute("/assessment/$kind")({
   validateSearch: (search: Record<string, unknown>) => ({
-    person: Number(search['person']) === 2 ? (2 as const) : (1 as const),
+    person: Number(search["person"]) === 2 ? (2 as const) : (1 as const),
   }),
   head: () => ({
     meta: [

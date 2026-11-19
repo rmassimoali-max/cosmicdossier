@@ -93,7 +93,10 @@ export function angles(time: AstroTime, latitude: number, longitude: number) {
   const phi = latitude * DEG;
 
   let mc = norm360(Math.atan2(Math.tan(ramc), Math.cos(eps)) / DEG);
-  if (Math.abs(norm360(mc) - norm360(ramc / DEG)) > 90 && Math.abs(norm360(mc) - norm360(ramc / DEG)) < 270) {
+  if (
+    Math.abs(norm360(mc) - norm360(ramc / DEG)) > 90 &&
+    Math.abs(norm360(mc) - norm360(ramc / DEG)) < 270
+  ) {
     mc = norm360(mc + 180);
   }
 

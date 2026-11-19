@@ -196,9 +196,17 @@ export const ENNEAGRAM_NAMES: Record<number, string> = {
 type EnneaQuestion = { id: string; prompt: string; type: number };
 
 export const ENNEAGRAM_QUESTIONS: EnneaQuestion[] = [
-  { id: "e1", prompt: "I notice what is wrong or imprecise before I notice what is good.", type: 1 },
+  {
+    id: "e1",
+    prompt: "I notice what is wrong or imprecise before I notice what is good.",
+    type: 1,
+  },
   { id: "e2", prompt: "I hold myself to standards most people would find punishing.", type: 1 },
-  { id: "e3", prompt: "I sense what others need and provide it, often before being asked.", type: 2 },
+  {
+    id: "e3",
+    prompt: "I sense what others need and provide it, often before being asked.",
+    type: 2,
+  },
   { id: "e4", prompt: "Being needed matters more to me than being admired.", type: 2 },
   { id: "e5", prompt: "I measure myself by what I have accomplished.", type: 3 },
   { id: "e6", prompt: "I adjust how I present myself so I read as impressive.", type: 3 },
@@ -264,12 +272,20 @@ export const ATTACHMENT_QUESTIONS: ScaleQuestion[] = [
   { id: "a4", prompt: "I worry a partner will stop wanting me.", key: "Anxious" },
   { id: "a5", prompt: "Slow replies make my mind spiral.", key: "Anxious" },
   { id: "a6", prompt: "I need frequent reassurance to feel settled.", key: "Anxious" },
-  { id: "a7", prompt: "I prefer independence over deep interdependence.", key: "Dismissive Avoidant" },
+  {
+    id: "a7",
+    prompt: "I prefer independence over deep interdependence.",
+    key: "Dismissive Avoidant",
+  },
   { id: "a8", prompt: "When someone gets too close I need distance.", key: "Dismissive Avoidant" },
   { id: "a9", prompt: "I rarely ask for help, even when I need it.", key: "Dismissive Avoidant" },
   { id: "a10", prompt: "I crave closeness and fear it at the same time.", key: "Fearful Avoidant" },
   { id: "a11", prompt: "I pull away right when things get real.", key: "Fearful Avoidant" },
-  { id: "a12", prompt: "Intimacy feels unsafe even when nothing is wrong.", key: "Fearful Avoidant" },
+  {
+    id: "a12",
+    prompt: "Intimacy feels unsafe even when nothing is wrong.",
+    key: "Fearful Avoidant",
+  },
 ];
 
 export function scoreAttachment(answers: Record<string, number>) {
@@ -305,7 +321,12 @@ export const BIGFIVE_QUESTIONS: ScaleQuestion[] = [
   { id: "b3", prompt: "I prefer routine over novelty.", key: "Openness", reverse: true },
   { id: "b4", prompt: "I finish what I start, on time.", key: "Conscientiousness" },
   { id: "b5", prompt: "I keep my commitments meticulously.", key: "Conscientiousness" },
-  { id: "b6", prompt: "I often leave things until the last moment.", key: "Conscientiousness", reverse: true },
+  {
+    id: "b6",
+    prompt: "I often leave things until the last moment.",
+    key: "Conscientiousness",
+    reverse: true,
+  },
   { id: "b7", prompt: "I feel energized in large social settings.", key: "Extraversion" },
   { id: "b8", prompt: "I speak up readily in groups.", key: "Extraversion" },
   { id: "b9", prompt: "I need long stretches of solitude.", key: "Extraversion", reverse: true },

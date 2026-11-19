@@ -5,7 +5,8 @@ export const PERSONALITY_ARTICLES: Article[] = [
     slug: "mbti-vs-big-five-whats-the-difference",
     title: "MBTI vs. Big Five: What's the Difference?",
     category: "Personality & MBTI",
-    excerpt: "MBTI and the Big Five answer different questions about personality. Here's how their structures, evidence, and uses differ.",
+    excerpt:
+      "MBTI and the Big Five answer different questions about personality. Here's how their structures, evidence, and uses differ.",
     readTime: "5 min read",
     content: [
       "Two of the most widely discussed approaches to personality are the Myers-Briggs Type Indicator (MBTI) and the Big Five personality traits. They answer different questions and rest on very different foundations.",
@@ -20,7 +21,8 @@ export const PERSONALITY_ARTICLES: Article[] = [
     slug: "why-your-mbti-type-isnt-your-personality",
     title: "Why Your MBTI Type Isn't Your Personality",
     category: "Personality & MBTI",
-    excerpt: "An MBTI type can provide useful language for preferences, but four letters cannot capture the full texture of a human personality.",
+    excerpt:
+      "An MBTI type can provide useful language for preferences, but four letters cannot capture the full texture of a human personality.",
     readTime: "5 min read",
     content: [
       "Many people treat their MBTI type as a complete description of who they are. While the framework can offer useful language for preferences, it is not a full account of personality.",
@@ -34,7 +36,8 @@ export const PERSONALITY_ARTICLES: Article[] = [
     slug: "can-personality-really-change",
     title: "Can Personality Really Change?",
     category: "Personality & MBTI",
-    excerpt: "Personality is relatively stable, but stability does not mean permanence. Meaningful change is possible, usually through gradual shifts in behavior and environment.",
+    excerpt:
+      "Personality is relatively stable, but stability does not mean permanence. Meaningful change is possible, usually through gradual shifts in behavior and environment.",
     readTime: "5 min read",
     content: [
       "A common question is whether personality is fixed or malleable. The evidence points to a nuanced answer: personality is relatively stable, yet meaningful change is possible.",
@@ -48,7 +51,8 @@ export const PERSONALITY_ARTICLES: Article[] = [
     slug: "introversion-vs-social-anxiety",
     title: "Introversion vs. Social Anxiety",
     category: "Personality & MBTI",
-    excerpt: "Being energized by solitude is not the same thing as being afraid of social situations. The distinction matters.",
+    excerpt:
+      "Being energized by solitude is not the same thing as being afraid of social situations. The distinction matters.",
     readTime: "5 min read",
     content: [
       "Introversion and social anxiety are frequently confused, yet they are distinct.",
@@ -63,7 +67,8 @@ export const PERSONALITY_ARTICLES: Article[] = [
     slug: "why-some-people-overanalyze-everything",
     title: "Why Some People Overanalyze Everything",
     category: "Personality & MBTI",
-    excerpt: "Overanalysis can be a fascinating mix of threat sensitivity, imagination, perfectionism, and a mind trying to manufacture certainty.",
+    excerpt:
+      "Overanalysis can be a fascinating mix of threat sensitivity, imagination, perfectionism, and a mind trying to manufacture certainty.",
     readTime: "5 min read",
     content: [
       "Overanalyzing—replaying conversations, examining motives, predicting outcomes in elaborate detail—is a common experience. Several psychological factors contribute.",
@@ -78,7 +83,8 @@ export const PERSONALITY_ARTICLES: Article[] = [
     slug: "the-psychology-of-people-pleasing",
     title: "The Psychology of People-Pleasing",
     category: "Personality & MBTI",
-    excerpt: "People-pleasing can look like kindness on the surface while functioning as a strategy for avoiding rejection, conflict, or emotional uncertainty.",
+    excerpt:
+      "People-pleasing can look like kindness on the surface while functioning as a strategy for avoiding rejection, conflict, or emotional uncertainty.",
     readTime: "5 min read",
     content: [
       "People-pleasing—the tendency to prioritize others’ needs, feelings, and approval at the expense of one’s own—has clear psychological roots.",
@@ -92,7 +98,8 @@ export const PERSONALITY_ARTICLES: Article[] = [
     slug: "why-some-people-have-extremely-strong-inner-worlds",
     title: "Why Some People Have Extremely Strong Inner Worlds",
     category: "Personality & MBTI",
-    excerpt: "Some minds are crowded with imagination, internal dialogue, fantasy, and elaborate mental models. That richness can be both refuge and resource.",
+    excerpt:
+      "Some minds are crowded with imagination, internal dialogue, fantasy, and elaborate mental models. That richness can be both refuge and resource.",
     readTime: "5 min read",
     content: [
       "Some individuals possess unusually vivid, elaborate, and absorbing inner lives—rich with imagination, internal dialogue, fantasy, or complex mental models. This is not merely “daydreaming.”",
@@ -106,7 +113,8 @@ export const PERSONALITY_ARTICLES: Article[] = [
     slug: "openness-neuroticism-and-the-overthinking-brain",
     title: "Openness, Neuroticism, and the Overthinking Brain",
     category: "Personality & MBTI",
-    excerpt: "When imagination meets threat sensitivity, the mind can become an extraordinary scenario generator with the volume turned way up.",
+    excerpt:
+      "When imagination meets threat sensitivity, the mind can become an extraordinary scenario generator with the volume turned way up.",
     readTime: "5 min read",
     content: [
       "Two Big Five traits—Openness and Neuroticism—frequently interact to produce a mind that overthinks.",
@@ -120,7 +128,8 @@ export const PERSONALITY_ARTICLES: Article[] = [
     slug: "personality-traits-vs-personality-disorders",
     title: "Personality Traits vs. Personality Disorders",
     category: "Personality & MBTI",
-    excerpt: "Traits exist across a spectrum. Personality disorders involve persistent, inflexible patterns that create significant impairment or distress.",
+    excerpt:
+      "Traits exist across a spectrum. Personality disorders involve persistent, inflexible patterns that create significant impairment or distress.",
     readTime: "5 min read",
     content: [
       "Personality traits and personality disorders exist on a continuum, but they are not the same.",
@@ -135,7 +144,8 @@ export const PERSONALITY_ARTICLES: Article[] = [
     slug: "why-two-people-with-the-same-mbti-type-can-be-completely-different",
     title: "Why Two People With the Same MBTI Type Can Be Completely Different",
     category: "Personality & MBTI",
-    excerpt: "Sharing four letters does not mean sharing the same emotional stability, values, habits, history, or relational style.",
+    excerpt:
+      "Sharing four letters does not mean sharing the same emotional stability, values, habits, history, or relational style.",
     readTime: "5 min read",
     content: [
       "It is common to meet two people who share the same four-letter MBTI type yet seem strikingly different in behavior, values, emotional style, or life choices. This is expected rather than surprising.",

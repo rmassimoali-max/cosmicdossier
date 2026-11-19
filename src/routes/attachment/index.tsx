@@ -15,7 +15,8 @@ export const Route = createFileRoute("/attachment/")({
       { property: "og:title", content: "Attachment Theory — Cosmic Dossier" },
       {
         property: "og:description",
-        content: "How each attachment style develops and shows up in real relationships, with a path toward healing.",
+        content:
+          "How each attachment style develops and shows up in real relationships, with a path toward healing.",
       },
       { property: "og:type", content: "website" },
       { name: "twitter:card", content: "summary_large_image" },
@@ -46,16 +47,16 @@ function AttachmentLanding() {
         <div className="panel mt-8 p-6 sm:p-8">
           <h2 className="font-display text-2xl text-gold">Where the theory comes from</h2>
           <p className="mt-3 text-sm leading-relaxed text-muted-foreground">
-            British psychiatrist John Bowlby first proposed attachment theory in the 1950s,
-            arguing that infants have an evolved need for proximity to a caregiver, not just for
-            food and safety. Developmental psychologist Mary Ainsworth tested this directly in the
-            1970s with the "Strange Situation" — observing how infants responded to a caregiver
-            leaving and returning — and from those responses identified the original secure,
-            anxious and avoidant categories. Mary Main and Judith Solomon later identified a
-            fourth pattern, fearful-avoidant (or disorganized) attachment, in the mid-1980s. In
-            1987, Cindy Hazan and Phillip Shaver extended the framework from infant-caregiver bonds
-            into adult romantic relationships, and it's been a major thread in relationship
-            research ever since.
+            British psychiatrist John Bowlby first proposed attachment theory in the 1950s, arguing
+            that infants have an evolved need for proximity to a caregiver, not just for food and
+            safety. Developmental psychologist Mary Ainsworth tested this directly in the 1970s with
+            the "Strange Situation" — observing how infants responded to a caregiver leaving and
+            returning — and from those responses identified the original secure, anxious and
+            avoidant categories. Mary Main and Judith Solomon later identified a fourth pattern,
+            fearful-avoidant (or disorganized) attachment, in the mid-1980s. In 1987, Cindy Hazan
+            and Phillip Shaver extended the framework from infant-caregiver bonds into adult
+            romantic relationships, and it's been a major thread in relationship research ever
+            since.
           </p>
           <p className="mt-4 text-xs leading-relaxed text-muted-foreground">
             This section is educational, not a diagnostic tool. Attachment style exists on a
@@ -82,7 +83,9 @@ function AttachmentLanding() {
                 <h3 className="font-display text-xl text-foreground transition-colors group-hover:text-gold">
                   {style.name}
                 </h3>
-                <p className="mt-2 text-sm leading-relaxed text-muted-foreground">{style.tagline}</p>
+                <p className="mt-2 text-sm leading-relaxed text-muted-foreground">
+                  {style.tagline}
+                </p>
                 <span className="mt-4 inline-block text-xs text-primary">Read more →</span>
               </Link>
             ))}
@@ -91,7 +94,14 @@ function AttachmentLanding() {
 
         <div className="panel mt-12 p-6 text-center sm:p-8">
           <p className="font-display text-xl text-foreground">Not sure which one describes you?</p>
-          <Link to="/tests/$slug" params={{ slug: "attachment-style" }} search={{ r: undefined }} className="mt-4 inline-flex text-sm text-primary hover:text-gold">Take the free attachment style test</Link>
+          <Link
+            to="/tests/$slug"
+            params={{ slug: "attachment-style" }}
+            search={{ r: undefined }}
+            className="mt-4 inline-flex text-sm text-primary hover:text-gold"
+          >
+            Take the free attachment style test
+          </Link>
           <p className="mx-auto mt-2 max-w-xl text-sm text-muted-foreground">
             Cosmic Dossier includes a short attachment assessment as part of your full personality
             dossier.

@@ -19,7 +19,7 @@ export const Route = createFileRoute("/archetype/$slug")({
     if (!archetype) throw notFound();
     return archetype;
   },
-    head: ({ loaderData }) => {
+  head: ({ loaderData }) => {
     if (!loaderData) {
       return { meta: [{ title: "Archetype not found — Cosmic Dossier" }] };
     }
@@ -56,7 +56,9 @@ function ArchetypePage() {
         </div>
 
         <div className="panel mt-8 p-6 sm:p-8">
-          <p className="text-[0.95rem] leading-relaxed text-foreground/90">{archetype.description}</p>
+          <p className="text-[0.95rem] leading-relaxed text-foreground/90">
+            {archetype.description}
+          </p>
           <div className="mt-6 flex flex-wrap gap-2">
             {archetype.coreTraits.map((t) => (
               <span
@@ -103,7 +105,9 @@ function ArchetypePage() {
           </div>
           <div className="panel p-6">
             <h4 className="font-display text-xl text-gold">Growth edge</h4>
-            <p className="mt-2 text-sm leading-relaxed text-muted-foreground">{archetype.growthThemes}</p>
+            <p className="mt-2 text-sm leading-relaxed text-muted-foreground">
+              {archetype.growthThemes}
+            </p>
           </div>
         </div>
 

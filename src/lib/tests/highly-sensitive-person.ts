@@ -6,15 +6,7 @@ import { scoreDimensions } from "./types";
 const SCALE = {
   min: 1,
   max: 7,
-  labels: [
-    "Not at All",
-    "Rarely",
-    "Occasionally",
-    "Sometimes",
-    "Often",
-    "Very Often",
-    "Extremely",
-  ],
+  labels: ["Not at All", "Rarely", "Occasionally", "Sometimes", "Often", "Very Often", "Extremely"],
 };
 
 export const HSP_TEST: TestDef = {
@@ -22,7 +14,8 @@ export const HSP_TEST: TestDef = {
   name: "Highly Sensitive Person",
   category: "Sensitivity & Emotional Style",
   tagline: "A nervous system tuned to notice more — and feel it longer.",
-  metaDescription: "Explore sensory processing sensitivity and how deeply you register sounds, lights, emotions and other stimulation with this short temperament screen.",
+  metaDescription:
+    "Explore sensory processing sensitivity and how deeply you register sounds, lights, emotions and other stimulation with this short temperament screen.",
   whatItMeasures:
     "This test measures sensory processing sensitivity: how deeply your nervous system registers and processes stimulation — sounds, lights, other people's moods, caffeine, pain, art. High sensitivity is a temperament trait found in roughly 15–20% of people, not a disorder.",
   background:
@@ -34,20 +27,60 @@ export const HSP_TEST: TestDef = {
   disclaimer:
     "This is not a diagnosis. Sensitivity is a neutral temperament dimension — its value depends entirely on the environment it meets.",
   items: [
-    { id: "hs1", text: "I am easily overwhelmed by strong sensory input.", dimension: "sensitivity" },
-    { id: "hs2", text: "I seem to be aware of subtleties in my environment.", dimension: "sensitivity" },
+    {
+      id: "hs1",
+      text: "I am easily overwhelmed by strong sensory input.",
+      dimension: "sensitivity",
+    },
+    {
+      id: "hs2",
+      text: "I seem to be aware of subtleties in my environment.",
+      dimension: "sensitivity",
+    },
     { id: "hs3", text: "Other people's moods affect me.", dimension: "sensitivity" },
-    { id: "hs4", text: "I find myself needing to withdraw during busy days.", dimension: "sensitivity" },
+    {
+      id: "hs4",
+      text: "I find myself needing to withdraw during busy days.",
+      dimension: "sensitivity",
+    },
     { id: "hs5", text: "I have a rich, complex inner life.", dimension: "sensitivity" },
     { id: "hs6", text: "I am deeply moved by the arts or music.", dimension: "sensitivity" },
-    { id: "hs7", text: "Loud or chaotic environments wear me down quickly.", dimension: "sensitivity" },
-    { id: "hs8", text: "I notice small changes others seem to miss — a tone, a scent, a shift in light.", dimension: "sensitivity" },
+    {
+      id: "hs7",
+      text: "Loud or chaotic environments wear me down quickly.",
+      dimension: "sensitivity",
+    },
+    {
+      id: "hs8",
+      text: "I notice small changes others seem to miss — a tone, a scent, a shift in light.",
+      dimension: "sensitivity",
+    },
     { id: "hs9", text: "I am sensitive to caffeine, hunger or pain.", dimension: "sensitivity" },
-    { id: "hs10", text: "I need more recovery time than most people after intense days.", dimension: "sensitivity" },
-    { id: "hs11", text: "I am conscientious about details because errors genuinely bother me.", dimension: "sensitivity" },
-    { id: "hs12", text: "Violent or distressing media stays with me long after.", dimension: "sensitivity" },
-    { id: "hs13", text: "I think deeply about experiences long after they happen.", dimension: "sensitivity" },
-    { id: "hs14", text: "Being observed or evaluated makes me noticeably more nervous.", dimension: "sensitivity" },
+    {
+      id: "hs10",
+      text: "I need more recovery time than most people after intense days.",
+      dimension: "sensitivity",
+    },
+    {
+      id: "hs11",
+      text: "I am conscientious about details because errors genuinely bother me.",
+      dimension: "sensitivity",
+    },
+    {
+      id: "hs12",
+      text: "Violent or distressing media stays with me long after.",
+      dimension: "sensitivity",
+    },
+    {
+      id: "hs13",
+      text: "I think deeply about experiences long after they happen.",
+      dimension: "sensitivity",
+    },
+    {
+      id: "hs14",
+      text: "Being observed or evaluated makes me noticeably more nervous.",
+      dimension: "sensitivity",
+    },
   ],
   dimensions: [
     {
