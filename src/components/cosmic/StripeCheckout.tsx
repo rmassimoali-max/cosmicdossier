@@ -2,11 +2,7 @@ import { useCallback, useEffect, useRef, useState } from "react";
 import { loadStripe, type Stripe } from "@stripe/stripe-js";
 import { EmbeddedCheckout, EmbeddedCheckoutProvider } from "@stripe/react-stripe-js";
 import { useServerFn } from "@tanstack/react-start";
-import {
-  createUnlockCheckout,
-  getStripeConfig,
-  verifyUnlockPayment,
-} from "@/lib/stripe.functions";
+import { createUnlockCheckout, getStripeConfig, verifyUnlockPayment } from "@/lib/stripe.functions";
 import { setUnlocked } from "@/lib/unlock";
 import { CButton } from "@/components/cosmic/ui";
 

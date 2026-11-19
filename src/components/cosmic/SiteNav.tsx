@@ -25,13 +25,17 @@ const SECTIONS: NavSection[] = [
   {
     label: "Archetypes",
     links: ARCHETYPES.map(({ name, slug }) => ({
-      label: name, to: "/archetype/$slug", params: { slug },
+      label: name,
+      to: "/archetype/$slug",
+      params: { slug },
     })),
   },
   {
     label: "The Systems",
     links: SYSTEMS.map(({ name, slug }) => ({
-      label: name, to: "/systems/$slug", params: { slug },
+      label: name,
+      to: "/systems/$slug",
+      params: { slug },
     })),
   },
 ];
@@ -44,7 +48,9 @@ export function SiteNav() {
   const panelId = useId();
   const location = useRouterState({ select: (state) => state.location.href });
 
-  useEffect(() => { setOpen(false); }, [location]);
+  useEffect(() => {
+    setOpen(false);
+  }, [location]);
 
   useEffect(() => {
     if (!open) return;
@@ -70,15 +76,22 @@ export function SiteNav() {
     // Stripe owns its overlay and z-index. Hide our floating controls entirely
     // while its checkout iframe is mounted, without modifying payment code.
     const checkCheckout = () => {
-      const active = Boolean(document.querySelector(
-        'iframe[src*="checkout.stripe.com"], iframe[src*="embedded-checkout"]',
-      ));
+      const active = Boolean(
+        document.querySelector(
+          'iframe[src*="checkout.stripe.com"], iframe[src*="embedded-checkout"]',
+        ),
+      );
       setCheckoutActive(active);
       if (active) setOpen(false);
     };
     checkCheckout();
     const observer = new MutationObserver(checkCheckout);
-    observer.observe(document.body, { childList: true, subtree: true, attributes: true, attributeFilter: ["src"] });
+    observer.observe(document.body, {
+      childList: true,
+      subtree: true,
+      attributes: true,
+      attributeFilter: ["src"],
+    });
     return () => observer.disconnect();
   }, []);
 
@@ -88,9 +101,11 @@ export function SiteNav() {
       to={item.to}
       {...(item.params ? { params: item.params } : {})}
       onClick={() => setOpen(false)}
-      className={item.prominent
-        ? "mb-3 flex min-h-11 items-center justify-center rounded-full px-4 py-2 font-display text-lg text-primary-foreground focus-visible:outline-2 focus-visible:outline-ring"
-        : "flex min-h-11 items-center rounded-md px-3 py-2 text-sm text-foreground hover:text-primary focus-visible:outline-2 focus-visible:outline-ring"}
+      className={
+        item.prominent
+          ? "mb-3 flex min-h-11 items-center justify-center rounded-full px-4 py-2 font-display text-lg text-primary-foreground focus-visible:outline-2 focus-visible:outline-ring"
+          : "flex min-h-11 items-center rounded-md px-3 py-2 text-sm text-foreground hover:text-primary focus-visible:outline-2 focus-visible:outline-ring"
+      }
       style={item.prominent ? { background: "var(--gradient-gold)" } : undefined}
     >
       {item.label}
@@ -107,7 +122,16 @@ export function SiteNav() {
         onClick={() => setOpen((current) => !current)}
         className="fixed top-3 left-3 z-40 h-11 w-11 rounded-full border border-border bg-background/70 p-0 text-foreground backdrop-blur hover:border-primary/60 motion-reduce:transition-none"
       >
-        <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="1.5" strokeLinecap="round" aria-hidden="true">
+        <svg
+          width="20"
+          height="20"
+          viewBox="0 0 24 24"
+          fill="none"
+          stroke="currentColor"
+          strokeWidth="1.5"
+          strokeLinecap="round"
+          aria-hidden="true"
+        >
           <path d="M4 6h16M4 12h16M4 18h16" />
         </svg>
       </CButton>
@@ -127,11 +151,24 @@ export function SiteNav() {
                 variant="ghost"
                 aria-expanded={groupOpen}
                 aria-controls={groupId}
-                onClick={() => setExpanded((current) => ({ ...current, [section.label]: !current[section.label] }))}
+                onClick={() =>
+                  setExpanded((current) => ({
+                    ...current,
+                    [section.label]: !current[section.label],
+                  }))
+                }
                 className="min-h-11 w-full justify-between rounded-md px-3 py-2 font-sans text-sm text-foreground motion-reduce:transition-none"
               >
                 {section.label}
-                <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="1.5" aria-hidden="true">
+                <svg
+                  width="16"
+                  height="16"
+                  viewBox="0 0 24 24"
+                  fill="none"
+                  stroke="currentColor"
+                  strokeWidth="1.5"
+                  aria-hidden="true"
+                >
                   <path d={groupOpen ? "m6 15 6-6 6 6" : "m6 9 6 6 6-6"} />
                 </svg>
               </CButton>

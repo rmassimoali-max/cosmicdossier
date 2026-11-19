@@ -12,7 +12,10 @@ export function LockedBlock({
 }) {
   return (
     <div className="relative overflow-hidden rounded-2xl">
-      <div aria-hidden className="pointer-events-none select-none blur-[7px] saturate-50 opacity-60">
+      <div
+        aria-hidden
+        className="pointer-events-none select-none blur-[7px] saturate-50 opacity-60"
+      >
         {children}
       </div>
       <div className="absolute inset-0 flex items-center justify-center bg-background/55 p-6">

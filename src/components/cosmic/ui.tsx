@@ -67,7 +67,9 @@ export function Field({
         {label}
       </span>
       {children}
-      {hint ? <span className="mt-1 block text-[0.7rem] text-muted-foreground/70">{hint}</span> : null}
+      {hint ? (
+        <span className="mt-1 block text-[0.7rem] text-muted-foreground/70">{hint}</span>
+      ) : null}
     </label>
   );
 }
@@ -130,9 +132,7 @@ export function Bar({
 export function SectionTitle({ children, kicker }: { children: ReactNode; kicker?: string }) {
   return (
     <div className="mb-5">
-      {kicker ? (
-        <p className="tracking-cosmic text-[0.65rem] text-primary/80">{kicker}</p>
-      ) : null}
+      {kicker ? <p className="tracking-cosmic text-[0.65rem] text-primary/80">{kicker}</p> : null}
       <h2 className="mt-2 text-3xl text-foreground">{children}</h2>
     </div>
   );

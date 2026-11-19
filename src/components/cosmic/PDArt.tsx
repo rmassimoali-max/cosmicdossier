@@ -2,7 +2,10 @@ type ArtProps = { theme: string; className?: string };
 
 const THEMES: Record<
   string,
-  { bg: [string, string]; blobs: { cx: number; cy: number; r: number; color: string; opacity: number }[] }
+  {
+    bg: [string, string];
+    blobs: { cx: number; cy: number; r: number; color: string; opacity: number }[];
+  }
 > = {
   "fractured-red": {
     bg: ["#1a0505", "#2b0a0a"],
