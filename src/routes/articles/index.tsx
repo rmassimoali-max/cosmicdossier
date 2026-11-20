@@ -5,7 +5,11 @@ import { SectionTitle } from "@/components/cosmic/ui";
 import { articles } from "@/lib/articles";
 import { STANDALONE_TEST_ARTICLES } from "@/lib/standaloneTestArticles";
 
-const allArticles = [...articles, ...STANDALONE_TEST_ARTICLES];
+const allArticles = Array.from(
+  new Map(
+    [...articles, ...STANDALONE_TEST_ARTICLES].map((article) => [article.slug, article]),
+  ).values(),
+);
 
 export const Route = createFileRoute("/articles/")({
   head: () => ({

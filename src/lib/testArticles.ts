@@ -42,24 +42,6 @@ export const TEST_ARTICLES: Article[] = [
     ],
   },
   {
-    slug: "understanding-the-dark-triad",
-    title: "Understanding the Dark Triad",
-    category: "Dark Traits",
-    excerpt:
-      "Machiavellianism, narcissism and psychopathy are not just villain traits. They are dimensions everyone carries to some degree. Here is what the research actually says.",
-    readTime: "6 min read",
-    content: [
-      "In 2002, Delroy Paulhus and Kevin Williams noticed that three socially aversive traits, studied separately for decades, overlapped. They also never fully merged. Machiavellianism, narcissism and psychopathy each had a distinct flavour, but all three shared a cold, self-interested core. They named the cluster the Dark Triad.",
-      "Machiavellianism, named after the Renaissance political theorist, describes a strategic and calculating approach to people. High scorers think in leverage, plan long games, and are comfortable using flattery or deception when it works. They are usually patient rather than impulsive.",
-      "Narcissism, in this research, means the subclinical trait rather than the personality disorder. It describes a need for admiration, attention and special status. High scorers can be charismatic and confident. They can also be fragile when the admiration stops.",
-      "Psychopathy, also measured at a subclinical level, is usually considered the darkest of the three. It describes callousness, low remorse, impulsivity and cynicism. High scorers are less moved by guilt or other people's distress.",
-      "Everyone has some of all three. These are dimensions, not categories, and most people score in the low-to-moderate range. A moderate score does not make someone a manipulator. It may simply mean they can negotiate hard, enjoy recognition, or stay detached in a crisis. Some research even links moderate levels of these traits to leadership emergence and to performing well under pressure.",
-      "The test here uses the Dirty Dozen, a 12-item measure published by Peter Jonason and Gregory Webster in 2010. Its brevity makes it popular in research, but it is a coarse instrument. It works well for showing your general position and poorly for fine distinctions. People also tend to underreport dark traits about themselves, so treat a low score with some humility and a high score with curiosity rather than alarm.",
-      "This is not a diagnosis. Clinical psychopathy and narcissistic personality disorder are assessed by trained professionals with structured interviews. No twelve-question screen can do that.",
-      "Inside the Cosmic Dossier framework, dark traits read best as shadow versions of ordinary strengths. The Strategist's long-range thinking can become manipulation. The Maverick's independence can become callousness. The question to ask is not whether you have these traits, because everyone does. It is what they currently serve in you.",
-    ],
-  },
-  {
     slug: "the-orchid-hypothesis-sensitivity-as-temperament",
     title: "The Orchid Hypothesis: Sensitivity as Temperament",
     category: "Sensitivity & Emotional Style",

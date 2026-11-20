@@ -5,7 +5,11 @@ import { GoldLink, SectionTitle } from "@/components/cosmic/ui";
 import { articleBySlug, articles } from "@/lib/articles";
 import { STANDALONE_TEST_ARTICLES } from "@/lib/standaloneTestArticles";
 
-const allArticles = [...articles, ...STANDALONE_TEST_ARTICLES];
+const allArticles = Array.from(
+  new Map(
+    [...articles, ...STANDALONE_TEST_ARTICLES].map((article) => [article.slug, article]),
+  ).values(),
+);
 const relatedSlugs: Record<string, string[]> = {
   "what-hexaco-adds-to-the-big-five": [
     "what-the-big-five-actually-measures",
@@ -39,10 +43,30 @@ export const Route = createFileRoute("/articles/$slug")({
     }
     return {
       meta: [
-        { title: `${loaderData.title} | Cosmic Dossier` },
-        { name: "description", content: loaderData.excerpt.slice(0, 155) },
-        { property: "og:title", content: `${loaderData.title} | Cosmic Dossier` },
-        { property: "og:description", content: loaderData.excerpt },
+        loaderData.slug === "understanding-the-dark-triad"
+          ? { title: "The Dark Triad: Traits, Research and Meaning | Cosmic Dossier" }
+          : { title: `${loaderData.title} | Cosmic Dossier` },
+        {
+          name: "description",
+          content:
+            loaderData.slug === "understanding-the-dark-triad"
+              ? "Understand Machiavellianism, narcissism and psychopathy, the research behind the Dark Triad, and how to interpret screening scores without diagnosis or stigma."
+              : loaderData.excerpt.slice(0, 155),
+        },
+        {
+          property: "og:title",
+          content:
+            loaderData.slug === "understanding-the-dark-triad"
+              ? "The Dark Triad: Traits, Research and Meaning | Cosmic Dossier"
+              : `${loaderData.title} | Cosmic Dossier`,
+        },
+        {
+          property: "og:description",
+          content:
+            loaderData.slug === "understanding-the-dark-triad"
+              ? "Understand Machiavellianism, narcissism and psychopathy, the research behind the Dark Triad, and how to interpret screening scores without diagnosis or stigma."
+              : loaderData.excerpt,
+        },
         { property: "og:type", content: "article" },
         { name: "twitter:card", content: "summary_large_image" },
       ],
