@@ -113,6 +113,8 @@ export const HEXACO_TEST: TestDef = {
     "Ashton, M. C., & Lee, K. (2009). The HEXACO-60: A short measure of the major dimensions of personality. Journal of Personality Assessment, 91(4), 340–345.",
   minutes: "~4 minutes",
   scale: AGREE_5,
+  disclaimer:
+    "HEXACO scores describe self-reported personality tendencies, not fixed traits or a clinical assessment. Read Honesty-Humility and the other factors within HEXACO rather than equating them with Big Five dimensions.",
   items,
   dimensions,
   ...multiDimHelpers(DIMS, "factor"),

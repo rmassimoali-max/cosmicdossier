@@ -109,4 +109,5 @@ export const RESILIENCE_TEST: TestDef = {
           slugs: ["the-empath", "the-observer"],
           text: "Slower recovery often resonates with The Empath or The Observer — people who feel and process deeply, and need deliberate recovery time.",
         },
+  dossierPatch: (scores) => ({ assessmentResults: { resilience: scores } }),
 };

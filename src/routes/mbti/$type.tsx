@@ -121,7 +121,7 @@ function MbtiTypePage() {
           <Link
             to="/tests/$slug"
             params={{ slug: "mbti" }}
-            search={{ r: undefined }}
+            search={{ r: undefined, person: 1 }}
             className="text-sm text-primary hover:text-gold"
           >
             Take the free MBTI-style test

@@ -23,6 +23,8 @@ import {
 } from "./interpret/astrology";
 import type { NatalChart } from "./astro";
 import type { PersonInput } from "./session";
+import { TESTS } from "./tests";
+import { bandFor } from "./tests/types";
 
 /* ------------------------------- rule engine ------------------------------ */
 
@@ -233,6 +235,21 @@ export const RULES: Rule[] = [
       isBand(p, "Agreeableness", "high") && isBand(p, "Conscientiousness", "high") && isL(p, "F"),
     "Warmth, duty and value-driven decisions combine into difficulty refusing legitimate requests. The word 'no' feels like a character flaw rather than a boundary.",
   ),
+  R(
+    "amplifier",
+    (p) =>
+      (p.assessmentResults?.["adhd-traits"]?.["inattention"] ?? 0) >= 66 &&
+      (p.assessmentResults?.["autism-quotient"]?.["overall"] ?? 0) >= 66,
+    "Reported ADHD-associated inattention traits and autistic-trait indicators can coexist, but this is not evidence of either clinical diagnosis. Their combination may suggest individualized needs around focus, routine or sensory support.",
+  ),
+  R(
+    "convergence",
+    (p) =>
+      typeof p.hsp === "number" &&
+      p.hsp >= 66 &&
+      (p.assessmentResults?.["autism-quotient"]?.["overall"] ?? 0) >= 66,
+    "Higher reported sensitivity and a higher autistic-trait indicator can reinforce needs for reduced overload and predictable recovery time; these are separate frameworks and do not establish a diagnosis.",
+  ),
 ];
 
 /* --------------------------- composition helpers -------------------------- */
@@ -340,7 +357,7 @@ function lensSections(p: Profile): ReportSection[] {
     out.push({
       group: GROUPS.lenses,
       title: "Big Five — Trait Profile",
-      body: "The Big Five is the most empirically grounded of your five lenses. Scores are self-report estimates on a 0–100 scale, read as bands rather than exact values.",
+      body: "The Big Five is a well-established trait framework in this dossier. Scores are self-report estimates on a 0–100 scale, read as bands rather than exact values.",
       bullets: BIG_FIVE.map((t) => {
         const v = p.bigFive?.[t] ?? 50;
         const e = bigFiveEntry(t, v);
@@ -372,21 +389,54 @@ function lensSections(p: Profile): ReportSection[] {
     });
   }
 
-  if (p.attachment) {
-    const a = p.attachment;
+  if (p.hexaco) {
+    const hexacoTest = TESTS.find((test) => test.slug === "hexaco");
+    const bullets = Object.entries(p.hexaco).map(([key, value]) => {
+      const dimension = hexacoTest?.dimensions.find((item) => item.key === key);
+      if (!dimension) return `${key} ${value}/100`;
+      const band = bandFor(dimension, value);
+      return `${dimension.label} ${value}/100 — ${band.label}: ${band.text}`;
+    });
     out.push({
       group: GROUPS.lenses,
-      title: `Attachment — ${a.style}`,
-      body: join([a.read, a.relationships]),
-      bullets: [
-        `Communication: ${a.communication}`,
-        `Conflict: ${a.conflict}`,
-        `Intimacy: ${a.intimacy}`,
-        `Likely triggers: ${a.triggers.join(", ")}.`,
-        `Strengths: ${a.strengths.join(", ")}.`,
-        `Growth edge: ${a.growth}`,
-      ],
+      title: "HEXACO — Six-Factor Personality",
+      body: "The HEXACO framework preserves six distinct factors and should be read independently of the Big Five, especially for Honesty-Humility.",
+      bullets,
     });
+  }
+
+  if (typeof p.hsp === "number") {
+    const hspTest = TESTS.find((test) => test.slug === "highly-sensitive-person");
+    const dimension = hspTest?.dimensions.find((item) => item.key === "sensitivity");
+    const band = dimension ? bandFor(dimension, p.hsp) : undefined;
+    out.push({
+      group: GROUPS.lenses,
+      title: "Highly Sensitive Person — Temperament",
+      body: band
+        ? `Sensitivity score ${p.hsp}/100 — ${band.label}. ${band.text} This is a neutral temperament dimension, not a disorder or diagnosis.`
+        : `Sensitivity score ${p.hsp}/100. This describes reported sensitivity and responsiveness to environment; it is not a disorder or diagnosis.`,
+    });
+  }
+
+  if (p.assessmentResults) {
+    for (const test of TESTS) {
+      const scores = p.assessmentResults[test.slug];
+      if (!scores) continue;
+      const bullets = test.dimensions.map((dimension) => {
+        const value = scores[dimension.key] ?? 0;
+        const band = bandFor(dimension, value);
+        return `${dimension.label} ${value}/100 — ${band.label}: ${band.text}`;
+      });
+      out.push({
+        group: GROUPS.lenses,
+        title: `${test.name} — Assessment Lens`,
+        body: test.disclaimer
+          ? `This is a self-reported assessment result. ${test.disclaimer}`
+          : "This is a self-reported assessment result and should be interpreted within its original framework.",
+        bullets,
+        premium: test.slug === "adhd-traits" || test.slug === "autism-quotient",
+      });
+    }
   }
 
   return out;
@@ -688,8 +738,8 @@ function finalDossier(p: Profile): ReportSection {
       conv ? `The strongest agreement across systems: ${lowerFirst(conv)}` : "",
       ten ? `The live tension: ${lowerFirst(ten)}` : "",
       p.completeness < 100
-        ? `This dossier is built from ${p.completeness}% of the available lenses; completing the rest will sharpen the cross-section rather than simply add length.`
-        : "All five lenses are present, which is why the cross-section above can be this specific.",
+        ? `This dossier is built from ${p.completeness}% of the integrated assessment domains; completing additional assessments will sharpen the cross-section rather than simply add length.`
+        : `The dossier currently includes ${p.assessmentDomainCount} completed assessment domains, so the cross-section reflects the data currently available.`,
       "Read all of this as a set of well-supported hypotheses about yourself, not a verdict. The useful question is not whether each line is true, but which ones you recognised before you finished reading them.",
     ]),
   };

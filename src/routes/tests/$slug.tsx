@@ -14,7 +14,8 @@ export const Route = createFileRoute("/tests/$slug")({
     const raw = search["r"];
     // Accept both the JSON-quoted form the app generates and a bare pasted value.
     const r = typeof raw === "string" ? raw : typeof raw === "number" ? String(raw) : undefined;
-    return { r };
+    const person = Number(search["person"]) === 2 ? (2 as const) : (1 as const);
+    return { r, person: search["person"] == null ? undefined : person };
   },
   loader: ({ params }) => {
     // Only the slug crosses the SSR boundary — the TestDef itself contains
@@ -52,11 +53,13 @@ function TestPage() {
   const { slug } = Route.useLoaderData();
   const test = testBySlug(slug);
   if (!test) throw notFound();
-  const { r } = Route.useSearch();
-  return <TestFlow key={`${slug}:${r ?? ""}`} test={test} r={r} />;
+  const { r, person } = Route.useSearch();
+  return (
+    <TestFlow key={`${slug}:${r ?? ""}:${person ?? 1}`} test={test} r={r} person={person ?? 1} />
+  );
 }
 
-function TestFlow({ test, r }: { test: TestDef; r: string | undefined }) {
+function TestFlow({ test, r, person }: { test: TestDef; r: string | undefined; person: 1 | 2 }) {
   const navigate = useNavigate();
 
   const sharedAnswers = useMemo(
@@ -82,7 +85,7 @@ function TestFlow({ test, r }: { test: TestDef; r: string | undefined }) {
     void navigate({
       to: "/tests/$slug",
       params: { slug: test.slug },
-      search: { r: encoded },
+      search: { r: encoded, person },
       replace: true,
     });
     setPhase("results");
@@ -101,7 +104,49 @@ function TestFlow({ test, r }: { test: TestDef; r: string | undefined }) {
   const addToDossier = () => {
     if (test.dossierPatch && scores) {
       const patch = test.dossierPatch(scores);
-      setSession((s) => ({ ...s, p1: { ...s.p1, ...patch } }));
+      const sourceName =
+        test.slug === "big-five"
+          ? "Mini-IPIP · 20 items"
+          : test.slug === "attachment-style"
+            ? "Library Attachment · two dimensions"
+            : test.name;
+      setSession((s) =>
+        person === 2
+          ? {
+              ...s,
+              p2: s.p2
+                ? {
+                    ...s.p2,
+                    ...patch,
+                    assessmentResults: {
+                      ...s.p2.assessmentResults,
+                      ...patch.assessmentResults,
+                    },
+                    assessmentSources: {
+                      ...s.p2.assessmentSources,
+                      [test.slug]: sourceName,
+                    },
+                  }
+                : s.p2,
+              dossier: undefined,
+            }
+          : {
+              ...s,
+              p1: {
+                ...s.p1,
+                ...patch,
+                assessmentResults: {
+                  ...s.p1.assessmentResults,
+                  ...patch.assessmentResults,
+                },
+                assessmentSources: {
+                  ...s.p1.assessmentSources,
+                  [test.slug]: sourceName,
+                },
+              },
+              dossier: undefined,
+            },
+      );
       setAdded(true);
     }
     void navigate({ to: "/input" });
@@ -197,6 +242,7 @@ function TestFlow({ test, r }: { test: TestDef; r: string | undefined }) {
           <Results
             test={test}
             scores={scores}
+            person={person}
             copied={copied}
             added={added}
             onShare={() => void share()}
@@ -207,7 +253,7 @@ function TestFlow({ test, r }: { test: TestDef; r: string | undefined }) {
               void navigate({
                 to: "/tests/$slug",
                 params: { slug: test.slug },
-                search: { r: undefined },
+                search: { r: undefined, person },
                 replace: true,
               });
             }}
@@ -266,6 +312,7 @@ function Intro({ test, onStart }: { test: TestDef; onStart: () => void }) {
 function Results({
   test,
   scores,
+  person,
   copied,
   added,
   onShare,
@@ -274,6 +321,7 @@ function Results({
 }: {
   test: TestDef;
   scores: Record<string, number>;
+  person: 1 | 2;
   copied: boolean;
   added: boolean;
   onShare: () => void;
@@ -304,6 +352,11 @@ function Results({
         {summary ? (
           <p className="mx-auto mt-4 max-w-xl text-sm leading-relaxed text-foreground/85">
             {summary}
+          </p>
+        ) : null}
+        {test.disclaimer ? (
+          <p className="mx-auto mt-4 max-w-xl rounded-md border border-border bg-background/40 p-3 text-xs leading-relaxed text-muted-foreground">
+            {test.disclaimer}
           </p>
         ) : null}
 
@@ -447,7 +500,7 @@ function Results({
               key={t.slug}
               to="/tests/$slug"
               params={{ slug: t.slug }}
-              search={{ r: undefined }}
+              search={{ r: undefined, person }}
               className="panel p-5 transition-transform duration-300 hover:-translate-y-0.5"
             >
               <h3 className="font-display text-lg text-foreground">{t.name}</h3>

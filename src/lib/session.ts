@@ -20,6 +20,8 @@ export type PersonInput = {
   bigFive?: Record<string, number> | undefined;
   hexaco?: Record<string, number> | undefined;
   hsp?: number | undefined;
+  assessmentResults?: Record<string, Record<string, number>> | undefined;
+  assessmentSources?: Record<string, string> | undefined;
 };
 
 export type DossierSection = { title: string; body: string };

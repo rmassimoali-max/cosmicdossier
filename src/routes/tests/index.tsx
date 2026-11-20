@@ -52,7 +52,7 @@ function TestsHub() {
                     key={test.slug}
                     to="/tests/$slug"
                     params={{ slug: test.slug }}
-                    search={{ r: undefined }}
+                    search={{ r: undefined, person: 1 }}
                     className="panel flex flex-col p-6 transition-transform duration-300 hover:-translate-y-0.5"
                   >
                     <h3 className="font-display text-2xl text-gold">{test.name}</h3>

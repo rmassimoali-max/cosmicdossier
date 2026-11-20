@@ -103,4 +103,5 @@ export const LOVE_STYLES_TEST: TestDef = {
   items,
   dimensions,
   ...multiDimHelpers(DIMS, "love style"),
+  dossierPatch: (scores) => ({ assessmentResults: { "love-styles": scores } }),
 };

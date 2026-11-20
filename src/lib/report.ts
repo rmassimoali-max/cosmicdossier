@@ -18,7 +18,7 @@ export type Report = {
 };
 
 export const GROUPS = {
-  lenses: "Your Five Lenses",
+  lenses: "Assessment Lenses",
   cross: "The Cross-Section",
   inner: "Inner World",
   rel: "Relationships",

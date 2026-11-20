@@ -23,6 +23,8 @@ export const BIG_FIVE_TEST: TestDef = {
     "Donnellan, M. B., Oswald, F. L., Baird, B. M., & Lucas, R. E. (2006). The Mini-IPIP Scales. Psychological Assessment, 18(2), 192–203.",
   minutes: "~3 minutes",
   scale: SCALE,
+  disclaimer:
+    "These Big Five scores describe self-reported trait tendencies, not fixed labels or a clinical assessment. Scores are estimates and may vary with mood, context and the instrument used.",
   items: [
     { id: "bf1", text: "Am the life of the party.", dimension: "extraversion" },
     { id: "bf2", text: "Sympathize with others' feelings.", dimension: "agreeableness" },

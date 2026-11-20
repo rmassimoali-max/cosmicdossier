@@ -128,10 +128,46 @@ function AssessmentPage() {
 
   const save = () => {
     if (!result) return;
+    const sourceName = {
+      mbti: "Legacy MBTI · 20 choices",
+      enneagram: "Legacy Enneagram · 18 statements",
+      attachment: "Legacy Attachment · 12 statements",
+      bigfive: "Legacy Big Five · 15 statements",
+    }[k];
+    const sourceKey = {
+      mbti: "mbti",
+      enneagram: "enneagram",
+      attachment: "attachment",
+      bigfive: "big-five",
+    }[k];
     setSession((s) =>
       person === 2
-        ? { ...s, p2: s.p2 ? { ...s.p2, ...result.patch } : s.p2 }
-        : { ...s, p1: { ...s.p1, ...result.patch } },
+        ? {
+            ...s,
+            p2: s.p2
+              ? {
+                  ...s.p2,
+                  ...result.patch,
+                  assessmentSources: {
+                    ...s.p2.assessmentSources,
+                    [sourceKey]: sourceName,
+                  },
+                }
+              : s.p2,
+            dossier: undefined,
+          }
+        : {
+            ...s,
+            p1: {
+              ...s.p1,
+              ...result.patch,
+              assessmentSources: {
+                ...s.p1.assessmentSources,
+                [sourceKey]: sourceName,
+              },
+            },
+            dossier: undefined,
+          },
     );
     navigate({ to: "/input" });
   };

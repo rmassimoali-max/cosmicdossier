@@ -88,4 +88,5 @@ export const EI_TEST: TestDef = {
   items,
   dimensions,
   ...multiDimHelpers(DIMS, "emotional skill"),
+  dossierPatch: (scores) => ({ assessmentResults: { "emotional-intelligence": scores } }),
 };

@@ -9,6 +9,7 @@ import {
   type AttachmentProfile,
 } from "./interpret/attachment";
 import { BIG_FIVE, band, type Band, type BigFiveTrait } from "./interpret/bigfive";
+import { TESTS } from "./tests";
 
 export type Profile = {
   person: PersonInput;
@@ -22,12 +23,21 @@ export type Profile = {
   wing?: number | undefined;
   instinct?: string | undefined;
   attachment?: AttachmentProfile | undefined;
+  hexaco?: Record<string, number> | undefined;
+  hsp?: number | undefined;
+  assessmentResults?: Record<string, Record<string, number>> | undefined;
+  assessmentSources?: Record<string, string> | undefined;
+  assessmentResultCount: number;
+  assessmentDomainCount: number;
   has: {
     chart: boolean;
     mbti: boolean;
     bigFive: boolean;
     ennea: boolean;
     attachment: boolean;
+    hexaco: boolean;
+    hsp: boolean;
+    assessmentResults: boolean;
   };
   completeness: number; // 0-100
 };
@@ -54,8 +64,39 @@ export function buildProfile(person: PersonInput, chart?: NatalChart | undefined
     bigFive: Boolean(person.bigFive),
     ennea: Boolean(ennea),
     attachment: Boolean(attachment),
+    hexaco: Boolean(person.hexaco),
+    hsp: typeof person.hsp === "number",
+    assessmentResults: Boolean(person.assessmentResults),
   };
-  const completeness = Math.round((Object.values(has).filter(Boolean).length / 5) * 100);
+  const coreLibrarySlugs = new Set([
+    "mbti",
+    "enneagram",
+    "attachment-style",
+    "big-five",
+    "hexaco",
+    "highly-sensitive-person",
+  ]);
+  const baseCompleted = Object.entries(has).filter(
+    ([key, value]) => key !== "assessmentResults" && value,
+  ).length;
+  const completedStandaloneTests = TESTS.filter(
+    (test) => !coreLibrarySlugs.has(test.slug) && Boolean(person.assessmentResults?.[test.slug]),
+  ).length;
+  const standaloneTests = TESTS.filter((test) => !coreLibrarySlugs.has(test.slug));
+  const totalDomains = 7 + standaloneTests.length;
+  const assessmentDomainCount =
+    (chart ? 1 : 0) +
+    (mbti ? 1 : 0) +
+    (ennea ? 1 : 0) +
+    (attachment ? 1 : 0) +
+    (person.bigFive ? 1 : 0) +
+    (person.hexaco ? 1 : 0) +
+    (typeof person.hsp === "number" ? 1 : 0) +
+    completedStandaloneTests;
+  const completeness =
+    totalDomains > 0
+      ? Math.round(((baseCompleted + completedStandaloneTests) / totalDomains) * 100)
+      : 0;
 
   return {
     person,
@@ -69,6 +110,12 @@ export function buildProfile(person: PersonInput, chart?: NatalChart | undefined
     wing: person.enneagramWing ? Number(person.enneagramWing) : undefined,
     instinct: person.enneagramInstinct,
     attachment,
+    hexaco: person.hexaco,
+    hsp: person.hsp,
+    assessmentResults: person.assessmentResults,
+    assessmentSources: person.assessmentSources,
+    assessmentResultCount: Object.keys(person.assessmentResults ?? {}).length,
+    assessmentDomainCount,
     has,
     completeness,
   };
@@ -121,3 +168,6 @@ export function dominantTraits(p: Profile): string[] {
   if (p.chart) out.push(`${p.chart.sun} Sun`, `${p.chart.moon} Moon`, `${p.chart.rising} Rising`);
   return out.slice(0, 9);
 }
+
+export const assessmentScore = (p: Profile, slug: string, dimension: string) =>
+  p.assessmentResults?.[slug]?.[dimension];

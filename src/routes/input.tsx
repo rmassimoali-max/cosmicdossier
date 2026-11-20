@@ -143,7 +143,9 @@ function PersonCard({
               }))}
               placeholder="Type"
               value={person.enneagramType ?? ""}
-              onChange={(e) => set({ enneagramType: e.target.value })}
+              onChange={(e) =>
+                set({ enneagramType: e.target.value, enneagramEstimates: undefined })
+              }
             />
             <SelectInput
               options={Object.keys(ENNEAGRAM_NAMES).map((n) => ({ value: n, label: `w${n}` }))}
@@ -166,7 +168,7 @@ function PersonCard({
               label: v,
             }))}
             value={person.attachment ?? ""}
-            onChange={(e) => set({ attachment: e.target.value })}
+            onChange={(e) => set({ attachment: e.target.value, attachmentEstimates: undefined })}
           />
         </Field>
       </div>
@@ -232,7 +234,7 @@ function InputPage() {
           <PersonCard
             index={1}
             person={session.p1}
-            onChange={(p1) => setSession((s) => ({ ...s, p1 }))}
+            onChange={(p1) => setSession((s) => ({ ...s, p1, dossier: undefined }))}
           />
         </div>
 
@@ -243,7 +245,7 @@ function InputPage() {
               <PersonCard
                 index={2}
                 person={session.p2}
-                onChange={(p2) => setSession((s) => ({ ...s, p2 }))}
+                onChange={(p2) => setSession((s) => ({ ...s, p2, dossier: undefined }))}
               />
               <CButton
                 variant="ghost"

@@ -247,6 +247,15 @@ function DossierView({
           ))}
         </div>
       )}
+      {locked && person?.assessmentResults ? (
+        person.assessmentResults["adhd-traits"] || person.assessmentResults["autism-quotient"] ? (
+          <div className="mt-6 rounded-md border border-border bg-background/40 p-4 text-xs leading-relaxed text-muted-foreground">
+            ADHD and autism-related results describe self-reported traits or screening indicators,
+            not clinical diagnoses. A qualified healthcare professional can provide appropriate
+            clinical evaluation.
+          </div>
+        ) : null
+      ) : null}
     </div>
   );
 }

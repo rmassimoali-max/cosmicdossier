@@ -4,6 +4,7 @@ const KEY = "cosmic-dossier:unlocked";
 
 function read(): boolean {
   if (typeof window === "undefined") return false;
+  if (import.meta.env.DEV) return true;
   try {
     return window.localStorage.getItem(KEY) === "1";
   } catch {

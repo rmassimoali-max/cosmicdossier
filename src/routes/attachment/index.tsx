@@ -97,7 +97,7 @@ function AttachmentLanding() {
           <Link
             to="/tests/$slug"
             params={{ slug: "attachment-style" }}
-            search={{ r: undefined }}
+            search={{ r: undefined, person: 1 }}
             className="mt-4 inline-flex text-sm text-primary hover:text-gold"
           >
             Take the free attachment style test

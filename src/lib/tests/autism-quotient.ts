@@ -143,4 +143,5 @@ export const AQ_TEST: TestDef = {
           slugs: ["the-harmonizer", "the-firestarter"],
           text: "Lower AQ-style scores often resonate with The Harmonizer or The Firestarter — people energized by social flow.",
         },
+  dossierPatch: (scores) => ({ assessmentResults: { "autism-quotient": scores } }),
 };

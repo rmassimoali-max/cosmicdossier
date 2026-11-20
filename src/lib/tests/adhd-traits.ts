@@ -64,6 +64,7 @@ export const ADHD_TEST: TestDef = {
   items,
   dimensions,
   ...multiDimHelpers(DIMS, "trait cluster"),
+  dossierPatch: (scores) => ({ assessmentResults: { "adhd-traits": scores } }),
   resultLabel: (s) => {
     const m = Math.max(s["inattention"] ?? 0, s["hyperactivity"] ?? 0);
     return m >= 66

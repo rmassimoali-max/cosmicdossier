@@ -142,6 +142,7 @@ export const DARK_TRIAD_TEST: TestDef = {
     text: "In Cosmic Dossier language, pronounced dark-triad traits can resemble a shadow expression of The Strategist or The Maverick — the same independence and long-game thinking, turned inward toward self-interest. The archetype is not the trait; it is what the trait looks like when it is also in service of something larger.",
   }),
   articleSlug: "understanding-the-dark-triad",
+  dossierPatch: (scores) => ({ assessmentResults: { "dark-triad": scores } }),
 };
 
 export function scoreDarkTriadTest(answers: Record<string, number>) {
