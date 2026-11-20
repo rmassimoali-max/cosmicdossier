@@ -67,9 +67,6 @@ export function synastryEvidence(a: Profile, b: Profile): SynastryEvidence {
   }
 
   for (const slug of Object.keys(a.assessmentResults ?? {})) {
-    if (b.assessmentResults?.[slug] && !["adhd-traits", "autism-quotient"].includes(slug)) {
-      relationshipDomains += 1;
-    }
     if (b.assessmentResults?.[slug]) sharedDomains += 1;
   }
 
