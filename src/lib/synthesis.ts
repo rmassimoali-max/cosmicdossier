@@ -189,7 +189,7 @@ export const RULES: Rule[] = [
     "contradiction",
     (p) =>
       Boolean(p.chart) && (p.chart?.elements.Fire ?? 0) >= 4 && isBand(p, "Extraversion", "low"),
-    "Fire emphasis with low Extraversion is a genuine internal contradiction: strong drive and appetite, low tolerance for the social exposure that usually carries it. Ambition that prefers to work privately.",
+    "Fire emphasis with low Extraversion may describe strong inner drive alongside lower social energy. This is a possible tension between symbolic and self-report frameworks, not a diagnosis or fixed contradiction.",
   ),
   R(
     "convergence",
@@ -219,7 +219,7 @@ export const RULES: Rule[] = [
   R(
     "hidden",
     (p) => isL(p, "I") && isBand(p, "Openness", "high") && p.attachment?.style !== "Secure",
-    "Interior, curious and not-yet-secure is a specific combination: you can build an extremely accurate map of intimacy while keeping the territory at arm's length.",
+    "Interior, curious and not-yet-secure is a possible combination: a detailed inner map of intimacy may coexist with keeping distance.",
   ),
   R(
     "amplifier",
@@ -227,28 +227,82 @@ export const RULES: Rule[] = [
       isBand(p, "Conscientiousness", "high") &&
       isBand(p, "Neuroticism", "high") &&
       [1, 3, 6].includes(p.ennea?.type ?? 0),
-    "High standards, a sensitive threat system and a compliance-oriented Enneagram type stack into over-functioning: you will meet the bar and still feel you got away with something.",
+    "High standards, a sensitive threat system and a compliance-oriented Enneagram type may combine into over-functioning; this is a hypothesis, not a fixed outcome.",
   ),
   R(
     "tension",
     (p) =>
       isBand(p, "Agreeableness", "high") && isBand(p, "Conscientiousness", "high") && isL(p, "F"),
-    "Warmth, duty and value-driven decisions combine into difficulty refusing legitimate requests. The word 'no' feels like a character flaw rather than a boundary.",
+    "Warmth, duty and value-driven decisions may make refusing requests harder. This is a possible cost to consider, not a required pattern.",
+  ),
+
+  /* ---- Added assessment relationships ---- */
+  R(
+    "convergence",
+    (p) => (p.hexaco?.["C"] ?? 0) >= 66 && isBand(p, "Conscientiousness", "high"),
+    "High HEXACO Conscientiousness and high Big Five Conscientiousness point toward a similar tendency, but they are related frameworks with different factor structures rather than interchangeable measurements.",
   ),
   R(
-    "amplifier",
+    "convergence",
+    (p) => (p.hexaco?.["O"] ?? 0) >= 66 && isBand(p, "Openness", "high"),
+    "High HEXACO Openness and high Big Five Openness suggest overlapping curiosity or idea-seeking tendencies. The overlap is descriptive, not direct confirmation of either instrument.",
+  ),
+  R(
+    "convergence",
+    (p) =>
+      (p.assessmentResults?.["emotional-intelligence"]?.["managing"] ?? 0) >= 66 &&
+      (p.assessmentResults?.["resilience"]?.["resilience"] ?? 0) >= 66,
+    "High reported emotional management and resilience may describe complementary capacities: self-regulation and recovery are related but distinct snapshots.",
+  ),
+  R(
+    "tension",
+    (p) =>
+      (p.assessmentResults?.["emotional-intelligence"]?.["managing"] ?? 0) >= 66 &&
+      isBand(p, "Neuroticism", "high"),
+    "Strong reported emotional management alongside high Big Five Neuroticism may suggest a difference between perceived coping ability and the frequency or intensity of emotional strain.",
+  ),
+  R(
+    "tension",
+    (p) =>
+      (p.assessmentResults?.["resilience"]?.["resilience"] ?? 0) <= 35 &&
+      isBand(p, "Neuroticism", "low"),
+    "A lower resilience snapshot and low Neuroticism may reflect current recovery conditions rather than fixed temperament.",
+  ),
+  R(
+    "tension",
     (p) =>
       (p.assessmentResults?.["adhd-traits"]?.["inattention"] ?? 0) >= 66 &&
-      (p.assessmentResults?.["autism-quotient"]?.["overall"] ?? 0) >= 66,
-    "Reported ADHD-associated inattention traits and autistic-trait indicators can coexist, but this is not evidence of either clinical diagnosis. Their combination may suggest individualized needs around focus, routine or sensory support.",
+      isBand(p, "Conscientiousness", "high"),
+    "Reported ADHD-related inattention alongside high Conscientiousness may indicate that organized behaviour and executive difficulties can coexist. These findings come from different frameworks.",
   ),
   R(
     "convergence",
     (p) =>
       typeof p.hsp === "number" &&
       p.hsp >= 66 &&
+      (p.assessmentResults?.["autism-quotient"]?.["social"] ?? 0) >= 66,
+    "Higher reported sensitivity and social-effort indicators may describe overlapping experiences of overload or social demand. HSP and autism-related trait measures remain distinct, and this overlap does not establish a diagnosis.",
+  ),
+  R(
+    "tension",
+    (p) =>
+      (p.assessmentResults?.["autism-quotient"]?.["social"] ?? 0) >= 66 &&
+      isBand(p, "Extraversion", "high"),
+    "Reported social effort alongside high Extraversion may suggest that someone can seek or enjoy social interaction while still finding social cue-processing demanding.",
+  ),
+  R(
+    "tension",
+    (p) =>
+      (p.assessmentResults?.["dark-triad"]?.["psychopathy"] ?? 0) >= 66 &&
+      isBand(p, "Agreeableness", "high"),
+    "A high dark-triad psychopathy indicator alongside high Agreeableness could describe different reported modes in different situations. It does not determine character or clinical status.",
+  ),
+  R(
+    "amplifier",
+    (p) =>
+      (p.assessmentResults?.["adhd-traits"]?.["inattention"] ?? 0) >= 66 &&
       (p.assessmentResults?.["autism-quotient"]?.["overall"] ?? 0) >= 66,
-    "Higher reported sensitivity and a higher autistic-trait indicator can reinforce needs for reduced overload and predictable recovery time; these are separate frameworks and do not establish a diagnosis.",
+    "Reported ADHD-associated inattention traits and autistic-trait indicators may coexist, but this is not evidence of either clinical diagnosis. The combination may suggest individualized needs around focus, routine or sensory support.",
   ),
 ];
 
@@ -264,12 +318,15 @@ const KIND_TITLE: Record<RuleKind, string> = {
 
 const KIND_INTRO: Record<RuleKind, string> = {
   convergence:
-    "Where two or more of your systems describe the same underlying trait, the reading gets more reliable.",
-  contradiction: "Where systems disagree, the disagreement itself is usually the interesting part.",
-  amplifier: "Some of your traits do not just coexist — they multiply each other.",
+    "Related assessments may point toward a similar tendency, but they measure different constructs and should not be treated as interchangeable.",
+  contradiction:
+    "Where systems differ, the difference may reflect distinct constructs or context rather than one result being wrong.",
+  amplifier:
+    "Some reported patterns may reinforce one another, but this is a possible interaction rather than a fixed outcome.",
   tension:
-    "These pairs pull you in different directions and are likely to feel like internal argument.",
-  hidden: "Combinations that none of the five systems would surface on its own.",
+    "These findings may describe competing tendencies or contexts and deserve careful interpretation.",
+  hidden:
+    "Combinations that become visible only when several completed assessments are considered together.",
 };
 
 function matched(p: Profile) {
@@ -357,11 +414,11 @@ function lensSections(p: Profile): ReportSection[] {
     out.push({
       group: GROUPS.lenses,
       title: "Big Five — Trait Profile",
-      body: "The Big Five is a well-established trait framework in this dossier. Scores are self-report estimates on a 0–100 scale, read as bands rather than exact values.",
+      body: "The Big Five is a self-report trait framework. Scores are estimates on a 0–100 scale and are most useful as bands rather than exact values.",
       bullets: BIG_FIVE.map((t) => {
         const v = p.bigFive?.[t] ?? 50;
         const e = bigFiveEntry(t, v);
-        return `${t} ${v} (${BAND_LABEL[e.band]}) — ${BIG_FIVE_BLURB[t]} ${e.read} ${e.interpersonal} ${e.work} Watch for: ${e.difficulties.join(", ")}.`;
+        return `${t} ${BAND_LABEL[e.band]} band — ${BIG_FIVE_BLURB[t]} ${e.read} ${e.interpersonal} ${e.work} Watch for: ${e.difficulties.join(", ")}.`;
       }),
     });
   }
@@ -389,13 +446,30 @@ function lensSections(p: Profile): ReportSection[] {
     });
   }
 
+  if (p.attachment) {
+    const a = p.attachment;
+    out.push({
+      group: GROUPS.lenses,
+      title: `Attachment — ${a.style}`,
+      body: join([a.read, a.relationships]),
+      bullets: [
+        `Communication: ${a.communication}`,
+        `Conflict: ${a.conflict}`,
+        `Intimacy: ${a.intimacy}`,
+        `Likely triggers: ${a.triggers.join(", ")}.`,
+        `Strengths: ${a.strengths.join(", ")}.`,
+        `Growth edge: ${a.growth}`,
+      ],
+    });
+  }
+
   if (p.hexaco) {
     const hexacoTest = TESTS.find((test) => test.slug === "hexaco");
     const bullets = Object.entries(p.hexaco).map(([key, value]) => {
       const dimension = hexacoTest?.dimensions.find((item) => item.key === key);
       if (!dimension) return `${key} ${value}/100`;
       const band = bandFor(dimension, value);
-      return `${dimension.label} ${value}/100 — ${band.label}: ${band.text}`;
+      return `${dimension.label} — ${band.label}: ${band.text}`;
     });
     out.push({
       group: GROUPS.lenses,
@@ -413,8 +487,8 @@ function lensSections(p: Profile): ReportSection[] {
       group: GROUPS.lenses,
       title: "Highly Sensitive Person — Temperament",
       body: band
-        ? `Sensitivity score ${p.hsp}/100 — ${band.label}. ${band.text} This is a neutral temperament dimension, not a disorder or diagnosis.`
-        : `Sensitivity score ${p.hsp}/100. This describes reported sensitivity and responsiveness to environment; it is not a disorder or diagnosis.`,
+        ? `Sensitivity — ${band.label}. ${band.text} This is a neutral temperament dimension, not a disorder or diagnosis.`
+        : "This describes reported sensitivity and responsiveness to environment; it is not a disorder or diagnosis.",
     });
   }
 
@@ -425,7 +499,7 @@ function lensSections(p: Profile): ReportSection[] {
       const bullets = test.dimensions.map((dimension) => {
         const value = scores[dimension.key] ?? 0;
         const band = bandFor(dimension, value);
-        return `${dimension.label} ${value}/100 — ${band.label}: ${band.text}`;
+        return `${dimension.label} — ${band.label}: ${band.text}`;
       });
       out.push({
         group: GROUPS.lenses,
@@ -459,8 +533,8 @@ function crossSections(p: Profile): ReportSection[] {
   if (!out.length) {
     out.push({
       group: GROUPS.cross,
-      title: "Not enough lenses yet",
-      body: "Complete at least two of the five assessments to generate a cross-sectional reading. The synthesis compares systems against each other, so it needs more than one input.",
+      title: "Insufficient cross-assessment data",
+      body: "Complete at least two assessments from distinct frameworks to support limited cross-sectional observations. Individual assessment lenses remain available, but this section will not fill gaps with speculation.",
     });
   }
   return out;
@@ -472,13 +546,13 @@ function innerWorld(p: Profile): ReportSection[] {
     p.attachment ? p.attachment.read : "",
     p.mbti
       ? isL(p, "F")
-        ? "You process by feeling first and reason second, and a decision that is logically clean but emotionally wrong will not settle."
-        : "You process by reasoning first, which means feelings often arrive after the decision, sometimes days after."
+        ? "Emotional meaning may be weighed early in decisions."
+        : "Reasoning may precede emotional interpretation."
       : "",
     n === "high"
-      ? "Your threat system is sensitive: emotion arrives fast, stays longer, and rumination is the main tax you pay."
+      ? "The Big Five threat-system band is high: emotion may arrive strongly and rumination may take longer to settle."
       : n === "low"
-        ? "Your baseline is unusually even, which is a real advantage and can leave you slow to notice distress in yourself or others."
+        ? "The Big Five threat-system band is low: stress may feel more contained, though distress in others can still be easy to miss."
         : "",
     p.ennea ? p.ennea.emotional : "",
   ]);
@@ -488,51 +562,36 @@ function innerWorld(p: Profile): ReportSection[] {
       ? `${p.ennea.coreMotivation} Underneath it sits the fear of ${p.ennea.coreFear.toLowerCase().replace(/\.$/, "")}.`
       : "",
     p.mbti ? p.mbti.core : "",
-    p.chart
-      ? `Symbolically, your ${p.chart.sun} Sun frames the same drive as a matter of what you are here to develop rather than what you are avoiding.`
-      : "",
   ]);
 
   const stress = join([
     p.mbti ? p.mbti.stress : "",
     p.ennea ? p.ennea.stress : "",
-    p.attachment ? `Relationally, stress shows up as: ${lowerFirst(p.attachment.conflict)}` : "",
-    isBand(p, "Conscientiousness", "high")
-      ? "Your default coping move is to work — which is effective right up until it becomes the problem."
-      : "",
-  ]);
-
-  const selfPerception = join([
-    isBand(p, "Neuroticism", "high") && isBand(p, "Conscientiousness", "high")
-      ? "You likely hold yourself to a standard you would never impose on anyone else, and read meeting it as the minimum rather than an achievement."
-      : "",
-    p.ennea?.type === 4
-      ? "You measure yourself against an internal ideal of authenticity, which makes ordinary contentment feel suspect."
-      : "",
-    p.ennea?.type === 3
-      ? "Your self-image tracks recent output more closely than you would like to admit."
-      : "",
-    "Where the systems agree about you, the reading is probably accurate. Where they disagree, the contradiction is usually the more useful thing to sit with.",
+    p.attachment ? `Relationally, stress may show up as: ${lowerFirst(p.attachment.conflict)}` : "",
   ]);
 
   return [
     {
       group: GROUPS.inner,
       title: "Emotional Processing",
-      body: emotional || "Add the attachment and Big Five assessments to unlock this section.",
+      body:
+        emotional || "No completed assessments yet describe emotional processing in enough detail.",
     },
     {
       group: GROUPS.inner,
       title: "Internal Motivation",
-      body: motivation || "Add the Enneagram assessment to unlock this section.",
+      body:
+        motivation ||
+        "Add an Enneagram or MBTI assessment to support a motivational interpretation.",
     },
     {
       group: GROUPS.inner,
       title: "Stress Response",
-      body: stress || "Add more assessments to unlock this section.",
+      body:
+        stress ||
+        "Add assessments that describe stress or relational patterns to support this section.",
       premium: true,
     },
-    { group: GROUPS.inner, title: "Self-Perception", body: selfPerception, premium: true },
   ];
 }
 
@@ -546,62 +605,20 @@ function relationships(p: Profile): ReportSection[] {
         p.mbti ? p.mbti.communication : "",
         a ? a.communication : "",
         isBand(p, "Agreeableness", "low")
-          ? "Low Agreeableness means your delivery is honest by default; people rarely have to guess, and occasionally wish they could."
-          : "",
-        isBand(p, "Extraversion", "low")
-          ? "Because you process internally, a partner may hear the conclusion without the reasoning that produced it."
+          ? "Low Big Five Agreeableness may make delivery direct; this is a possibility rather than a fixed communication style."
           : "",
       ]),
     },
     {
       group: GROUPS.rel,
       title: "Conflict Style",
-      body: join([
-        a ? a.conflict : "",
-        p.mbti
-          ? isL(p, "T")
-            ? "You try to separate the problem from the feelings, which is efficient and can read as dismissive mid-argument."
-            : "You need the relationship to feel intact before the problem can be solved, and cannot think clearly while it is in doubt."
-          : "",
-        isBand(p, "Agreeableness", "high")
-          ? "Your accommodating default means small grievances tend to be absorbed rather than raised — until they are raised all at once."
-          : "",
-      ]),
+      body: join([a ? a.conflict : "", p.mbti ? p.mbti.communication : ""]),
       premium: true,
     },
     {
       group: GROUPS.rel,
       title: "Intimacy Style",
-      body: join([
-        a ? a.intimacy : "",
-        p.chart
-          ? `Symbolically, Venus in ${p.chart.placements.find((x) => x.label === "Venus")?.sign ?? "your chart"} points at what you find valuable in closeness, while Mars in ${p.chart.placements.find((x) => x.label === "Mars")?.sign ?? "your chart"} describes how you pursue it.`
-          : "",
-        p.ennea ? p.ennea.interpersonal : "",
-      ]),
-      premium: true,
-    },
-    {
-      group: GROUPS.rel,
-      title: "What You Need From a Partner",
-      body: join([
-        a?.style === "Anxious"
-          ? "Predictability stated out loud: not more love, but more legible love — times, plans, explicit reassurance before you have to ask."
-          : "",
-        a?.style === "Avoidant"
-          ? "Room that is granted rather than taken, and a partner who does not read your need for space as a verdict on them."
-          : "",
-        a?.style === "Fearful-Avoidant"
-          ? "Consistency that survives your withdrawal — someone steady enough not to match your oscillation."
-          : "",
-        a?.style === "Secure"
-          ? "A partner whose instability you are not quietly compensating for."
-          : "",
-        isBand(p, "Extraversion", "low") ? "Recovery time that is not treated as rejection." : "",
-        isBand(p, "Openness", "high")
-          ? "Conversation that goes somewhere; you can survive most things except being bored."
-          : "",
-      ]),
+      body: join([a ? a.intimacy : "", p.ennea ? p.ennea.interpersonal : ""]),
       premium: true,
     },
   ].filter((s) => s.body.length > 0);
@@ -627,53 +644,20 @@ function strengthsAndBlind(p: Profile): ReportSection[] {
     }
   }
 
-  const sabotage = join([
-    p.attachment?.style === "Anxious"
-      ? "Seeking reassurance in a form that makes reassurance harder to give — testing rather than asking."
-      : "",
-    p.attachment?.style === "Avoidant"
-      ? "Solving the discomfort of closeness by creating distance, then explaining the distance as circumstance."
-      : "",
-    p.attachment?.style === "Fearful-Avoidant"
-      ? "Leaving right after the moment that went well, because it went well."
-      : "",
-    isBand(p, "Conscientiousness", "high")
-      ? "Using productivity as the answer to feelings that are not productivity problems."
-      : "",
-    isBand(p, "Conscientiousness", "low")
-      ? "Waiting for the pressure that makes action possible, and calling the resulting stress bad luck."
-      : "",
-    p.ennea?.type === 5 ? "Preparing indefinitely so that entry never has to be risked." : "",
-    p.ennea?.type === 9
-      ? "Agreeing in the moment and withdrawing effort later, so the disagreement never has to be spoken."
-      : "",
-    p.ennea?.type === 3 ? "Substituting a better result for the harder conversation." : "",
-  ]);
-
   return [
     {
       group: GROUPS.strengths,
-      title: "Strengths",
-      body: "Drawn from the points where your systems agree — these are the capacities most likely to be genuinely yours rather than situational.",
+      title: "Possible Strengths",
+      body: "These are possible capacities suggested by completed assessments. They are not confirmed by agreement between unrelated measures.",
       bullets: dedupe(strengths).slice(0, 10),
     },
     {
       group: GROUPS.strengths,
-      title: "Blind Spots",
-      body: "Stated as tendencies, not verdicts. Each of these is the cost side of something you are good at.",
+      title: "Possible Blind Spots",
+      body: "Stated as contextual tendencies, not verdicts.",
       bullets: dedupe(blind).slice(0, 10),
       premium: true,
     },
-    ...(sabotage
-      ? [
-          {
-            group: GROUPS.strengths,
-            title: "Self-Sabotage Patterns",
-            body: sabotage,
-            premium: true,
-          },
-        ]
-      : []),
   ];
 }
 
@@ -681,46 +665,29 @@ function careerAndGrowth(p: Profile): ReportSection[] {
   const career = join([
     p.mbti ? p.mbti.work : "",
     isBand(p, "Conscientiousness", "high")
-      ? "High Conscientiousness makes you the person work accretes around; guard scope deliberately."
+      ? "High Big Five Conscientiousness may support roles that require follow-through and reliable scope management."
       : "",
     isBand(p, "Openness", "high")
-      ? "High Openness means a role without novel problems will erode you slowly even if everything else is good."
-      : "",
-    isBand(p, "Extraversion", "low")
-      ? "Roles that require constant visibility will cost energy you would rather spend on the work itself."
-      : "",
-    p.chart
-      ? `Symbolically, the Midheaven in ${p.chart.midheaven.sign} suggests a public direction coloured by that sign's register.`
+      ? "High Big Five Openness may make novelty, ideas or experimentation valuable in work."
       : "",
   ]);
-
   const growth = join([
     p.attachment ? `Relationally: ${lowerFirst(p.attachment.growth)}` : "",
     p.ennea
-      ? `Motivationally: the Type ${p.ennea.type} growth move is to stop solving ${p.ennea.coreFear.toLowerCase().replace(/\.$/, "")} and start tolerating the possibility of it.`
-      : "",
-    isBand(p, "Neuroticism", "high")
-      ? "Practically: the highest-leverage habit for you is anything that shortens rumination — writing it down, saying it out loud, or acting before certainty arrives."
-      : "",
-    isBand(p, "Agreeableness", "high")
-      ? "Practically: practise the small no, in low-stakes situations, before you need the large one."
-      : "",
-    isBand(p, "Conscientiousness", "low")
-      ? "Practically: external structure works better for you than resolve — commitments with other people in them."
+      ? `Motivationally: the Type ${p.ennea.type} growth question is to notice ${p.ennea.coreFear.toLowerCase().replace(/\.$/, "")} without letting that fear determine every choice.`
       : "",
   ]);
-
   return [
     {
       group: GROUPS.career,
       title: "Career & Work Style",
-      body: career || "Add the MBTI and Big Five assessments to unlock this section.",
+      body: career || "Add relevant assessments to support this section.",
       premium: true,
     },
     {
       group: GROUPS.career,
       title: "Growth Areas",
-      body: growth || "Add more assessments to unlock this section.",
+      body: growth || "Add more assessment data to support growth observations.",
       premium: true,
     },
   ];
@@ -735,12 +702,12 @@ function finalDossier(p: Profile): ReportSection {
     title: "The Integrated Read",
     body: join([
       `${p.name} reads most consistently as ${headlineFor(p).toLowerCase().replace("the ", "")}.`,
-      conv ? `The strongest agreement across systems: ${lowerFirst(conv)}` : "",
-      ten ? `The live tension: ${lowerFirst(ten)}` : "",
+      conv ? `A possible overlap across completed domains: ${lowerFirst(conv)}` : "",
+      ten ? `A possible difference or tension to consider: ${lowerFirst(ten)}` : "",
       p.completeness < 100
-        ? `This dossier is built from ${p.completeness}% of the integrated assessment domains; completing additional assessments will sharpen the cross-section rather than simply add length.`
-        : `The dossier currently includes ${p.assessmentDomainCount} completed assessment domains, so the cross-section reflects the data currently available.`,
-      "Read all of this as a set of well-supported hypotheses about yourself, not a verdict. The useful question is not whether each line is true, but which ones you recognised before you finished reading them.",
+        ? `This dossier is built from ${p.completeness}% of the integrated assessment domains; additional completed assessments may add relevant context.`
+        : `The dossier currently includes ${p.assessmentDomainCount} completed assessment domains.`,
+      "Read these findings as hypotheses from self-report and interpretive frameworks, not as diagnoses or verdicts.",
     ]),
   };
 }
@@ -749,35 +716,31 @@ function executiveSummary(p: Profile): string {
   const m = matched(p);
   return join([
     p.mbti && p.ennea
-      ? `You come out as ${p.mbti.type} — ${p.mbti.nickname.toLowerCase().replace("the ", "")} — running a Type ${p.ennea.type}${p.wing ? `w${p.wing}` : ""} motivational engine.`
+      ? `Possible type and motivational patterns include ${p.mbti.type} and Enneagram Type ${p.ennea.type}${p.wing ? `w${p.wing}` : ""}.`
       : p.mbti
-        ? `You come out as ${p.mbti.type}, ${p.mbti.nickname.toLowerCase().replace("the ", "")}.`
+        ? `An MBTI preference pattern is available: ${p.mbti.type}.`
         : "",
-    p.attachment
-      ? `Your relational baseline is ${p.attachment.style.toLowerCase()}: ${lowerFirst(p.attachment.read)}`
-      : "",
+    p.attachment ? `A relational pattern to consider is ${p.attachment.style.toLowerCase()}.` : "",
     p.bigFive ? bigFiveHeadline(p) : "",
     p.chart
-      ? `Symbolically the chart agrees in its own language: ${p.chart.sun} Sun, ${p.chart.moon} Moon, ${p.chart.rising} Rising.`
+      ? `The natal chart may be read symbolically as ${p.chart.sun} Sun, ${p.chart.moon} Moon, and ${p.chart.rising} Rising.`
       : "",
-    m.convergence.length
-      ? `Across systems, ${m.convergence.length} clear convergence${m.convergence.length === 1 ? "" : "s"} and ${m.tension.length + m.contradiction.length} point${m.tension.length + m.contradiction.length === 1 ? "" : "s"} of tension emerged — the tensions are where the interesting reading lives.`
+    m.convergence.length || m.tension.length || m.contradiction.length
+      ? `The cross-assessment section contains ${m.convergence.length} possible overlap${m.convergence.length === 1 ? "" : "s"} and ${m.tension.length + m.contradiction.length} possible tension or difference${m.tension.length + m.contradiction.length === 1 ? "" : "s"}.`
       : "",
   ]);
 }
 
 function bigFiveHeadline(p: Profile): string {
-  const ranked = BIG_FIVE.map((t) => ({ t, v: p.bigFive?.[t] ?? 50 })).sort((a, b) => b.v - a.v);
-  const hi = ranked[0];
-  const lo = ranked[ranked.length - 1];
-  if (!hi || !lo) return "";
-  return `On the Big Five your highest trait is ${hi.t} (${hi.v}) and your lowest is ${lo.t} (${lo.v}), which sets the practical shape of everything above.`;
+  const bands = BIG_FIVE.map((t) => ({ t, band: p.bands[t] ?? "moderate" })).filter((x) => x.band);
+  const hi = bands.filter((x) => x.band === "high")[0];
+  const lo = bands.filter((x) => x.band === "low")[0];
+  if (!hi && !lo) return "The available Big Five traits are largely in moderate bands.";
+  return join([hi ? `${hi.t} is in the high band` : "", lo ? `${lo.t} is in the low band` : ""]);
 }
 
 const lowerFirst = (s: string) => (s ? s.charAt(0).toLowerCase() + s.slice(1) : s);
 const dedupe = (a: string[]) => Array.from(new Set(a));
-
-/* --------------------------------- public --------------------------------- */
 
 export function generateCrossSection(profile: Profile): ReportSection[] {
   return crossSections(profile);

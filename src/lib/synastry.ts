@@ -27,12 +27,36 @@ const pairMatch = (p: Pair, x: (q: Profile) => boolean, y: (q: Profile) => boole
 
 const isAtt = (s: string) => (q: Profile) => q.attachment?.style === s;
 
+type SynastryEvidence = {
+  level: "insufficient" | "partial" | "sufficient";
+  sharedDomains: number;
+};
+
+function synastryEvidence(a: Profile, b: Profile): SynastryEvidence {
+  let sharedDomains = 0;
+  if (a.chart && b.chart) sharedDomains += 1;
+  if (a.mbti && b.mbti) sharedDomains += 1;
+  if (a.bigFive && b.bigFive) sharedDomains += 1;
+  if (a.ennea && b.ennea) sharedDomains += 1;
+  if (a.attachment && b.attachment) sharedDomains += 1;
+  if (a.hexaco && b.hexaco) sharedDomains += 1;
+  if (typeof a.hsp === "number" && typeof b.hsp === "number") sharedDomains += 1;
+  for (const slug of Object.keys(a.assessmentResults ?? {})) {
+    if (b.assessmentResults?.[slug]) sharedDomains += 1;
+  }
+
+  return {
+    sharedDomains,
+    level: sharedDomains === 0 ? "insufficient" : sharedDomains === 1 ? "partial" : "sufficient",
+  };
+}
+
 export const PAIR_RULES: PairRule[] = [
   P(
     "friction",
     (p) => pairMatch(p, isAtt("Anxious"), isAtt("Avoidant")),
     (p) =>
-      `Anxious and avoidant attachment together tend to produce the pursue-withdraw cycle: one moves toward contact to settle the nervous system, the other moves away to lower the temperature, and each move confirms the other's fear. Naming the cycle out loud — while it is happening — is usually more effective than either of you changing your instinct. This is the single most predictable dynamic between ${nameA(p)} and ${nameB(p)}.`,
+      `Anxious and avoidant attachment styles may produce a pursue-withdraw dynamic: one may seek contact to settle while the other seeks distance. This is a possible pattern worth naming, not a predictable outcome for ${nameA(p)} and ${nameB(p)}.`,
   ),
   P(
     "friction",
@@ -62,7 +86,7 @@ export const PAIR_RULES: PairRule[] = [
         (q) => isBand(q, "Neuroticism", "high"),
         (q) => isBand(q, "Neuroticism", "low"),
       ),
-    "One of you is highly sensitive to threat and the other is unusually steady. The steady one may read urgency as overreaction; the sensitive one may read calm as not caring. Both readings are wrong and both are predictable.",
+    "A higher-threat-system band and a lower-threat-system band may create different interpretations of urgency and calm. This is a possible mismatch in stress responses, not a verdict that either reading is wrong.",
   ),
   P(
     "friction",
@@ -110,7 +134,7 @@ export const PAIR_RULES: PairRule[] = [
         (q) => isL(q, "J"),
         (q) => isL(q, "P"),
       ),
-    "Judging with Perceiving is a genuine complement: one of you closes decisions, the other keeps them open long enough to find better options. It works when it is deliberate and grinds when it is not.",
+    "Judging with Perceiving may offer complementary timing: one preference may close decisions while the other keeps options open long enough to consider alternatives.",
   ),
   P(
     "complement",
@@ -190,7 +214,7 @@ function elementMix(a: NatalChart, b: NatalChart) {
   const sunB = ELEMENT_OF[b.sun];
   if (!sunA || !sunB) return "";
   if (sunA === sunB)
-    return `Both Suns share the ${sunA} element, which usually reads as instinctive recognition and a shared pace.`;
+    return `Both Suns share the ${sunA} element, which may offer a symbolic similarity in pace or style; it does not establish compatibility.`;
   const easy: Record<string, string> = { Fire: "Air", Air: "Fire", Earth: "Water", Water: "Earth" };
   return easy[sunA] === sunB
     ? `${sunA} and ${sunB} Suns are a traditionally easy mix — different registers that feed each other rather than compete.`
@@ -200,6 +224,7 @@ function elementMix(a: NatalChart, b: NatalChart) {
 /* --------------------------------- public --------------------------------- */
 
 export function generateSynastry(a: Profile, b: Profile): Report {
+  const evidence = synastryEvidence(a, b);
   const pair: Pair = { a, b };
   const matched: Record<PairRule["kind"], string[]> = {
     strength: [],
@@ -222,17 +247,22 @@ export function generateSynastry(a: Profile, b: Profile): Report {
   sections.push({
     group: G.cross,
     title: "Overall Dynamic",
-    body: [
-      `${a.name} and ${b.name} bring ${describe(a)} together with ${describe(b)}.`,
-      matched.friction.length
-        ? "The dominant dynamic to watch is described below under friction; it is the pattern most likely to repeat."
-        : "No high-friction structural pattern surfaced from the systems you have both completed.",
-      matched.complement.length
-        ? "There are also real complements — differences that function as capability rather than conflict."
-        : "",
-    ]
-      .filter(Boolean)
-      .join(" "),
+    body:
+      evidence.level === "insufficient"
+        ? `Insufficient shared data is available for ${a.name} and ${b.name}; no relationship dynamics are established by this report.`
+        : evidence.level === "partial"
+          ? "Only partial shared assessment data is available, so the observations below are limited examples rather than a comprehensive dynamic."
+          : [
+              `${a.name} and ${b.name} bring ${describe(a)} together with ${describe(b)}.`,
+              matched.friction.length
+                ? "Potential friction patterns are listed below as possibilities, not predictions."
+                : "No high-friction structural pattern was surfaced, but this does not establish compatibility.",
+              matched.complement.length
+                ? "Possible complements are differences that may function as capability rather than conflict."
+                : "",
+            ]
+              .filter(Boolean)
+              .join(" "),
   });
 
   sections.push({
@@ -383,7 +413,7 @@ export function generateSynastry(a: Profile, b: Profile): Report {
         const gap = Math.abs(va - vb);
         const label =
           gap <= 12 ? "closely matched" : gap <= 30 ? "moderately different" : "sharply different";
-        return `${t}: ${a.name} ${va} (${band(va)}) vs ${b.name} ${vb} (${band(vb)}) — ${label}.`;
+        return `${t}: ${a.name} is in the ${band(va)} band while ${b.name} is in the ${band(vb)} band — these bands are ${label} on a self-report estimate.`;
       }),
       premium: true,
     });
@@ -401,19 +431,29 @@ export function generateSynastry(a: Profile, b: Profile): Report {
   sections.push({
     group: G.final,
     title: "Cross-System Relationship Synthesis",
-    body: [
-      `Across every system you have both completed, the relationship between ${a.name} and ${b.name} tends toward ${verdict(matched)}.`,
-      matched.friction[0] ? `The pattern most worth watching: ${lower(matched.friction[0])}` : "",
-      matched.strength[0] ? `The pattern most worth protecting: ${lower(matched.strength[0])}` : "",
-      "None of this is prediction. Compatibility is not a score — it is a description of which differences you will have to become skilled at.",
-    ]
-      .filter(Boolean)
-      .join(" "),
+    body:
+      evidence.level === "insufficient"
+        ? `Insufficient shared assessment data is available for ${a.name} and ${b.name}. This section does not establish resonance, friction, compatibility, or incompatibility. Complete more assessments for both people before drawing relationship conclusions.`
+        : evidence.level === "partial"
+          ? `Partial data is available through ${evidence.sharedDomains} shared assessment domain. Observations below are limited and should not be treated as a comprehensive relationship reading.`
+          : `Across ${evidence.sharedDomains} shared assessment domains, possible patterns include ${verdict(matched)}. None of this is prediction; the measures use different frameworks and do not establish compatibility or diagnosis.`,
   });
 
+  const evidenceSummary =
+    evidence.level === "insufficient"
+      ? `Insufficient shared assessment data (${evidence.sharedDomains} shared domains); no relationship conclusion is supported.`
+      : evidence.level === "partial"
+        ? `Partial shared data (${evidence.sharedDomains} shared domain); only limited observations are available.`
+        : `${evidence.sharedDomains} shared assessment domains provide possible cross-system observations, not a compatibility verdict.`;
+
   return {
-    headline: pairHeadline(matched),
-    executiveSummary: `${a.name} and ${b.name}: ${matched.strength.length + matched.complement.length} supporting pattern${matched.strength.length + matched.complement.length === 1 ? "" : "s"} and ${matched.friction.length} friction pattern${matched.friction.length === 1 ? "" : "s"} surfaced across the systems you have both completed. ${verdictSentence(matched)}`,
+    headline:
+      evidence.level === "insufficient"
+        ? "Insufficient Data"
+        : evidence.level === "partial"
+          ? "Limited Data — Partial Reading"
+          : pairHeadline(matched),
+    executiveSummary: `${a.name} and ${b.name}. ${evidenceSummary}`,
     dominantTraits: [
       ...(a.mbti && b.mbti ? [`${a.mbti.type} × ${b.mbti.type}`] : []),
       ...(a.ennea && b.ennea ? [`Type ${a.ennea.type} × Type ${b.ennea.type}`] : []),
@@ -443,7 +483,7 @@ function bigFiveGap(a: Profile, b: Profile) {
   const biggest = gaps[0];
   const smallest = gaps[gaps.length - 1];
   if (!biggest || !smallest) return "";
-  return `Your widest Big Five gap is ${biggest.t} (${biggest.gap} points), which is where you are most likely to misread each other's reactions as choices. Your closest match is ${smallest.t}, which is probably where you feel most immediately understood.`;
+  return `The broadest Big Five band difference is ${biggest.t}; the closest band comparison is ${smallest.t}. These are possible areas of translation or recognition, not confirmed causes of relationship difficulty.`;
 }
 
 function venusMars(a: NatalChart, b: NatalChart, na: string, nb: string) {
