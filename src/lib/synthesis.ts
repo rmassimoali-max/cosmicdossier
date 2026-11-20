@@ -28,7 +28,15 @@ import { bandFor } from "./tests/types";
 
 /* ------------------------------- rule engine ------------------------------ */
 
-type RuleKind = "convergence" | "contradiction" | "amplifier" | "tension" | "hidden";
+type RuleKind =
+  | "convergence"
+  | "construct_overlap"
+  | "complementary"
+  | "tension"
+  | "unresolved"
+  | "contradiction"
+  | "amplifier"
+  | "hidden";
 type Rule = { kind: RuleKind; when: (p: Profile) => boolean; text: (p: Profile) => string };
 
 const R = (kind: RuleKind, when: Rule["when"], text: string | Rule["text"]): Rule => ({
@@ -45,9 +53,9 @@ export const RULES: Rule[] = [
     "Your MBTI introversion and your low Big Five Extraversion agree: solitude is not a preference you can talk yourself out of, it is how your system refuels.",
   ),
   R(
-    "contradiction",
+    "unresolved",
     (p) => isL(p, "I") && isBand(p, "Extraversion", "high"),
-    "Your type reads as introverted while your measured Extraversion is high. That usually means you are socially capable and outwardly warm, but the energy is spent rather than generated — a sociable introvert who pays afterwards.",
+    "MBTI introversion and high Big Five Extraversion differ on how social energy is described. This may reflect differences between preference and measured behavior, but the available results cannot determine why.",
   ),
   R(
     "convergence",
@@ -55,9 +63,9 @@ export const RULES: Rule[] = [
     "Intuition and high Openness converge on the same appetite: you would rather understand a pattern than memorise a procedure, and unfamiliar territory reliably interests you more than mastery of the known.",
   ),
   R(
-    "contradiction",
+    "unresolved",
     (p) => isL(p, "N") && isBand(p, "Openness", "low"),
-    "Abstract preference sits beside low measured Openness — you may think conceptually but live conservatively, generating ideas you rarely act on.",
+    "Abstract preference sits beside low measured Openness. The frameworks may describe different modes or contexts, but this difference is unresolved rather than proof that either result is wrong.",
   ),
   R(
     "convergence",
@@ -75,14 +83,14 @@ export const RULES: Rule[] = [
     "Feeling preference and high Agreeableness stack: the relational cost of a decision registers before its logic does.",
   ),
   R(
-    "contradiction",
+    "unresolved",
     (p) => isL(p, "F") && isBand(p, "Agreeableness", "low"),
-    "You weigh values heavily but are not automatically accommodating — a combination that produces principled bluntness: warm about people in general, unyielding in the specific case.",
+    "Feeling preference and low measured Agreeableness differ in emphasis. They may describe values and interpersonal behavior in different contexts, but the available evidence cannot explain the difference.",
   ),
   R(
-    "contradiction",
+    "unresolved",
     (p) => isL(p, "T") && isBand(p, "Agreeableness", "high"),
-    "Thinking preference with high Agreeableness means you reason coldly and deliver warmly, which can leave people unsure whether they were just helped or just assessed.",
+    "Thinking preference and high Agreeableness may describe decision style and interpersonal warmth together. They do not establish a fixed contradiction; context may explain a difference in style or delivery.",
   ),
 
   /* ---- MBTI <-> Enneagram ---- */
@@ -238,17 +246,17 @@ export const RULES: Rule[] = [
 
   /* ---- Added assessment relationships ---- */
   R(
-    "convergence",
+    "construct_overlap",
     (p) => (p.hexaco?.["C"] ?? 0) >= 66 && isBand(p, "Conscientiousness", "high"),
-    "High HEXACO Conscientiousness and high Big Five Conscientiousness point toward a similar tendency, but they are related frameworks with different factor structures rather than interchangeable measurements.",
+    "High HEXACO Conscientiousness and high Big Five Conscientiousness point toward a related tendency, but the frameworks use different factor structures and are not interchangeable measurements.",
   ),
   R(
-    "convergence",
+    "construct_overlap",
     (p) => (p.hexaco?.["O"] ?? 0) >= 66 && isBand(p, "Openness", "high"),
-    "High HEXACO Openness and high Big Five Openness suggest overlapping curiosity or idea-seeking tendencies. The overlap is descriptive, not direct confirmation of either instrument.",
+    "High HEXACO Openness and high Big Five Openness suggest overlapping curiosity or idea-seeking tendencies. This overlap is descriptive, not direct confirmation by either instrument.",
   ),
   R(
-    "convergence",
+    "complementary",
     (p) =>
       (p.assessmentResults?.["emotional-intelligence"]?.["managing"] ?? 0) >= 66 &&
       (p.assessmentResults?.["resilience"]?.["resilience"] ?? 0) >= 66,
@@ -276,7 +284,7 @@ export const RULES: Rule[] = [
     "Reported ADHD-related inattention alongside high Conscientiousness may indicate that organized behaviour and executive difficulties can coexist. These findings come from different frameworks.",
   ),
   R(
-    "convergence",
+    "construct_overlap",
     (p) =>
       typeof p.hsp === "number" &&
       p.hsp >= 66 &&
@@ -310,21 +318,30 @@ export const RULES: Rule[] = [
 
 const KIND_TITLE: Record<RuleKind, string> = {
   convergence: "Convergences",
+  construct_overlap: "Construct Overlap",
+  complementary: "Complementary Findings",
+  tension: "Potential Tensions",
+  unresolved: "Unresolved Differences",
   contradiction: "Contradictions",
   amplifier: "Amplifiers",
-  tension: "Tensions",
   hidden: "Hidden Patterns",
 };
 
 const KIND_INTRO: Record<RuleKind, string> = {
   convergence:
     "Related assessments may point toward a similar tendency, but they measure different constructs and should not be treated as interchangeable.",
+  construct_overlap:
+    "These findings touch related traits or experiences. The overlap is descriptive, not independent confirmation or a clinical equivalence.",
+  complementary:
+    "These results describe different aspects of functioning that may complement rather than duplicate one another.",
+  tension:
+    "These findings may describe competing tendencies or contexts and deserve careful interpretation.",
+  unresolved:
+    "The available results differ, but the information is not sufficient to explain why or determine which context applies.",
   contradiction:
     "Where systems differ, the difference may reflect distinct constructs or context rather than one result being wrong.",
   amplifier:
     "Some reported patterns may reinforce one another, but this is a possible interaction rather than a fixed outcome.",
-  tension:
-    "These findings may describe competing tendencies or contexts and deserve careful interpretation.",
   hidden:
     "Combinations that become visible only when several completed assessments are considered together.",
 };
@@ -332,9 +349,12 @@ const KIND_INTRO: Record<RuleKind, string> = {
 function matched(p: Profile) {
   const out: Record<RuleKind, string[]> = {
     convergence: [],
+    construct_overlap: [],
+    complementary: [],
+    tension: [],
+    unresolved: [],
     contradiction: [],
     amplifier: [],
-    tension: [],
     hidden: [],
   };
   for (const rule of RULES) {
@@ -518,7 +538,16 @@ function lensSections(p: Profile): ReportSection[] {
 
 function crossSections(p: Profile): ReportSection[] {
   const m = matched(p);
-  const kinds: RuleKind[] = ["convergence", "contradiction", "amplifier", "tension", "hidden"];
+  const kinds: RuleKind[] = [
+    "convergence",
+    "construct_overlap",
+    "complementary",
+    "tension",
+    "unresolved",
+    "contradiction",
+    "amplifier",
+    "hidden",
+  ];
   const out: ReportSection[] = [];
   for (const k of kinds) {
     if (!m[k].length) continue;
@@ -695,8 +724,8 @@ function careerAndGrowth(p: Profile): ReportSection[] {
 
 function finalDossier(p: Profile): ReportSection {
   const m = matched(p);
-  const conv = m.convergence[0];
-  const ten = m.tension[0] ?? m.contradiction[0];
+  const conv = m.convergence[0] ?? m.construct_overlap[0] ?? m.complementary[0];
+  const ten = m.tension[0] ?? m.unresolved[0] ?? m.contradiction[0];
   return {
     group: GROUPS.final,
     title: "The Integrated Read",
@@ -725,8 +754,13 @@ function executiveSummary(p: Profile): string {
     p.chart
       ? `The natal chart may be read symbolically as ${p.chart.sun} Sun, ${p.chart.moon} Moon, and ${p.chart.rising} Rising.`
       : "",
-    m.convergence.length || m.tension.length || m.contradiction.length
-      ? `The cross-assessment section contains ${m.convergence.length} possible overlap${m.convergence.length === 1 ? "" : "s"} and ${m.tension.length + m.contradiction.length} possible tension or difference${m.tension.length + m.contradiction.length === 1 ? "" : "s"}.`
+    m.convergence.length ||
+    m.construct_overlap.length ||
+    m.complementary.length ||
+    m.tension.length ||
+    m.unresolved.length ||
+    m.contradiction.length
+      ? `The cross-assessment section contains ${m.convergence.length + m.construct_overlap.length + m.complementary.length} possible overlap or complementary finding${m.convergence.length + m.construct_overlap.length + m.complementary.length === 1 ? "" : "s"} and ${m.tension.length + m.unresolved.length + m.contradiction.length} possible tension or unresolved difference${m.tension.length + m.unresolved.length + m.contradiction.length === 1 ? "" : "s"}.`
       : "",
   ]);
 }

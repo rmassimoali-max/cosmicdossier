@@ -8,6 +8,7 @@ import { BIG_FIVE, band } from "./interpret/bigfive";
 type Pair = { a: Profile; b: Profile };
 type PairRule = {
   kind: "strength" | "friction" | "misunderstanding" | "complement" | "similarity";
+  evidence?: "attachment" | "personality" | "astrology" | "clinical" | "general";
   when: (p: Pair) => boolean;
   text: (p: Pair) => string;
 };
@@ -19,7 +20,8 @@ const P = (
   kind: PairRule["kind"],
   when: PairRule["when"],
   text: string | PairRule["text"],
-): PairRule => ({ kind, when, text: typeof text === "string" ? () => text : text });
+  evidence: NonNullable<PairRule["evidence"]> = "general",
+): PairRule => ({ kind, evidence, when, text: typeof text === "string" ? () => text : text });
 
 // symmetric helper: true if one side matches x and the other matches y
 const pairMatch = (p: Pair, x: (q: Profile) => boolean, y: (q: Profile) => boolean) =>
@@ -27,27 +29,71 @@ const pairMatch = (p: Pair, x: (q: Profile) => boolean, y: (q: Profile) => boole
 
 const isAtt = (s: string) => (q: Profile) => q.attachment?.style === s;
 
-type SynastryEvidence = {
+export type SynastryEvidence = {
   level: "insufficient" | "partial" | "sufficient";
   sharedDomains: number;
+  relationshipDomains: number;
+  attachment: boolean;
+  personality: boolean;
+  astrology: boolean;
+  clinicalTraits: boolean;
 };
 
-function synastryEvidence(a: Profile, b: Profile): SynastryEvidence {
+export function synastryEvidence(a: Profile, b: Profile): SynastryEvidence {
   let sharedDomains = 0;
-  if (a.chart && b.chart) sharedDomains += 1;
-  if (a.mbti && b.mbti) sharedDomains += 1;
-  if (a.bigFive && b.bigFive) sharedDomains += 1;
-  if (a.ennea && b.ennea) sharedDomains += 1;
-  if (a.attachment && b.attachment) sharedDomains += 1;
-  if (a.hexaco && b.hexaco) sharedDomains += 1;
-  if (typeof a.hsp === "number" && typeof b.hsp === "number") sharedDomains += 1;
+  let relationshipDomains = 0;
+  if (a.chart && b.chart) {
+    sharedDomains += 1;
+    relationshipDomains += 1;
+  }
+  if (a.mbti && b.mbti) {
+    sharedDomains += 1;
+    relationshipDomains += 1;
+  }
+  if (a.bigFive && b.bigFive) {
+    sharedDomains += 1;
+    relationshipDomains += 1;
+  }
+  if (a.ennea && b.ennea) {
+    sharedDomains += 1;
+    relationshipDomains += 1;
+  }
+  if (a.attachment && b.attachment) {
+    sharedDomains += 1;
+    relationshipDomains += 1;
+  }
+  if (a.hexaco && b.hexaco) {
+    sharedDomains += 1;
+    relationshipDomains += 1;
+  }
+
   for (const slug of Object.keys(a.assessmentResults ?? {})) {
     if (b.assessmentResults?.[slug]) sharedDomains += 1;
   }
 
+  const level =
+    relationshipDomains === 0
+      ? "insufficient"
+      : relationshipDomains === 1
+        ? "partial"
+        : "sufficient";
+
   return {
     sharedDomains,
-    level: sharedDomains === 0 ? "insufficient" : sharedDomains === 1 ? "partial" : "sufficient",
+    relationshipDomains,
+    level,
+    attachment: Boolean(a.attachment && b.attachment),
+    personality: Boolean(
+      (a.mbti && b.mbti) ||
+      (a.bigFive && b.bigFive) ||
+      (a.ennea && b.ennea) ||
+      (a.hexaco && b.hexaco),
+    ),
+    astrology: Boolean(a.chart && b.chart),
+    clinicalTraits: Boolean(
+      (a.assessmentResults?.["adhd-traits"] && b.assessmentResults?.["adhd-traits"]) ||
+      (a.assessmentResults?.["autism-quotient"] && b.assessmentResults?.["autism-quotient"]),
+    ),
   };
 }
 
@@ -235,9 +281,19 @@ export function generateSynastry(a: Profile, b: Profile): Report {
   };
   for (const rule of PAIR_RULES) {
     try {
-      if (rule.when(pair)) matched[rule.kind].push(rule.text(pair));
+      const supported =
+        rule.evidence === "attachment"
+          ? evidence.attachment
+          : rule.evidence === "personality"
+            ? evidence.personality
+            : rule.evidence === "astrology"
+              ? evidence.astrology
+              : rule.evidence === "clinical"
+                ? evidence.clinicalTraits
+                : evidence.level !== "insufficient";
+      if (supported && rule.when(pair)) matched[rule.kind].push(rule.text(pair));
     } catch {
-      /* ignore */
+      /* ignore malformed profile data */
     }
   }
 
@@ -269,35 +325,40 @@ export function generateSynastry(a: Profile, b: Profile): Report {
     group: G.rel,
     title: "Attachment Dynamic",
     body:
-      a.attachment && b.attachment
-        ? `${a.name} is ${a.attachment.style.toLowerCase()}; ${b.name} is ${b.attachment.style.toLowerCase()}. ${a.attachment.conflict} Meanwhile, ${lower(b.attachment.conflict)} Under stress those two moves will meet each other before either of you chooses a response.`
-        : "Both people need the attachment assessment for this section.",
+      evidence.attachment && a.attachment && b.attachment
+        ? `${a.name} is ${a.attachment.style.toLowerCase()}; ${b.name} is ${b.attachment.style.toLowerCase()}. ${a.attachment.conflict} Meanwhile, ${lower(b.attachment.conflict)} Under stress these patterns may meet before either person chooses a response. This is a possibility, not a prediction.`
+        : "Insufficient evidence: both people need a completed attachment assessment to describe an attachment dynamic.",
     premium: true,
   });
 
   sections.push({
     group: G.rel,
     title: "Communication Compatibility",
-    body: [
-      a.mbti ? `${a.name}: ${a.mbti.communication}` : "",
-      b.mbti ? `${b.name}: ${b.mbti.communication}` : "",
-      matched.misunderstanding[0] ?? "",
-    ]
-      .filter(Boolean)
-      .join(" "),
+    body:
+      a.mbti && b.mbti
+        ? [
+            `${a.name}: ${a.mbti.communication}`,
+            `${b.name}: ${b.mbti.communication}`,
+            matched.misunderstanding[0] ??
+              "No supported personality-based misunderstanding pattern was identified.",
+          ].join(" ")
+        : "Insufficient evidence: both people need a shared personality framework, such as MBTI, to support this comparison.",
   });
 
   sections.push({
     group: G.rel,
     title: "Emotional Compatibility",
-    body: [
-      a.bigFive && b.bigFive ? bigFiveGap(a, b) : "",
-      a.ennea && b.ennea
-        ? `Motivationally, a Type ${a.ennea.type} and a Type ${b.ennea.type} want different things from the same situation: ${lower(a.ennea.coreDesire)} versus ${lower(b.ennea.coreDesire)}`
-        : "",
-    ]
-      .filter(Boolean)
-      .join(" "),
+    body: evidence.personality
+      ? [
+          a.bigFive && b.bigFive ? bigFiveGap(a, b) : "",
+          a.ennea && b.ennea
+            ? `Motivationally, a Type ${a.ennea.type} and a Type ${b.ennea.type} may want different things from the same situation: ${lower(a.ennea.coreDesire)} versus ${lower(b.ennea.coreDesire)} This is an interpretive possibility, not a compatibility verdict.`
+            : "",
+        ]
+          .filter(Boolean)
+          .join(" ") ||
+        "Insufficient evidence: the shared personality data do not support a specific emotional comparison."
+      : "Insufficient evidence: both people need shared personality assessment data for an emotional compatibility comparison.",
     premium: true,
   });
 
@@ -305,21 +366,35 @@ export function generateSynastry(a: Profile, b: Profile): Report {
     group: G.rel,
     title: "Conflict Dynamic",
     body:
-      matched.friction.join(" ") ||
-      "No structural conflict pattern surfaced from the data provided.",
+      evidence.level === "insufficient"
+        ? "Insufficient evidence: no relationship-specific conflict pattern can be established from the data provided."
+        : evidence.attachment || evidence.personality
+          ? matched.friction.join(" ") ||
+            "No supported structural conflict pattern was identified. This does not establish compatibility or incompatibility."
+          : "Insufficient evidence: the shared data do not support a conflict interpretation.",
     premium: true,
   });
 
   sections.push({
     group: G.rel,
     title: "Intimacy Dynamic",
-    body: [
-      a.attachment ? `${a.name} in closeness: ${lower(a.attachment.intimacy)}` : "",
-      b.attachment ? `${b.name} in closeness: ${lower(b.attachment.intimacy)}` : "",
-      a.chart && b.chart ? venusMars(a.chart, b.chart, a.name, b.name) : "",
-    ]
-      .filter(Boolean)
-      .join(" "),
+    body:
+      evidence.attachment || evidence.astrology
+        ? [
+            evidence.attachment && a.attachment
+              ? `${a.name} in closeness: ${lower(a.attachment.intimacy)}`
+              : "",
+            evidence.attachment && b.attachment
+              ? `${b.name} in closeness: ${lower(b.attachment.intimacy)}`
+              : "",
+            evidence.astrology && a.chart && b.chart
+              ? venusMars(a.chart, b.chart, a.name, b.name)
+              : "",
+          ]
+            .filter(Boolean)
+            .join(" ") ||
+          "Insufficient evidence: the available data do not support a specific intimacy interpretation."
+        : "Insufficient evidence: both people need shared attachment or astrology information for this section.",
     premium: true,
   });
 
