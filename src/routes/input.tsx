@@ -4,6 +4,8 @@ import { StarField } from "@/components/cosmic/StarField";
 import { CButton, Field, SectionTitle, SelectInput, TextInput } from "@/components/cosmic/ui";
 import { ENNEAGRAM_NAMES, INSTINCTS, MBTI_TYPES } from "@/lib/assessments";
 import { emptyPerson, setSession, useSession, type PersonInput } from "@/lib/session";
+import { TESTS } from "@/lib/tests";
+import { bandFor } from "@/lib/tests/types";
 
 export const Route = createFileRoute("/input")({
   head: () => ({
@@ -46,7 +48,14 @@ function PersonCard({
 }) {
   const set = (patch: Partial<PersonInput>) => onChange({ ...person, ...patch });
 
-  const assessments: { kind: string; label: string; done?: string | undefined }[] = [
+  type AssessmentPill = {
+    kind: string;
+    label: string;
+    done?: string | undefined;
+    library?: boolean | undefined;
+  };
+
+  const legacyAssessments: AssessmentPill[] = [
     { kind: "mbti", label: "MBTI · 20 questions", done: person.mbti },
     {
       kind: "enneagram",
@@ -62,6 +71,41 @@ function PersonCard({
       done: person.bigFive ? "Scored" : undefined,
     },
   ];
+
+  const duplicateLegacySlugs = new Set(["mbti", "enneagram", "attachment-style", "big-five"]);
+
+  const libraryAssessments: AssessmentPill[] = TESTS.flatMap((test) => {
+    if (duplicateLegacySlugs.has(test.slug)) return [];
+
+    const scores = person.assessmentResults?.[test.slug];
+    if (!scores) {
+      if (test.slug === "hexaco" && person.hexaco) {
+        const done = test.resultLabel?.(person.hexaco) ?? "Scored";
+        return [{ kind: test.slug, label: test.name, done, library: true }];
+      }
+      if (test.slug === "highly-sensitive-person" && typeof person.hsp === "number") {
+        const done = test.resultLabel?.({ sensitivity: person.hsp }) ?? `${person.hsp}/100`;
+        return [{ kind: test.slug, label: test.name, done, library: true }];
+      }
+      return [];
+    }
+
+    const resultLabel = test.resultLabel?.(scores);
+    const highestDimension = test.dimensions
+      .map((dimension) => ({ dimension, score: scores[dimension.key] ?? 0 }))
+      .sort((a, b) => b.score - a.score)[0];
+
+    let done = resultLabel;
+    if (!done && highestDimension) {
+      const band = bandFor(highestDimension.dimension, highestDimension.score);
+      done = `${highestDimension.dimension.label}: ${band.label}`;
+    }
+    if (!done) done = "Scored";
+
+    return [{ kind: test.slug, label: test.name, done, library: true }];
+  });
+
+  const assessments = [...legacyAssessments, ...libraryAssessments];
 
   return (
     <div className="panel p-6 sm:p-8">
@@ -178,18 +222,31 @@ function PersonCard({
           Don't know? Take an assessment
         </p>
         <div className="flex flex-wrap gap-2">
-          {assessments.map((a) => (
-            <Link
-              key={a.kind}
-              to="/assessment/$kind"
-              params={{ kind: a.kind }}
-              search={{ person: index }}
-              className="rounded-full border border-border bg-card/60 px-4 py-2 text-xs text-foreground transition-colors hover:border-primary/60 hover:text-primary"
-            >
-              {a.label}
-              {a.done ? <span className="ml-2 text-primary">✓ {a.done}</span> : null}
-            </Link>
-          ))}
+          {assessments.map((a) =>
+            a.library ? (
+              <Link
+                key={a.kind}
+                to="/tests/$slug"
+                params={{ slug: a.kind }}
+                search={{ r: undefined, person: index }}
+                className="rounded-full border border-border bg-card/60 px-4 py-2 text-xs text-foreground transition-colors hover:border-primary/60 hover:text-primary"
+              >
+                {a.label}
+                {a.done ? <span className="ml-2 text-primary">✓ {a.done}</span> : null}
+              </Link>
+            ) : (
+              <Link
+                key={a.kind}
+                to="/assessment/$kind"
+                params={{ kind: a.kind }}
+                search={{ person: index }}
+                className="rounded-full border border-border bg-card/60 px-4 py-2 text-xs text-foreground transition-colors hover:border-primary/60 hover:text-primary"
+              >
+                {a.label}
+                {a.done ? <span className="ml-2 text-primary">✓ {a.done}</span> : null}
+              </Link>
+            ),
+          )}
         </div>
       </div>
     </div>
