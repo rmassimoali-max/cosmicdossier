@@ -8,7 +8,7 @@ import { BIG_FIVE, band } from "./interpret/bigfive";
 type Pair = { a: Profile; b: Profile };
 type PairRule = {
   kind: "strength" | "friction" | "misunderstanding" | "complement" | "similarity";
-  evidence?: "attachment" | "personality" | "astrology" | "clinical" | "general";
+  evidence: ("attachment" | "personality" | "astrology" | "clinical" | "general")[];
   when: (p: Pair) => boolean;
   text: (p: Pair) => string;
 };
@@ -20,7 +20,7 @@ const P = (
   kind: PairRule["kind"],
   when: PairRule["when"],
   text: string | PairRule["text"],
-  evidence: NonNullable<PairRule["evidence"]> = "general",
+  evidence: PairRule["evidence"] = ["general"],
 ): PairRule => ({ kind, evidence, when, text: typeof text === "string" ? () => text : text });
 
 // symmetric helper: true if one side matches x and the other matches y
@@ -44,7 +44,6 @@ export function synastryEvidence(a: Profile, b: Profile): SynastryEvidence {
   let relationshipDomains = 0;
   if (a.chart && b.chart) {
     sharedDomains += 1;
-    relationshipDomains += 1;
   }
   if (a.mbti && b.mbti) {
     sharedDomains += 1;
@@ -68,6 +67,9 @@ export function synastryEvidence(a: Profile, b: Profile): SynastryEvidence {
   }
 
   for (const slug of Object.keys(a.assessmentResults ?? {})) {
+    if (b.assessmentResults?.[slug] && !["adhd-traits", "autism-quotient"].includes(slug)) {
+      relationshipDomains += 1;
+    }
     if (b.assessmentResults?.[slug]) sharedDomains += 1;
   }
 
@@ -103,16 +105,19 @@ export const PAIR_RULES: PairRule[] = [
     (p) => pairMatch(p, isAtt("Anxious"), isAtt("Avoidant")),
     (p) =>
       `Anxious and avoidant attachment styles may produce a pursue-withdraw dynamic: one may seek contact to settle while the other seeks distance. This is a possible pattern worth naming, not a predictable outcome for ${nameA(p)} and ${nameB(p)}.`,
+    ["attachment"],
   ),
   P(
     "friction",
     (p) => pairMatch(p, isAtt("Anxious"), isAtt("Fearful-Avoidant")),
-    "Anxious with fearful-avoidant can produce intense closeness followed by abrupt distance, then escalating pursuit. The intensity is real; the oscillation is the risk.",
+    "Anxious with fearful-avoidant styles may produce a cycle of closeness followed by distance. This is an interpretive possibility, not a predictable outcome.",
+    ["attachment"],
   ),
   P(
     "strength",
     (p) => p.a.attachment?.style === "Secure" && p.b.attachment?.style === "Secure",
     "Two secure-style baselines may make proportional conflict and overnight uncertainty easier to tolerate. This is a possibility, not a promise of compatibility.",
+    ["attachment"],
   ),
   P(
     "strength",
@@ -122,7 +127,8 @@ export const PAIR_RULES: PairRule[] = [
         isAtt("Secure"),
         (q) => q.attachment?.style !== undefined && q.attachment.style !== "Secure",
       ),
-    "One secure partner can meaningfully stabilise the other's pattern, provided the secure one does not slide into managing rather than relating.",
+    "One secure-style pattern may help stabilize a different attachment pattern, provided it does not become managing rather than relating.",
+    ["attachment"],
   ),
   P(
     "friction",
@@ -133,6 +139,7 @@ export const PAIR_RULES: PairRule[] = [
         (q) => isBand(q, "Neuroticism", "low"),
       ),
     "A higher-threat-system band and a lower-threat-system band may create different interpretations of urgency and calm. This is a possible mismatch in stress responses, not a verdict that either reading is wrong.",
+    ["personality"],
   ),
   P(
     "friction",
@@ -142,7 +149,8 @@ export const PAIR_RULES: PairRule[] = [
         (q) => isBand(q, "Conscientiousness", "high"),
         (q) => isBand(q, "Conscientiousness", "low"),
       ),
-    "Different structure expectations are likely: one of you experiences plans as commitments, the other as intentions. Most of the resulting arguments will be about respect while appearing to be about logistics.",
+    "Different structure expectations are possible: one person may experience plans as commitments and the other as intentions. The resulting disagreement may concern respect as much as logistics.",
+    ["personality"],
   ),
   P(
     "misunderstanding",
@@ -152,7 +160,8 @@ export const PAIR_RULES: PairRule[] = [
         (q) => isBand(q, "Extraversion", "high"),
         (q) => isBand(q, "Extraversion", "low"),
       ),
-    "Differing social-energy needs mean recovery time and stimulation have to be negotiated explicitly rather than assumed. Silence is not withdrawal, and enthusiasm is not pressure.",
+    "Differing social-energy needs may require recovery time and stimulation to be negotiated explicitly rather than assumed.",
+    ["personality"],
   ),
   P(
     "friction",
@@ -162,7 +171,8 @@ export const PAIR_RULES: PairRule[] = [
         (q) => isBand(q, "Agreeableness", "high"),
         (q) => isAtt("Avoidant")(q),
       ),
-    "High agreeableness on one side and avoidance on the other can suppress conflict entirely: nothing is raised, nothing is resolved, and distance grows without a single argument.",
+    "High Agreeableness on one side and avoidance on the other may make conflict harder to raise or resolve. This is a possibility based on different frameworks, not a fixed outcome.",
+    ["personality", "attachment"],
   ),
   P(
     "similarity",
@@ -170,7 +180,8 @@ export const PAIR_RULES: PairRule[] = [
       p.a.bigFive && p.b.bigFive
         ? Math.abs((p.a.bigFive["Openness"] ?? 50) - (p.b.bigFive["Openness"] ?? 50)) <= 12
         : false,
-    "Similar Openness bands may make conversation, novelty and taste easier to share, though it does not predict compatibility.",
+    "Similar Openness bands may make conversation, novelty and taste easier to share, though this does not predict compatibility.",
+    ["personality"],
   ),
   P(
     "complement",
@@ -180,7 +191,8 @@ export const PAIR_RULES: PairRule[] = [
         (q) => isL(q, "J"),
         (q) => isL(q, "P"),
       ),
-    "Judging with Perceiving may offer complementary timing: one preference may close decisions while the other keeps options open long enough to consider alternatives.",
+    "Judging with Perceiving may offer complementary timing: one preference may close decisions while the other keeps options open for alternatives.",
+    ["personality"],
   ),
   P(
     "complement",
@@ -190,17 +202,20 @@ export const PAIR_RULES: PairRule[] = [
         (q) => isL(q, "T"),
         (q) => isL(q, "F"),
       ),
-    "Thinking with Feeling means one of you brings decision clarity and the other brings relational accuracy. Each will underestimate the other's contribution under stress.",
+    "Thinking with Feeling may offer complementary decision clarity and relational awareness. This is an interpretive possibility, not a fixed division.",
+    ["personality"],
   ),
   P(
     "similarity",
     (p) => Boolean(p.a.mbti && p.b.mbti && p.a.mbti.type[1] === p.b.mbti.type[1]),
-    "You share the same perceiving function, which is why you tend to notice the same things — the fastest form of feeling understood.",
+    "Shared perceiving preferences may help both people notice similar kinds of information. This does not establish relationship compatibility.",
+    ["personality"],
   ),
   P(
     "misunderstanding",
     (p) => Boolean(p.a.mbti && p.b.mbti && p.a.mbti.type[1] !== p.b.mbti.type[1]),
     "One person may lead with concrete detail and the other with pattern and implication. This is one possible source of misunderstanding, not a fixed prediction.",
+    ["personality"],
   ),
   P(
     "friction",
@@ -210,12 +225,14 @@ export const PAIR_RULES: PairRule[] = [
         (q) => q.ennea?.type === 8,
         (q) => q.ennea?.type === 9,
       ),
-    "Eight and Nine energy: one escalates to make contact, the other withdraws to keep peace. Directness and stillness will each feel like aggression to the other.",
+    "Type 8 and Type 9 patterns may meet as escalation and withdrawal. These are possible dynamics, not a fixed interaction.",
+    ["personality"],
   ),
   P(
     "strength",
     (p) => Boolean(p.a.ennea && p.b.ennea && p.a.ennea.type === p.b.ennea.type),
-    "Sharing an Enneagram type means you recognise each other's engine immediately — and share the same blind spot, with nobody positioned to catch it.",
+    "Sharing an Enneagram type may create immediate recognition, while also sharing a similar blind spot. Recognition does not establish compatibility.",
+    ["personality"],
   ),
   P(
     "complement",
@@ -225,7 +242,8 @@ export const PAIR_RULES: PairRule[] = [
         (q) => q.ennea?.type === 2,
         (q) => q.ennea?.type === 5,
       ),
-    "Two-and-Five pairs the person who moves toward with the person who conserves. Warmth may register as demand; independence may register as rejection.",
+    "Type 2 and Type 5 patterns may pair moving toward relationships with conserving personal space. Warmth may register as demand and independence as distance; this is a possibility.",
+    ["personality"],
   ),
 ];
 
@@ -281,16 +299,13 @@ export function generateSynastry(a: Profile, b: Profile): Report {
   };
   for (const rule of PAIR_RULES) {
     try {
-      const supported =
-        rule.evidence === "attachment"
-          ? evidence.attachment
-          : rule.evidence === "personality"
-            ? evidence.personality
-            : rule.evidence === "astrology"
-              ? evidence.astrology
-              : rule.evidence === "clinical"
-                ? evidence.clinicalTraits
-                : evidence.level !== "insufficient";
+      const supported = rule.evidence.every((category) => {
+        if (category === "attachment") return evidence.attachment;
+        if (category === "personality") return evidence.personality;
+        if (category === "astrology") return evidence.astrology;
+        if (category === "clinical") return evidence.clinicalTraits;
+        return evidence.level !== "insufficient";
+      });
       if (supported && rule.when(pair)) matched[rule.kind].push(rule.text(pair));
     } catch {
       /* ignore malformed profile data */
@@ -326,7 +341,7 @@ export function generateSynastry(a: Profile, b: Profile): Report {
     title: "Attachment Dynamic",
     body:
       evidence.attachment && a.attachment && b.attachment
-        ? `${a.name} is ${a.attachment.style.toLowerCase()}; ${b.name} is ${b.attachment.style.toLowerCase()}. ${a.attachment.conflict} Meanwhile, ${lower(b.attachment.conflict)} Under stress these patterns may meet before either person chooses a response. This is a possibility, not a prediction.`
+        ? `${a.name} is ${a.attachment.style.toLowerCase()}; ${b.name} is ${b.attachment.style.toLowerCase()}. ${a.attachment.conflict} Meanwhile, ${lower(b.attachment.conflict)}. Under stress these patterns may meet before either person chooses a response. This is a possibility, not a prediction.`
         : "Insufficient evidence: both people need a completed attachment assessment to describe an attachment dynamic.",
     premium: true,
   });
@@ -498,7 +513,7 @@ export function generateSynastry(a: Profile, b: Profile): Report {
     sections.push({
       group: G.lenses,
       title: `Enneagram Interaction — ${a.ennea.type} × ${b.ennea.type}`,
-      body: `${a.name} is organised around ${lower(a.ennea.coreMotivation)} ${b.name} is organised around ${lower(b.ennea.coreMotivation)} Under pressure, ${lower(a.ennea.stress)} while ${lower(b.ennea.stress)}`,
+      body: `${a.name} is organised around ${lower(a.ennea.coreMotivation)}. ${b.name} is organised around ${lower(b.ennea.coreMotivation)}. Under pressure, ${lower(a.ennea.stress)}. Their styles may meet as ${lower(b.ennea.stress)}.`,
       premium: true,
     });
   }

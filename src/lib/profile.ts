@@ -29,6 +29,8 @@ export type Profile = {
   assessmentSources?: Record<string, string> | undefined;
   assessmentResultCount: number;
   assessmentDomainCount: number;
+  psychometricDomainCount: number;
+  symbolicDomainCount: number;
   has: {
     chart: boolean;
     mbti: boolean;
@@ -84,8 +86,7 @@ export function buildProfile(person: PersonInput, chart?: NatalChart | undefined
   ).length;
   const standaloneTests = TESTS.filter((test) => !coreLibrarySlugs.has(test.slug));
   const totalDomains = 7 + standaloneTests.length;
-  const assessmentDomainCount =
-    (chart ? 1 : 0) +
+  const psychometricDomainCount =
     (mbti ? 1 : 0) +
     (ennea ? 1 : 0) +
     (attachment ? 1 : 0) +
@@ -93,6 +94,8 @@ export function buildProfile(person: PersonInput, chart?: NatalChart | undefined
     (person.hexaco ? 1 : 0) +
     (typeof person.hsp === "number" ? 1 : 0) +
     completedStandaloneTests;
+  const symbolicDomainCount = chart ? 1 : 0;
+  const assessmentDomainCount = psychometricDomainCount + symbolicDomainCount;
   const completeness =
     totalDomains > 0
       ? Math.round(((baseCompleted + completedStandaloneTests) / totalDomains) * 100)
@@ -116,6 +119,8 @@ export function buildProfile(person: PersonInput, chart?: NatalChart | undefined
     assessmentSources: person.assessmentSources,
     assessmentResultCount: Object.keys(person.assessmentResults ?? {}).length,
     assessmentDomainCount,
+    psychometricDomainCount,
+    symbolicDomainCount,
     has,
     completeness,
   };

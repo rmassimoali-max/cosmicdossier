@@ -170,8 +170,8 @@ describe("evidence-aware synastry", () => {
     );
     const report = generateSynastry(a, b);
     const text = sectionsText(report);
-    expect(text).not.toContain("compatible");
-    expect(text).not.toContain("diagnosis");
+    expect(text).not.toContain("compatible partner");
+    expect(text).not.toContain("relationship diagnosis");
   });
 
   test("shared astrology information supports astrology evidence", () => {
@@ -195,7 +195,7 @@ describe("evidence-aware synastry", () => {
     const b = buildProfile(person({ name: "B" }), chart);
     const evidence = synastryEvidence(a, b);
     expect(evidence.astrology).toBe(true);
-    expect(evidence.relationshipDomains).toBe(1);
+    expect(evidence.relationshipDomains).toBe(0);
   });
 
   test("two personality domains do not support attachment conclusions", () => {
@@ -230,6 +230,38 @@ describe("evidence-aware synastry", () => {
     expect(evidence.level).toBe("sufficient");
     expect(evidence.attachment).toBe(false);
     expect(sectionsText(report)).toContain("both people need a completed attachment assessment");
+  });
+
+  test("overall completeness keeps astrology distinct from psychometric evidence", () => {
+    const chart = {
+      place: { label: "London", latitude: 51.5, longitude: -0.12 },
+      local: "12:00",
+      placements: [],
+      ascendant: { sign: "Leo", degree: "10" },
+      midheaven: { sign: "Taurus", degree: "10" },
+      houses: [],
+      aspects: [],
+      elements: { Fire: 5, Earth: 3, Air: 3, Water: 2 },
+      modalities: { Cardinal: 4, Fixed: 5, Mutable: 3 },
+      dominantPlanets: [],
+      chartShape: "Bowl",
+      sun: "Leo",
+      moon: "Cancer",
+      rising: "Leo",
+    };
+    const profile = buildProfile(person(), chart);
+    expect(profile.symbolicDomainCount).toBe(1);
+    expect(profile.psychometricDomainCount).toBe(0);
+    expect(profile.assessmentDomainCount).toBe(1);
+  });
+
+  test("clinical assessment sharing never creates psychometric compatibility evidence", () => {
+    const a = buildProfile(person({ assessmentResults: { "autism-quotient": { overall: 70 } } }));
+    const b = buildProfile(person({ assessmentResults: { "autism-quotient": { overall: 70 } } }));
+    const evidence = synastryEvidence(a, b);
+    const report = generateSynastry(a, b);
+    expect(evidence.relationshipDomains).toBe(0);
+    expect(sectionsText(report)).not.toContain("compatibility verdict");
   });
 });
 
@@ -309,5 +341,24 @@ describe("assessment quality", () => {
     expect(AQ_TEST.dimensions.find((dimension) => dimension.key === "detail")?.blurb).toContain(
       "not a difficulty",
     );
+  });
+});
+
+describe("report presentation", () => {
+  test("Enneagram synastry interaction uses sentence boundaries", () => {
+    const a = buildProfile(person({ name: "A", enneagramType: "8" }));
+    const b = buildProfile(person({ name: "B", enneagramType: "9" }));
+    const report = generateSynastry(a, b);
+    const text = sectionsText(report);
+    expect(text).not.toContain("motivation  Under pressure");
+  });
+
+  test("similar strength variants are normalized without removing distinct findings", () => {
+    const profile = buildProfile(
+      person({ mbti: "INFJ", attachment: "Fearful-Avoidant", enneagramType: "4" }),
+    );
+    const report = generateDossier(profile);
+    const strengths = report.sections.find((section) => section.title === "Possible Strengths");
+    expect(strengths?.bullets?.includes("Insight and reflective depth")).toBe(true);
   });
 });

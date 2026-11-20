@@ -182,46 +182,7 @@ export const RULES: Rule[] = [
   ),
 
   /* ---- Astrology <-> psychology ---- */
-  R(
-    "convergence",
-    (p) =>
-      Boolean(p.chart) && (p.chart?.elements.Water ?? 0) >= 4 && isBand(p, "Neuroticism", "high"),
-    "A water-weighted chart and high Neuroticism point at the same sensitivity: you register atmosphere early and carry it longer than the people who produced it.",
-  ),
-  R(
-    "convergence",
-    (p) => Boolean(p.chart) && (p.chart?.elements.Air ?? 0) >= 4 && isL(p, "N"),
-    "Air emphasis in the chart matches your intuitive preference — you process by abstraction and language rather than by sensation.",
-  ),
-  R(
-    "contradiction",
-    (p) =>
-      Boolean(p.chart) && (p.chart?.elements.Fire ?? 0) >= 4 && isBand(p, "Extraversion", "low"),
-    "Fire emphasis with low Extraversion may describe strong inner drive alongside lower social energy. This is a possible tension between symbolic and self-report frameworks, not a diagnosis or fixed contradiction.",
-  ),
-  R(
-    "convergence",
-    (p) =>
-      Boolean(p.chart) &&
-      (p.chart?.elements.Earth ?? 0) >= 4 &&
-      isBand(p, "Conscientiousness", "high"),
-    "Earth-heavy chart and high Conscientiousness say the same thing in two languages: you are trusted with things because you finish them.",
-  ),
-  R(
-    "hidden",
-    (p) =>
-      Boolean(p.chart) &&
-      p.chart?.modalities.Fixed !== undefined &&
-      (p.chart?.modalities.Fixed ?? 0) >= 5 &&
-      isL(p, "P"),
-    "A fixed-heavy chart under a Perceiving preference produces someone flexible about plans and immovable about positions.",
-  ),
-  R(
-    "hidden",
-    (p) =>
-      Boolean(p.chart) && (p.chart?.aspects.filter((a) => a.type === "square").length ?? 0) >= 5,
-    "Your chart carries an unusual number of squares. Read symbolically, that suggests a life organised around friction that produces capability rather than ease that produces comfort.",
-  ),
+  /* Astrology remains a standalone symbolic lens; it does not participate in psychometric cross-assessment rules. */
 
   /* ---- Three-system combinations ---- */
   R(
@@ -572,18 +533,16 @@ function crossSections(p: Profile): ReportSection[] {
 function innerWorld(p: Profile): ReportSection[] {
   const n = p.bands.Neuroticism;
   const emotional = join([
-    p.attachment ? p.attachment.read : "",
+    n === "high"
+      ? "The Big Five threat-system band is high. Emotion may arrive strongly and rumination may take longer to settle."
+      : n === "low"
+        ? "The Big Five threat-system band is low. Emotional intensity may feel more contained, while others' distress can sometimes be harder to register."
+        : "",
     p.mbti
       ? isL(p, "F")
-        ? "Emotional meaning may be weighed early in decisions."
-        : "Reasoning may precede emotional interpretation."
+        ? "Your MBTI pattern may give emotional meaning a prominent role in interpretation."
+        : "Your MBTI pattern may give reasoning or structure a prominent role before emotional interpretation."
       : "",
-    n === "high"
-      ? "The Big Five threat-system band is high: emotion may arrive strongly and rumination may take longer to settle."
-      : n === "low"
-        ? "The Big Five threat-system band is low: stress may feel more contained, though distress in others can still be easy to miss."
-        : "",
-    p.ennea ? p.ennea.emotional : "",
   ]);
 
   const motivation = join([
@@ -593,11 +552,7 @@ function innerWorld(p: Profile): ReportSection[] {
     p.mbti ? p.mbti.core : "",
   ]);
 
-  const stress = join([
-    p.mbti ? p.mbti.stress : "",
-    p.ennea ? p.ennea.stress : "",
-    p.attachment ? `Relationally, stress may show up as: ${lowerFirst(p.attachment.conflict)}` : "",
-  ]);
+  const stress = join([p.mbti ? p.mbti.stress : "", p.ennea ? p.ennea.stress : ""]);
 
   return [
     {
@@ -641,7 +596,12 @@ function relationships(p: Profile): ReportSection[] {
     {
       group: GROUPS.rel,
       title: "Conflict Style",
-      body: join([a ? a.conflict : "", p.mbti ? p.mbti.communication : ""]),
+      body: join([
+        a ? a.conflict : "",
+        isBand(p, "Agreeableness", "low")
+          ? "Low Big Five Agreeableness may make delivery direct; this is a possibility rather than a fixed communication style."
+          : "",
+      ]),
       premium: true,
     },
     {
@@ -776,9 +736,20 @@ function bigFiveHeadline(p: Profile): string {
 const lowerFirst = (s: string) => (s ? s.charAt(0).toLowerCase() + s.slice(1) : s);
 const dedupe = (a: string[]) => {
   const normalized = a.map((value) => {
-    if (/^(depth of insight|high capacity for insight)$/i.test(value.trim()))
-      return "Insight depth";
-    return value.trim() === "Depth" ? "Reflective depth" : value.trim();
+    const cleaned = value.trim();
+    if (
+      /^(depth|depth of insight|analytical depth|emotional depth|high capacity for insight)$/i.test(
+        cleaned,
+      )
+    )
+      return "Insight and reflective depth";
+    if (/^(listening|considered speech|pattern-reading of people)$/i.test(cleaned))
+      return "Attuned listening and insight";
+    if (/^(perfectionism|rigidity when plans change|difficulty resting)$/i.test(cleaned))
+      return "Structure may become rigid under pressure";
+    if (/^(rumination|reactivity to ambiguity|physical stress load)$/i.test(cleaned))
+      return "Uncertainty may increase stress";
+    return cleaned;
   });
   return Array.from(new Set(normalized));
 };
