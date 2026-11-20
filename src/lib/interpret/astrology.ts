@@ -13,25 +13,76 @@ export const PLANET_THEME: Record<string, { domain: string; verb: string }> = {
   Jupiter: { domain: "where you expand and what you trust", verb: "grows" },
   Saturn: { domain: "where you meet limit and build durability", verb: "hardens" },
   Uranus: { domain: "where you break pattern", verb: "disrupts" },
-  Neptune: { domain: "where boundaries dissolve — imagination and illusion alike", verb: "diffuses" },
+  Neptune: {
+    domain: "where boundaries dissolve — imagination and illusion alike",
+    verb: "diffuses",
+  },
   Pluto: { domain: "where you confront power and are remade", verb: "transforms" },
   "North Node": { domain: "the direction of growth that feels unfamiliar", verb: "pulls" },
   "South Node": { domain: "the comfortable competence you over-rely on", verb: "rests" },
 };
 
 export const SIGN_STYLE: Record<string, { adj: string; mode: string; shadow: string }> = {
-  Aries: { adj: "direct and initiating", mode: "moves first and asks later", shadow: "impatience with anything slow" },
-  Taurus: { adj: "steady and sensory", mode: "builds slowly and holds ground", shadow: "resistance to necessary change" },
-  Gemini: { adj: "quick and plural", mode: "gathers, connects and talks it through", shadow: "scatter and surface-skimming" },
-  Cancer: { adj: "protective and tidal", mode: "works through feeling and memory", shadow: "retreat into the shell when hurt" },
-  Leo: { adj: "warm and expressive", mode: "wants to be seen doing it wholeheartedly", shadow: "needing recognition to feel real" },
-  Virgo: { adj: "precise and improving", mode: "refines the detail until it functions", shadow: "criticism aimed inward first" },
-  Libra: { adj: "relational and balancing", mode: "weighs the other side before acting", shadow: "indecision and over-accommodation" },
-  Scorpio: { adj: "intense and penetrating", mode: "goes all the way in or not at all", shadow: "control disguised as depth" },
-  Sagittarius: { adj: "expansive and searching", mode: "needs horizon, meaning and room", shadow: "restlessness dressed as principle" },
-  Capricorn: { adj: "disciplined and structural", mode: "commits long and pays the cost", shadow: "self-worth tied to output" },
-  Aquarius: { adj: "detached and inventive", mode: "steps outside the system to see it", shadow: "distance where warmth was needed" },
-  Pisces: { adj: "permeable and imaginative", mode: "absorbs atmosphere and dissolves edges", shadow: "escape when reality gets sharp" },
+  Aries: {
+    adj: "direct and initiating",
+    mode: "moves first and asks later",
+    shadow: "impatience with anything slow",
+  },
+  Taurus: {
+    adj: "steady and sensory",
+    mode: "builds slowly and holds ground",
+    shadow: "resistance to necessary change",
+  },
+  Gemini: {
+    adj: "quick and plural",
+    mode: "gathers, connects and talks it through",
+    shadow: "scatter and surface-skimming",
+  },
+  Cancer: {
+    adj: "protective and tidal",
+    mode: "works through feeling and memory",
+    shadow: "retreat into the shell when hurt",
+  },
+  Leo: {
+    adj: "warm and expressive",
+    mode: "wants to be seen doing it wholeheartedly",
+    shadow: "needing recognition to feel real",
+  },
+  Virgo: {
+    adj: "precise and improving",
+    mode: "refines the detail until it functions",
+    shadow: "criticism aimed inward first",
+  },
+  Libra: {
+    adj: "relational and balancing",
+    mode: "weighs the other side before acting",
+    shadow: "indecision and over-accommodation",
+  },
+  Scorpio: {
+    adj: "intense and penetrating",
+    mode: "goes all the way in or not at all",
+    shadow: "control disguised as depth",
+  },
+  Sagittarius: {
+    adj: "expansive and searching",
+    mode: "needs horizon, meaning and room",
+    shadow: "restlessness dressed as principle",
+  },
+  Capricorn: {
+    adj: "disciplined and structural",
+    mode: "commits long and pays the cost",
+    shadow: "self-worth tied to output",
+  },
+  Aquarius: {
+    adj: "detached and inventive",
+    mode: "steps outside the system to see it",
+    shadow: "distance where warmth was needed",
+  },
+  Pisces: {
+    adj: "permeable and imaginative",
+    mode: "absorbs atmosphere and dissolves edges",
+    shadow: "escape when reality gets sharp",
+  },
 };
 
 export const HOUSE_THEME: Record<number, string> = {
@@ -69,8 +120,14 @@ export function placementText(label: string, sign: string, house: number | null,
   const parts = [
     `${label} in ${sign}: ${p.domain} ${p.verb} in a ${s.adj} register — it ${s.mode}.`,
   ];
-  if (house) parts.push(`Placed in the ${ordinal(house)} house, that energy concentrates around ${HOUSE_THEME[house]}.`);
-  if (retro) parts.push(`Retrograde here suggests the theme turns inward before it turns outward, and often gets learned by revisiting.`);
+  if (house)
+    parts.push(
+      `Placed in the ${ordinal(house)} house, that energy concentrates around ${HOUSE_THEME[house]}.`,
+    );
+  if (retro)
+    parts.push(
+      `Retrograde here suggests the theme turns inward before it turns outward, and often gets learned by revisiting.`,
+    );
   parts.push(`The shadow to watch is ${s.shadow}.`);
   return parts.join(" ");
 }
@@ -105,7 +162,8 @@ export function modalityText(m: Record<string, number>) {
   return `Modality balance leans ${top}: ${READ[top]}.`;
 }
 
-const ordinal = (n: number) => `${n}${["th", "st", "nd", "rd"][n % 10 > 3 || (n >= 11 && n <= 13) ? 0 : n % 10]}`;
+const ordinal = (n: number) =>
+  `${n}${["th", "st", "nd", "rd"][n % 10 > 3 || (n >= 11 && n <= 13) ? 0 : n % 10]}`;
 const lower = (s: string) => s.charAt(0).toLowerCase() + s.slice(1);
 
 export const ASTROLOGY_DISCLAIMER =

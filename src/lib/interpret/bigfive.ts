@@ -45,7 +45,11 @@ export const BIG_FIVE_LIBRARY: Record<BigFiveTrait, Record<Band, TraitBand>> = {
     high: {
       read: "You are drawn to the unfamiliar and think in abstractions, metaphors and possibilities.",
       strengths: ["Original thinking", "Comfort with complexity", "Aesthetic sensitivity"],
-      difficulties: ["Restlessness with routine", "Idea churn over completion", "Overthinking simple choices"],
+      difficulties: [
+        "Restlessness with routine",
+        "Idea churn over completion",
+        "Overthinking simple choices",
+      ],
       interpersonal: "You bond over ideas and want conversation that goes somewhere unexpected.",
       emotional: "Your inner life is vivid and layered, which deepens both pleasure and unease.",
       work: "You do best with problems that are genuinely open rather than procedures to maintain.",
@@ -61,7 +65,11 @@ export const BIG_FIVE_LIBRARY: Record<BigFiveTrait, Record<Band, TraitBand>> = {
     low: {
       read: "You prefer the proven, the concrete and the clearly useful over the speculative.",
       strengths: ["Focus", "Practical grounding", "Consistency of taste and method"],
-      difficulties: ["Discomfort with sudden change", "Undervaluing abstract framing", "Slower to adopt new methods"],
+      difficulties: [
+        "Discomfort with sudden change",
+        "Undervaluing abstract framing",
+        "Slower to adopt new methods",
+      ],
       interpersonal: "You bond over shared activity and real experience more than theory.",
       emotional: "Your inner life is steadier and less prone to imaginative amplification.",
       work: "You excel where mastery, precision and reliability matter more than reinvention.",
@@ -78,7 +86,11 @@ export const BIG_FIVE_LIBRARY: Record<BigFiveTrait, Record<Band, TraitBand>> = {
     },
     moderate: {
       read: "You are organised when it matters and flexible when it does not.",
-      strengths: ["Adaptive structure", "Reasonable follow-through", "Tolerable with both planners and improvisers"],
+      strengths: [
+        "Adaptive structure",
+        "Reasonable follow-through",
+        "Tolerable with both planners and improvisers",
+      ],
       difficulties: ["Occasional slippage under low pressure", "Inconsistent systems"],
       interpersonal: "You neither impose structure nor resist it strongly.",
       emotional: "You handle disorder without spiralling and order without rigidity.",
@@ -87,7 +99,11 @@ export const BIG_FIVE_LIBRARY: Record<BigFiveTrait, Record<Band, TraitBand>> = {
     low: {
       read: "You work in bursts driven by interest rather than schedule.",
       strengths: ["Spontaneity", "Comfort with mess", "Fast pivots"],
-      difficulties: ["Deadline pressure as the main engine", "Unfinished threads", "Administrative drag"],
+      difficulties: [
+        "Deadline pressure as the main engine",
+        "Unfinished threads",
+        "Administrative drag",
+      ],
       interpersonal: "You may frustrate structured people and relieve rigid ones.",
       emotional: "Constraint feels heavier to you than chaos does.",
       work: "You need flexible deadlines, interest-led tasks and support on logistics.",
@@ -97,7 +113,11 @@ export const BIG_FIVE_LIBRARY: Record<BigFiveTrait, Record<Band, TraitBand>> = {
     high: {
       read: "Contact energises you and you think partly by talking.",
       strengths: ["Momentum", "Social ease", "Visible leadership"],
-      difficulties: ["Understimulated when alone", "Speaking before processing", "Filling silence that needed to stay open"],
+      difficulties: [
+        "Understimulated when alone",
+        "Speaking before processing",
+        "Filling silence that needed to stay open",
+      ],
       interpersonal: "You initiate readily and expect responsiveness.",
       emotional: "You metabolise feeling by expressing it outward.",
       work: "You do best in collaborative, high-contact, fast-feedback settings.",
@@ -113,7 +133,11 @@ export const BIG_FIVE_LIBRARY: Record<BigFiveTrait, Record<Band, TraitBand>> = {
     low: {
       read: "Solitude restores you and stimulation depletes faster than others realise.",
       strengths: ["Depth of focus", "Listening", "Considered speech"],
-      difficulties: ["Visibility costs energy", "Slower to assert presence", "Read as distant when simply quiet"],
+      difficulties: [
+        "Visibility costs energy",
+        "Slower to assert presence",
+        "Read as distant when simply quiet",
+      ],
       interpersonal: "You prefer a few real conversations to many light ones.",
       emotional: "You process internally first and may share only the conclusion.",
       work: "You need protected solo time and low-noise environments.",
@@ -123,7 +147,11 @@ export const BIG_FIVE_LIBRARY: Record<BigFiveTrait, Record<Band, TraitBand>> = {
     high: {
       read: "Your default is cooperation, generosity and assuming good intent.",
       strengths: ["Trust-building", "Repairing conflict", "Genuine consideration"],
-      difficulties: ["Difficulty with boundaries", "Suppressed disagreement", "Over-accommodating the demanding"],
+      difficulties: [
+        "Difficulty with boundaries",
+        "Suppressed disagreement",
+        "Over-accommodating the demanding",
+      ],
       interpersonal: "You are easy to be close to and easy to take advantage of.",
       emotional: "Others' discomfort registers almost as your own.",
       work: "You strengthen teams but may under-advocate for yourself.",
@@ -139,7 +167,11 @@ export const BIG_FIVE_LIBRARY: Record<BigFiveTrait, Record<Band, TraitBand>> = {
     low: {
       read: "You lead with candour and are unbothered by friction.",
       strengths: ["Directness", "Independent standards", "Willing to say the unpopular thing"],
-      difficulties: ["Bluntness read as hostility", "Underestimating relational maintenance", "Skepticism as a default"],
+      difficulties: [
+        "Bluntness read as hostility",
+        "Underestimating relational maintenance",
+        "Skepticism as a default",
+      ],
       interpersonal: "People know where they stand, though warmth may need translation.",
       emotional: "You are less porous to others' states, which protects and isolates.",
       work: "You are valuable where honest assessment matters more than comfort.",
@@ -165,8 +197,13 @@ export const BIG_FIVE_LIBRARY: Record<BigFiveTrait, Record<Band, TraitBand>> = {
     low: {
       read: "You are unusually steady, slow to alarm and quick to settle.",
       strengths: ["Calm in crisis", "Low rumination", "Fast recovery"],
-      difficulties: ["Missing early warning signs", "Underestimating others' distress", "Reading urgency as overreaction"],
-      interpersonal: "You are stabilising, and you can seem unmoved when someone needs visible concern.",
+      difficulties: [
+        "Missing early warning signs",
+        "Underestimating others' distress",
+        "Reading urgency as overreaction",
+      ],
+      interpersonal:
+        "You are stabilising, and you can seem unmoved when someone needs visible concern.",
       emotional: "Your baseline is even; intensity is rare and brief.",
       work: "You hold high-pressure roles without much cost.",
     },
