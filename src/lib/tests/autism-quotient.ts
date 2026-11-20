@@ -36,7 +36,8 @@ const DIMS: DimSpec[] = [
   {
     key: "detail",
     label: "Attention to Detail",
-    blurb: "Noticing patterns and small details.",
+    blurb:
+      "Detail noticing (higher = stronger attention to patterns and small details, not a difficulty).",
     archetypes: ["the-observer", "the-strategist"],
     low: "You focus on the big picture more than details.",
     mid: "You notice details when they matter.",

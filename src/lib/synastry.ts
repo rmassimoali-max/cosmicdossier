@@ -112,7 +112,7 @@ export const PAIR_RULES: PairRule[] = [
   P(
     "strength",
     (p) => p.a.attachment?.style === "Secure" && p.b.attachment?.style === "Secure",
-    "Two secure baselines mean conflict is likely to stay proportional — you can both tolerate a topic staying open overnight without reading it as a threat to the relationship.",
+    "Two secure-style baselines may make proportional conflict and overnight uncertainty easier to tolerate. This is a possibility, not a promise of compatibility.",
   ),
   P(
     "strength",
@@ -170,7 +170,7 @@ export const PAIR_RULES: PairRule[] = [
       p.a.bigFive && p.b.bigFive
         ? Math.abs((p.a.bigFive["Openness"] ?? 50) - (p.b.bigFive["Openness"] ?? 50)) <= 12
         : false,
-    "You sit close on Openness, which usually means conversation, novelty and taste come easily and rarely need translating.",
+    "Similar Openness bands may make conversation, novelty and taste easier to share, though it does not predict compatibility.",
   ),
   P(
     "complement",
@@ -200,7 +200,7 @@ export const PAIR_RULES: PairRule[] = [
   P(
     "misunderstanding",
     (p) => Boolean(p.a.mbti && p.b.mbti && p.a.mbti.type[1] !== p.b.mbti.type[1]),
-    "One of you leads with concrete detail and the other with pattern and implication. Most misunderstandings between you will start as a disagreement about what actually happened.",
+    "One person may lead with concrete detail and the other with pattern and implication. This is one possible source of misunderstanding, not a fixed prediction.",
   ),
   P(
     "friction",
@@ -264,7 +264,7 @@ function elementMix(a: NatalChart, b: NatalChart) {
   const easy: Record<string, string> = { Fire: "Air", Air: "Fire", Earth: "Water", Water: "Earth" };
   return easy[sunA] === sunB
     ? `${sunA} and ${sunB} Suns are a traditionally easy mix — different registers that feed each other rather than compete.`
-    : `${sunA} and ${sunB} Suns are a friction mix in traditional terms: you are likely to want different tempos, and to interpret the difference as a values gap when it is closer to a metabolism gap.`;
+    : `${sunA} and ${sunB} Suns are a traditionally contrasting mix in this symbolic framework. The chart may suggest different tempos or registers to discuss, not a relationship verdict or an empirical cause of conflict.`;
 }
 
 /* --------------------------------- public --------------------------------- */

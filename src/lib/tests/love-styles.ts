@@ -61,7 +61,7 @@ const DIMS: DimSpec[] = [
       "When someone helps me with a chore, I feel loved.",
       "Actions speak louder than words to me.",
       "-I'd rather do things myself than have someone help.",
-      "Broken promises to help bother me a lot.",
+      "It means a lot when someone notices a practical task I need help with.",
     ],
   },
   {

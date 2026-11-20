@@ -2,6 +2,10 @@ import { describe, expect, test } from "bun:test";
 import { buildProfile } from "./profile";
 import { generateDossier, generateCrossSection } from "./synthesis";
 import { generateSynastry, synastryEvidence } from "./synastry";
+import { getAssessmentEntries, getAssessmentCategories } from "./assessment-discovery";
+import { LOVE_STYLES_TEST } from "./tests/love-styles";
+import { AQ_TEST } from "./tests/autism-quotient";
+import { scoreTest } from "./tests/types";
 
 const person = (overrides = {}) => ({
   name: "",
@@ -226,5 +230,84 @@ describe("evidence-aware synastry", () => {
     expect(evidence.level).toBe("sufficient");
     expect(evidence.attachment).toBe(false);
     expect(sectionsText(report)).toContain("both people need a completed attachment assessment");
+  });
+});
+
+describe("assessment discovery", () => {
+  test("finds love styles assessment", () => {
+    const entries = getAssessmentEntries(person());
+    expect(entries.find((entry) => entry.slug === "love-styles")?.label).toBe("Love Styles");
+  });
+
+  test("finds autism quotient assessment", () => {
+    const entries = getAssessmentEntries(person());
+    expect(entries.find((entry) => entry.slug === "autism-quotient")?.label).toContain("Autism");
+  });
+
+  test("categories are correctly identified", () => {
+    const entries = getAssessmentEntries(person()).filter((entry) => !entry.legacy);
+    const categories = getAssessmentCategories(entries);
+    expect(
+      categories
+        .find((group) => group.category === "Relationships & Attachment")
+        ?.entries.some((entry) => entry.slug === "love-styles"),
+    ).toBe(true);
+    expect(
+      categories
+        .find((group) => group.category === "Neurodiversity")
+        ?.entries.some((entry) => entry.slug === "autism-quotient"),
+    ).toBe(true);
+  });
+
+  test("lists all registered assessments and keeps core duplicates out", () => {
+    const entries = getAssessmentEntries(person());
+    expect(entries.filter((entry) => entry.legacy)).toHaveLength(4);
+    expect(entries.some((entry) => entry.slug === "love-styles")).toBe(true);
+    expect(entries.some((entry) => entry.slug === "mbti")).toBe(true);
+    expect(entries.some((entry) => entry.slug === "attachment-style")).toBe(false);
+  });
+
+  test("completion status is independent for each person", () => {
+    const first = getAssessmentEntries(
+      person({ mbti: "INTJ", mbtiEstimates: [{ label: "INTJ", percent: 80 }] }),
+    );
+    const second = getAssessmentEntries(person());
+    expect(first.find((entry) => entry.slug === "mbti")?.completed).toBe(true);
+    expect(second.find((entry) => entry.slug === "mbti")?.completed).toBe(false);
+  });
+
+  test("registered entries retain categories for grouped discovery", () => {
+    const entries = getAssessmentEntries(person());
+    const categories = getAssessmentCategories(entries.filter((entry) => !entry.legacy));
+    expect(categories.length).toBeGreaterThan(0);
+    expect(categories.every((group) => group.entries.length > 0)).toBe(true);
+  });
+});
+
+describe("assessment quality", () => {
+  test("Love Styles retains 20 items and four items per style", () => {
+    expect(LOVE_STYLES_TEST.items).toHaveLength(20);
+    for (const dimension of LOVE_STYLES_TEST.dimensions) {
+      expect(
+        LOVE_STYLES_TEST.items.filter((item) => item.dimension === dimension.key),
+      ).toHaveLength(4);
+    }
+  });
+
+  test("Love Styles no longer contains the reliability-focused broken-promises item", () => {
+    const text = LOVE_STYLES_TEST.items.map((item) => item.text).join(" ");
+    expect(text).not.toContain("Broken promises");
+    expect(text).toContain("practical task");
+  });
+
+  test("AQ higher social difficulty and detail scores stay directionally consistent", () => {
+    const highAnswers = Object.fromEntries(AQ_TEST.items.map((item) => [item.id, 5]));
+    const lowAnswers = Object.fromEntries(AQ_TEST.items.map((item) => [item.id, 1]));
+    const high = scoreTest(AQ_TEST, highAnswers);
+    const low = scoreTest(AQ_TEST, lowAnswers);
+    expect(high["overall"] ?? 0).toBeGreaterThan(low["overall"] ?? 100);
+    expect(AQ_TEST.dimensions.find((dimension) => dimension.key === "detail")?.blurb).toContain(
+      "not a difficulty",
+    );
   });
 });

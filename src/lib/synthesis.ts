@@ -50,7 +50,7 @@ export const RULES: Rule[] = [
   R(
     "convergence",
     (p) => isL(p, "I") && isBand(p, "Extraversion", "low"),
-    "Your MBTI introversion and your low Big Five Extraversion agree: solitude is not a preference you can talk yourself out of, it is how your system refuels.",
+    "Your MBTI introversion and low Big Five Extraversion may point toward a similar pattern: solitude could be especially useful as recovery time. This is a possible interpretation rather than a fixed rule.",
   ),
   R(
     "unresolved",
@@ -98,7 +98,7 @@ export const RULES: Rule[] = [
     "amplifier",
     (p) => isL(p, "I") && [4, 5, 9].includes(p.ennea?.type ?? 0),
     (p) =>
-      `Introversion amplifies your Type ${p.ennea?.type} withdrawal reflex. Retreat is both your recovery strategy and your avoidance strategy, and from the inside the two feel identical.`,
+      `Introversion and a possible Type ${p.ennea?.type} withdrawal pattern may reinforce one another. Consider whether retreat helps you recover and whether it can also become avoidance; the two are not always easy to distinguish.`,
   ),
   R(
     "amplifier",
@@ -770,11 +770,18 @@ function bigFiveHeadline(p: Profile): string {
   const hi = bands.filter((x) => x.band === "high")[0];
   const lo = bands.filter((x) => x.band === "low")[0];
   if (!hi && !lo) return "The available Big Five traits are largely in moderate bands.";
-  return join([hi ? `${hi.t} is in the high band` : "", lo ? `${lo.t} is in the low band` : ""]);
+  return join([hi ? `${hi.t} is in the high band.` : "", lo ? `${lo.t} is in the low band.` : ""]);
 }
 
 const lowerFirst = (s: string) => (s ? s.charAt(0).toLowerCase() + s.slice(1) : s);
-const dedupe = (a: string[]) => Array.from(new Set(a));
+const dedupe = (a: string[]) => {
+  const normalized = a.map((value) => {
+    if (/^(depth of insight|high capacity for insight)$/i.test(value.trim()))
+      return "Insight depth";
+    return value.trim() === "Depth" ? "Reflective depth" : value.trim();
+  });
+  return Array.from(new Set(normalized));
+};
 
 export function generateCrossSection(profile: Profile): ReportSection[] {
   return crossSections(profile);
