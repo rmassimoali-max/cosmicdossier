@@ -147,7 +147,9 @@ export function placementText(label: string, sign: string, house: number | null,
     );
   }
   if (retro) {
-    parts.push("Retrograde motion is traditionally read as a reason to revisit this theme inwardly.");
+    parts.push(
+      "Retrograde motion is traditionally read as a reason to revisit this theme inwardly.",
+    );
   }
   parts.push(`One possible tension is ${style.shadow}.`);
   return parts.join(" ");
