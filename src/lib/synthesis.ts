@@ -634,11 +634,13 @@ function strengthsAndBlind(p: Profile): ReportSection[] {
   }
 
   if (!strengths.length && !blind.length) {
-    return [{
-      group: GROUPS.strengths,
-      title: "Strengths & Blind Spots",
-      body: "Complete a personality or attachment assessment to explore possible strengths and blind spots. A birth chart alone is not evidence of psychological traits.",
-    }];
+    return [
+      {
+        group: GROUPS.strengths,
+        title: "Strengths & Blind Spots",
+        body: "Complete a personality or attachment assessment to explore possible strengths and blind spots. A birth chart alone is not evidence of psychological traits.",
+      },
+    ];
   }
 
   return [
