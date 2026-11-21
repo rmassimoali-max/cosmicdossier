@@ -67,7 +67,9 @@ export const createUnlockCheckout = createServerFn({ method: "POST" }).handler(a
 
 /** Server-side confirmation that a session was actually paid. */
 export const verifyUnlockPayment = createServerFn({ method: "POST" })
-  .inputValidator((input: unknown) => z.object({ sessionId: z.string().regex(/^cs_(test|live)_[A-Za-z0-9]+$/) }).parse(input))
+  .inputValidator((input: unknown) =>
+    z.object({ sessionId: z.string().regex(/^cs_(test|live)_[A-Za-z0-9]+$/) }).parse(input),
+  )
   .handler(async ({ data }) => {
     const session = await stripeCall(
       `/checkout/sessions/${encodeURIComponent(data.sessionId)}`,
