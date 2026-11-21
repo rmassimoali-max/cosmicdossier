@@ -56,7 +56,7 @@ export function StripeUnlockButton() {
     try {
       const res = await verify({ data: { sessionId: id } });
       if (res.paid) {
-        setUnlocked(true);
+        setUnlocked(id);
         setOpen(false);
       } else {
         setError(`Payment not completed (status: ${res.status}).`);
