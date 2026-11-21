@@ -36,7 +36,10 @@ export function UnlockCard({
   note?: string | undefined;
   offer?: UnlockOffer | undefined;
 }) {
-  const features = offer?.features ?? ["Detailed results from your completed profile", "Printable PDF dossier"];
+  const features = offer?.features ?? [
+    "Detailed results from your completed profile",
+    "Printable PDF dossier",
+  ];
   return (
     <div className="panel max-w-md p-6 text-center sm:p-8">
       <p className="tracking-cosmic text-[0.65rem] text-primary/80">Full dossier</p>
