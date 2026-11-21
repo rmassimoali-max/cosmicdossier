@@ -30,7 +30,7 @@ export async function downloadDossierPdf(args: {
     doc.setFont("times", style);
     doc.setFontSize(size);
     const lineHeight = size * 1.45;
-    const paragraphs = text.split(/\\n+/).filter((paragraph) => paragraph.trim());
+    const paragraphs = text.split(/\n+/).filter((paragraph) => paragraph.trim());
     for (const [index, paragraph] of paragraphs.entries()) {
       const lines = doc.splitTextToSize(paragraph, width) as string[];
       for (const line of lines) {
