@@ -46,9 +46,9 @@ export function UnlockCard({
       </p>
       <ul className="mx-auto mt-5 space-y-1.5 text-left text-xs text-muted-foreground">
         {(offer?.features ?? [
-          "Detailed results from your completed profile",
-          "Printable PDF dossier",
-        ]).map((f) => (
+            "Detailed results from your completed profile",
+            "Printable PDF dossier",
+          ]).map((f) => (
           <li key={f} className="flex gap-2">
             <span className="text-primary/80">✦</span>
             {f}
