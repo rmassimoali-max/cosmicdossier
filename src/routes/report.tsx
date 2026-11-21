@@ -9,6 +9,8 @@ import { computeNatalChart } from "@/lib/astro.functions";
 import { buildDossier, buildSynastry } from "@/lib/generate";
 import { downloadDossierPdf } from "@/lib/pdf";
 import { useUnlocked } from "@/lib/unlock";
+import { buildUnlockOffer } from "@/lib/unlock-offer";
+import type { UnlockOffer } from "@/lib/unlock-offer";
 import {
   ageFrom,
   getSession,
@@ -51,10 +53,12 @@ function ChartPanel({
   chart,
   name,
   locked = false,
+  offer,
 }: {
   chart: NatalChart;
   name: string;
   locked?: boolean;
+  offer?: UnlockOffer;
 }) {
   const elementMax = Math.max(...Object.values(chart.elements), 1);
   const modalMax = Math.max(...Object.values(chart.modalities), 1);
@@ -84,7 +88,8 @@ function ChartPanel({
         <div className="mt-6">
           <UnlockCard
             title="Full chart is locked"
-            note="Your Sun, Moon and Rising are free. Unlock to see every placement, house, element balance and aspect."
+            note="Your Sun, Moon and Rising are free. Unlock the full chart details and interpretations available for this profile."
+            offer={offer}
           />
         </div>
       ) : null}
@@ -184,10 +189,12 @@ function DossierView({
   dossier,
   person,
   locked = false,
+  offer,
 }: {
   dossier: Dossier;
   person?: PersonInput;
   locked?: boolean;
+  offer?: UnlockOffer;
 }) {
   const preview = dossier.synthesis.slice(0, 420);
   return (
@@ -234,7 +241,8 @@ function DossierView({
           </div>
           <UnlockCard
             title="You've only seen the surface"
-            note="Your full dossier connects these patterns into one personalized interpretation — the complete synthesis, every deep-dive section, and your full natal chart."
+            note="Unlock the detailed results available from the information you provided. You can add assessments later for additional insights."
+            offer={offer}
           />
         </div>
       ) : (
@@ -326,6 +334,8 @@ function ReportPage() {
   const d2 = session.dossier?.p2;
   const syn = session.dossier?.synastry;
   const hasP2 = Boolean(session.p2);
+  const offer1 = buildUnlockOffer(session.p1, Boolean(chart1), hasP2);
+  const offer2 = session.p2 ? buildUnlockOffer(session.p2, Boolean(chart2), true) : undefined;
 
   return (
     <main className="relative min-h-screen">
@@ -396,7 +406,7 @@ function ReportPage() {
             {tab === "p1" ? (
               <div className="animate-drift-in mt-6 space-y-6">
                 {chart1 ? (
-                  <ChartPanel chart={chart1} name={session.p1.name || "Person 1"} locked={locked} />
+                  <ChartPanel chart={chart1} name={session.p1.name || "Person 1"} locked={locked} offer={offer1} />
                 ) : (
                   <div className="panel p-6 text-sm text-muted-foreground">
                     No natal chart — birth date, time and city were left blank. The psychological
@@ -404,7 +414,7 @@ function ReportPage() {
                     layer.
                   </div>
                 )}
-                <DossierView dossier={d1} person={session.p1} locked={locked} />
+                <DossierView dossier={d1} person={session.p1} locked={locked} offer={offer1} />
                 <div className="mt-6">
                   <SectionTitle kicker="Share">Your shareable result</SectionTitle>
                   <p className="mt-2 text-sm text-muted-foreground">
@@ -421,9 +431,9 @@ function ReportPage() {
             {tab === "p2" && session.p2 ? (
               <div className="animate-drift-in mt-6 space-y-6">
                 {chart2 ? (
-                  <ChartPanel chart={chart2} name={session.p2.name || "Person 2"} locked={locked} />
+                  <ChartPanel chart={chart2} name={session.p2.name || "Person 2"} locked={locked} offer={offer2} />
                 ) : null}
-                {d2 ? <DossierView dossier={d2} person={session.p2} locked={locked} /> : null}
+                {d2 ? <DossierView dossier={d2} person={session.p2} locked={locked} offer={offer2} /> : null}
               </div>
             ) : null}
 
@@ -431,7 +441,7 @@ function ReportPage() {
               syn ? (
                 <div className="animate-drift-in mt-6">
                   {locked ? (
-                    <LockedBlock title="Synastry is part of the full dossier">
+                    <LockedBlock title="Available relationship insights" offer={offer1} note="Unlock the relationship observations supported by both profiles. Missing data cannot be supplied by payment.">
                       <DossierView dossier={syn} />
                     </LockedBlock>
                   ) : (
