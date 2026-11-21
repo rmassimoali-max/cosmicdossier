@@ -30,6 +30,7 @@ export function LockedBlock({
 export function UnlockCard({
   title = "You've seen the pattern. Now see the whole picture.",
   note,
+  offer,
 }: {
   title?: string;
   note?: string | undefined;
