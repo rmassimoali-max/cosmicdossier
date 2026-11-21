@@ -36,6 +36,7 @@ export function UnlockCard({
   note?: string | undefined;
   offer?: UnlockOffer | undefined;
 }) {
+  const features = offer?.features ?? ["Detailed results from your completed profile", "Printable PDF dossier"];
   return (
     <div className="panel max-w-md p-6 text-center sm:p-8">
       <p className="tracking-cosmic text-[0.65rem] text-primary/80">Full dossier</p>
@@ -45,10 +46,7 @@ export function UnlockCard({
           "Your full dossier connects your personality traits, attachment style, typology and astrological profile into one personalized interpretation — not just a few extra paragraphs."}
       </p>
       <ul className="mx-auto mt-5 space-y-1.5 text-left text-xs text-muted-foreground">
-        {(offer?.features ?? [
-            "Detailed results from your completed profile",
-            "Printable PDF dossier",
-          ]).map((f) => (
+        {features.map((f) => (
           <li key={f} className="flex gap-2">
             <span className="text-primary/80">✦</span>
             {f}
