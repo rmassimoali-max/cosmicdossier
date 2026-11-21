@@ -11,7 +11,7 @@ export function LockedBlock({
   children: ReactNode;
   title?: string;
   note?: string | undefined;
-  offer?: UnlockOffer;
+  offer?: UnlockOffer | undefined;
 }) {
   return (
     <div className="relative overflow-hidden rounded-2xl">
@@ -33,7 +33,7 @@ export function UnlockCard({
 }: {
   title?: string;
   note?: string | undefined;
-  offer?: UnlockOffer;
+  offer?: UnlockOffer | undefined;
 }) {
   return (
     <div className="panel max-w-md p-6 text-center sm:p-8">
