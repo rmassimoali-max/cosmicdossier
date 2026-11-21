@@ -406,7 +406,12 @@ function ReportPage() {
             {tab === "p1" ? (
               <div className="animate-drift-in mt-6 space-y-6">
                 {chart1 ? (
-                  <ChartPanel chart={chart1} name={session.p1.name || "Person 1"} locked={locked} offer={offer1} />
+                  <ChartPanel
+                    chart={chart1}
+                    name={session.p1.name || "Person 1"}
+                    locked={locked}
+                    offer={offer1}
+                  />
                 ) : (
                   <div className="panel p-6 text-sm text-muted-foreground">
                     No natal chart — birth date, time and city were left blank. The psychological
@@ -431,9 +436,16 @@ function ReportPage() {
             {tab === "p2" && session.p2 ? (
               <div className="animate-drift-in mt-6 space-y-6">
                 {chart2 ? (
-                  <ChartPanel chart={chart2} name={session.p2.name || "Person 2"} locked={locked} offer={offer2} />
+                  <ChartPanel
+                    chart={chart2}
+                    name={session.p2.name || "Person 2"}
+                    locked={locked}
+                    offer={offer2}
+                  />
                 ) : null}
-                {d2 ? <DossierView dossier={d2} person={session.p2} locked={locked} offer={offer2} /> : null}
+                {d2 ? (
+                  <DossierView dossier={d2} person={session.p2} locked={locked} offer={offer2} />
+                ) : null}
               </div>
             ) : null}
 
@@ -441,7 +453,11 @@ function ReportPage() {
               syn ? (
                 <div className="animate-drift-in mt-6">
                   {locked ? (
-                    <LockedBlock title="Available relationship insights" offer={offer1} note="Unlock the relationship observations supported by both profiles. Missing data cannot be supplied by payment.">
+                    <LockedBlock
+                      title="Available relationship insights"
+                      offer={offer1}
+                      note="Unlock the relationship observations supported by both profiles. Missing data cannot be supplied by payment."
+                    >
                       <DossierView dossier={syn} />
                     </LockedBlock>
                   ) : (
