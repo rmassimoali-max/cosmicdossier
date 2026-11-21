@@ -43,14 +43,16 @@ describe("astrology-only dossier evidence and copy", () => {
   test("no-assessment report does not invent an archetype", () => {
     const profile = buildProfile(person());
     expect(headlineFor(profile)).toBe("Your Dossier Preview");
-    expect(generateDossier(profile).sections.find((s) => s.title === "The Integrated Read")?.body)
-      .toContain("No assessment evidence");
+    expect(
+      generateDossier(profile).sections.find((s) => s.title === "The Integrated Read")?.body,
+    ).toContain("No assessment evidence");
   });
 
   test("astrology-only report avoids empty strengths and blind-spots headings", () => {
     const report = generateDossier(buildProfile(person(), chart));
-    expect(report.sections.find((s) => s.title === "Strengths & Blind Spots")?.body)
-      .toContain("A birth chart alone is not evidence");
+    expect(report.sections.find((s) => s.title === "Strengths & Blind Spots")?.body).toContain(
+      "A birth chart alone is not evidence",
+    );
     expect(report.sections.some((s) => s.title === "Possible Strengths")).toBe(false);
     expect(report.sections.some((s) => s.title === "Possible Blind Spots")).toBe(false);
   });
