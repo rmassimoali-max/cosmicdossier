@@ -56,7 +56,7 @@ export const createUnlockCheckout = createServerFn({ method: "POST" }).handler(a
     "line_items[0][price_data][unit_amount]": "400",
     "line_items[0][price_data][product_data][name]": "Cosmic Dossier — full report unlock",
     "line_items[0][price_data][product_data][description]":
-      "Full cross-sectional synthesis, complete natal chart detail, synastry and PDF export.",
+      "Detailed results available from your completed profile, with printable PDF export.",
     "metadata[product]": "cosmic-dossier-unlock",
   });
   return {
@@ -67,12 +67,29 @@ export const createUnlockCheckout = createServerFn({ method: "POST" }).handler(a
 
 /** Server-side confirmation that a session was actually paid. */
 export const verifyUnlockPayment = createServerFn({ method: "POST" })
-  .inputValidator((input: unknown) => z.object({ sessionId: z.string().min(1) }).parse(input))
+  .inputValidator((input: unknown) =>
+    z.object({ sessionId: z.string().regex(/^cs_(test|live)_[A-Za-z0-9]+$/) }).parse(input),
+  )
   .handler(async ({ data }) => {
     const session = await stripeCall(
       `/checkout/sessions/${encodeURIComponent(data.sessionId)}`,
       secretKey(),
     );
     const status = String(session["payment_status"] ?? "");
-    return { paid: status === "paid" || status === "no_payment_required", status };
+    const metadata = session["metadata"] as Record<string, unknown> | undefined;
+    const validProduct = metadata?.["product"] === "cosmic-dossier-unlock";
+    const validAmount = session["amount_total"] === 400;
+    const validCurrency = session["currency"] === "usd";
+    const validMode = session["mode"] === "payment";
+    const validStatus = session["status"] === "complete";
+    return {
+      paid:
+        status === "paid" &&
+        validProduct &&
+        validAmount &&
+        validCurrency &&
+        validMode &&
+        validStatus,
+      status,
+    };
   });
