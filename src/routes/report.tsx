@@ -58,7 +58,7 @@ function ChartPanel({
   chart: NatalChart;
   name: string;
   locked?: boolean;
-  offer?: UnlockOffer;
+  offer?: UnlockOffer | undefined;
 }) {
   const elementMax = Math.max(...Object.values(chart.elements), 1);
   const modalMax = Math.max(...Object.values(chart.modalities), 1);
@@ -194,7 +194,7 @@ function DossierView({
   dossier: Dossier;
   person?: PersonInput;
   locked?: boolean;
-  offer?: UnlockOffer;
+  offer?: UnlockOffer | undefined;
 }) {
   const preview = dossier.synthesis.slice(0, 420);
   return (
