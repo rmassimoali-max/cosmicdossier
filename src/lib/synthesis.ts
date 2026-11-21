@@ -633,6 +633,14 @@ function strengthsAndBlind(p: Profile): ReportSection[] {
     }
   }
 
+  if (!strengths.length && !blind.length) {
+    return [{
+      group: GROUPS.strengths,
+      title: "Strengths & Blind Spots",
+      body: "Complete a personality or attachment assessment to explore possible strengths and blind spots. A birth chart alone is not evidence of psychological traits.",
+    }];
+  }
+
   return [
     {
       group: GROUPS.strengths,
@@ -690,12 +698,14 @@ function finalDossier(p: Profile): ReportSection {
     group: GROUPS.final,
     title: "The Integrated Read",
     body: join([
-      `${p.name} reads most consistently as ${headlineFor(p).toLowerCase().replace("the ", "")}.`,
+      p.psychometricDomainCount > 0
+        ? `${p.name} reads most consistently as ${headlineFor(p).toLowerCase().replace(/^the /, "")}.`
+        : p.chart
+          ? `This dossier currently contains a symbolic natal-chart interpretation for ${p.name}, not a psychological personality profile.`
+          : `No assessment evidence is available yet for ${p.name}.`,
       conv ? `A possible overlap across completed domains: ${lowerFirst(conv)}` : "",
       ten ? `A possible difference or tension to consider: ${lowerFirst(ten)}` : "",
-      p.completeness < 100
-        ? `This dossier is built from ${p.completeness}% of the integrated assessment domains; additional completed assessments may add relevant context.`
-        : `The dossier currently includes ${p.assessmentDomainCount} completed assessment domains.`,
+      `Completed psychological assessment domains: ${p.psychometricDomainCount}. Symbolic astrology chart: ${p.symbolicDomainCount ? "included" : "not included"}. Additional assessments may provide context, but no number of tests can establish a complete or definitive personality profile.`,
       "Read these findings as hypotheses from self-report and interpretive frameworks, not as diagnoses or verdicts.",
     ]),
   };
