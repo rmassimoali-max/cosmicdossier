@@ -29,13 +29,26 @@ export async function downloadDossierPdf(args: {
   const write = (text: string, size: number, style: "normal" | "bold" | "italic", gap = 10) => {
     doc.setFont("times", style);
     doc.setFontSize(size);
-    const lines = doc.splitTextToSize(text, width) as string[];
-    for (const line of lines) {
-      ensure(size * 1.35);
-      doc.text(line, margin, y);
-      y += size * 1.35;
+    const lineHeight = size * 1.45;
+    const paragraphs = text.split(/\n+/).filter((paragraph) => paragraph.trim());
+    for (const [index, paragraph] of paragraphs.entries()) {
+      const lines = doc.splitTextToSize(paragraph, width) as string[];
+      for (const line of lines) {
+        ensure(lineHeight);
+        doc.text(line, margin, y);
+        y += lineHeight;
+      }
+      if (index < paragraphs.length - 1) y += size * 0.55;
     }
     y += gap;
+  };
+
+  const sectionHeading = (heading: string) => {
+    ensure(54);
+    y += 9;
+    doc.setTextColor(90, 70, 110);
+    write(heading, 14, "bold", 7);
+    doc.setTextColor(0, 0, 0);
   };
 
   const rule = () => {
@@ -120,10 +133,17 @@ export async function downloadDossierPdf(args: {
     write("Synthesis", 16, "bold", 6);
     write(args.dossier.synthesis, 11, "normal", 10);
     if (args.dossier.dominantTraits.length) {
-      write("Dominant traits: " + args.dossier.dominantTraits.join(" · "), 11, "italic", 10);
+      write(
+        (args.chart && !p.mbti && !p.enneagramType && !p.attachment && !p.bigFive
+          ? "Symbolic chart themes: "
+          : "Dominant traits: ") + args.dossier.dominantTraits.join(" · "),
+        11,
+        "italic",
+        10,
+      );
     }
     for (const s of args.dossier.sections) {
-      write(s.title, 14, "bold", 4);
+      sectionHeading(s.title);
       write(s.body, 11, "normal", 10);
     }
   }

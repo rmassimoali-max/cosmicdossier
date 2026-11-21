@@ -113,22 +113,45 @@ export const ASPECT_MEANING: Record<string, string> = {
   quintile: "combine into a specific creative knack",
 };
 
+const PLANET_FOCUS: Record<string, string> = {
+  Sun: "identity and creative direction",
+  Moon: "emotional rhythms and comfort",
+  Mercury: "thought and communication",
+  Venus: "affection, attraction and values",
+  Mars: "assertion and initiative",
+  Jupiter: "growth and possibility",
+  Saturn: "responsibility and limits",
+  Uranus: "change and independence",
+  Neptune: "imagination and ideals",
+  Pluto: "transformation and power",
+  Rising: "first impressions and approach",
+  Ascendant: "first impressions and approach",
+  Midheaven: "public direction",
+  "North Node": "unfamiliar growth",
+  "South Node": "familiar patterns",
+};
+
 export function placementText(label: string, sign: string, house: number | null, retro: boolean) {
-  const p = PLANET_THEME[label];
-  const s = SIGN_STYLE[sign];
-  if (!p || !s) return "";
+  const planet = PLANET_THEME[label];
+  const style = SIGN_STYLE[sign];
+  if (!planet || !style) return "";
+
+  const focus = PLANET_FOCUS[label] ?? planet.domain;
+  const article = /^[aeiou]/i.test(style.adj) ? "an" : "a";
   const parts = [
-    `${label} in ${sign}: ${p.domain} ${p.verb} in ${/^[aeiou]/i.test(s.adj) ? "an" : "a"} ${s.adj} register — it ${s.mode}.`,
+    `${label} in ${sign}: symbolically, ${focus} takes on ${article} ${style.adj} quality. In this placement, the ${label} theme ${style.mode}.`,
   ];
-  if (house)
+  if (house && HOUSE_THEME[house]) {
     parts.push(
-      `Placed in the ${ordinal(house)} house, that energy concentrates around ${HOUSE_THEME[house]}.`,
+      `The ${ordinal(house)} house places this theme in the context of ${HOUSE_THEME[house]}.`,
     );
-  if (retro)
+  }
+  if (retro) {
     parts.push(
-      `Retrograde here suggests the theme turns inward before it turns outward, and often gets learned by revisiting.`,
+      "Retrograde motion is traditionally read as a reason to revisit this theme inwardly.",
     );
-  parts.push(`The shadow to watch is ${s.shadow}.`);
+  }
+  parts.push(`One possible tension is ${style.shadow}.`);
   return parts.join(" ");
 }
 
