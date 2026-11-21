@@ -44,7 +44,10 @@ export function UnlockCard({
           "Your full dossier connects your personality traits, attachment style, typology and astrological profile into one personalized interpretation — not just a few extra paragraphs."}
       </p>
       <ul className="mx-auto mt-5 space-y-1.5 text-left text-xs text-muted-foreground">
-        {(offer?.features ?? ["Detailed results from your completed profile", "Printable PDF dossier"]).map((f) => (
+        {(offer?.features ?? [
+          "Detailed results from your completed profile",
+          "Printable PDF dossier",
+        ]).map((f) => (
           <li key={f} className="flex gap-2">
             <span className="text-primary/80">✦</span>
             {f}
