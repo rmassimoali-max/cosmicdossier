@@ -136,6 +136,7 @@ export const att = (p: Profile) => p.attachment?.style;
 export const enneaType = (p: Profile) => p.ennea?.type;
 
 export function headlineFor(p: Profile): string {
+  if (p.psychometricDomainCount === 0) return p.chart ? "Your Natal Chart" : "Your Dossier Preview";
   const bits: string[] = [];
   if (isL(p, "N")) bits.push("Pattern-Reader");
   else if (isL(p, "S")) bits.push("Grounded");

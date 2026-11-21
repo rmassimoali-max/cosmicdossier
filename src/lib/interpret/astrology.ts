@@ -118,7 +118,7 @@ export function placementText(label: string, sign: string, house: number | null,
   const s = SIGN_STYLE[sign];
   if (!p || !s) return "";
   const parts = [
-    `${label} in ${sign}: ${p.domain} ${p.verb} in a ${s.adj} register — it ${s.mode}.`,
+    `${label} in ${sign}: ${p.domain} ${p.verb} in ${/^[aeiou]/i.test(s.adj) ? "an" : "a"} ${s.adj} register — it ${s.mode}.`,
   ];
   if (house)
     parts.push(
