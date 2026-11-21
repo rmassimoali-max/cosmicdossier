@@ -5,15 +5,19 @@ export type UnlockOffer = {
   additionalNote: string;
 };
 
-export function buildUnlockOffer(person: PersonInput, hasChart: boolean, hasPartner = false): UnlockOffer {
+export function buildUnlockOffer(
+  person: PersonInput,
+  hasChart: boolean,
+  hasPartner = false,
+): UnlockOffer {
   const hasPersonality = Boolean(
     person.mbti ||
-      person.enneagramType ||
-      person.attachment ||
-      person.bigFive ||
-      person.hexaco ||
-      typeof person.hsp === "number" ||
-      Object.keys(person.assessmentResults ?? {}).length,
+    person.enneagramType ||
+    person.attachment ||
+    person.bigFive ||
+    person.hexaco ||
+    typeof person.hsp === "number" ||
+    Object.keys(person.assessmentResults ?? {}).length,
   );
   const features: string[] = [];
   if (hasChart) {
