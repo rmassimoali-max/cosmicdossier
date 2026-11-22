@@ -77,10 +77,7 @@ export const registerAccount = createServerFn({ method: "POST" })
   .handler(async ({ data }) => {
     const siteUrl = process.env["AUTH_SITE_URL"] ?? "https://www.cosmicdossier.com";
     const confirmUrl = new URL("/sign-in", siteUrl).toString();
-    const payload = await authRequest(
-      `signup?redirect_to=${encodeURIComponent(confirmUrl)}`,
-      data,
-    );
+    const payload = await authRequest(`signup?redirect_to=${encodeURIComponent(confirmUrl)}`, data);
     if (typeof payload["access_token"] === "string") {
       saveTokens(payload);
       return { signedIn: true };
