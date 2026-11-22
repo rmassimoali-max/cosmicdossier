@@ -6,6 +6,10 @@ import { getAuthCallbackUrl, readSupabasePublicConfig } from "./supabase-config"
 const ACCESS = "cd_auth_access";
 const REFRESH = "cd_auth_refresh";
 const emailSchema = z.object({ email: z.string().trim().email().max(254) });
+const credentialsSchema = z.object({
+  email: z.string().trim().email().max(254),
+  password: z.string().min(8).max(128),
+});
 const callbackSchema = z.object({
   tokenHash: z.string().min(16).max(2048),
   type: z.enum(["magiclink", "email", "signup"]),
@@ -67,6 +71,29 @@ function clearTokens() {
   deleteCookie(ACCESS, { path: "/" });
   deleteCookie(REFRESH, { path: "/" });
 }
+
+export const registerAccount = createServerFn({ method: "POST" })
+  .inputValidator((input: unknown) => credentialsSchema.parse(input))
+  .handler(async ({ data }) => {
+    const siteUrl = process.env["AUTH_SITE_URL"] ?? "https://www.cosmicdossier.com";
+    const payload = await authRequest(
+      `signup?redirect_to=${encodeURIComponent(getAuthCallbackUrl(siteUrl))}`,
+      data,
+    );
+    if (typeof payload["access_token"] === "string") {
+      saveTokens(payload);
+      return { signedIn: true };
+    }
+    return { signedIn: false };
+  });
+
+export const signInWithPassword = createServerFn({ method: "POST" })
+  .inputValidator((input: unknown) => credentialsSchema.parse(input))
+  .handler(async ({ data }) => {
+    const payload = await authRequest("token?grant_type=password", data);
+    saveTokens(payload);
+    return { success: true };
+  });
 
 export const requestMagicLink = createServerFn({ method: "POST" })
   .inputValidator((input: unknown) => emailSchema.parse(input))
