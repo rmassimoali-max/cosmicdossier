@@ -1,9 +1,12 @@
 import { z } from "zod";
 
 const configSchema = z.object({
-  url: z.string().url().refine((value) => new URL(value).protocol === "https:", {
-    message: "Supabase URL must use HTTPS",
-  }),
+  url: z
+    .string()
+    .url()
+    .refine((value) => new URL(value).protocol === "https:", {
+      message: "Supabase URL must use HTTPS",
+    }),
   publishableKey: z.string().min(1),
 });
 
