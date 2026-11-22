@@ -196,8 +196,15 @@ export const verifyRecoveryToken = createServerFn({ method: "POST" })
 export const acceptRecoverySession = createServerFn({ method: "POST" })
   .inputValidator((input: unknown) => recoverySessionSchema.parse(input))
   .handler(async ({ data }) => {
-    const user = await authRequest("user", undefined, data.accessToken);
-    if (typeof user["id"] !== "string") throw new Error("Invalid recovery session.");
+    let user: Record<string, unknown>;
+    try {
+      user = await authRequest("user", undefined, data.accessToken);
+    } catch {
+      return { success: false as const, reason: "provider_validation_failed" as const };
+    }
+    if (typeof user["id"] !== "string") {
+      return { success: false as const, reason: "invalid_user_response" as const };
+    }
     saveTokens({ access_token: data.accessToken, refresh_token: data.refreshToken });
     setCookie(RECOVERY, "1", {
       httpOnly: true,
