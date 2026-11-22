@@ -51,6 +51,9 @@ function AccountPage() {
               Saved dossiers and purchase recovery are coming next. Signing in does not unlock a
               paid report.
             </p>
+            <Link to="/input" className="mt-5 inline-block text-sm text-primary">
+              Continue building my dossier
+            </Link>
             <button
               type="button"
               className="mt-6 rounded-full border border-border px-5 py-3 text-sm"
