@@ -72,10 +72,10 @@ export const requestMagicLink = createServerFn({ method: "POST" })
   .inputValidator((input: unknown) => emailSchema.parse(input))
   .handler(async ({ data }) => {
     const siteUrl = process.env["AUTH_SITE_URL"] ?? "https://www.cosmicdossier.com";
-    await authRequest(
-      `otp?redirect_to=${encodeURIComponent(getAuthCallbackUrl(siteUrl))}`,
-      { email: data.email, create_user: true },
-    );
+    await authRequest(`otp?redirect_to=${encodeURIComponent(getAuthCallbackUrl(siteUrl))}`, {
+      email: data.email,
+      create_user: true,
+    });
     return { sent: true };
   });
 
