@@ -24,6 +24,7 @@ export function StripeUnlockButton() {
     testMode: boolean;
   } | null>(null);
   const [open, setOpen] = useState(false);
+  const [showAccountChoice, setShowAccountChoice] = useState(false);
   const [clientSecret, setClientSecret] = useState<string | null>(null);
   const [busy, setBusy] = useState(false);
   const [error, setError] = useState<string | null>(null);
@@ -68,9 +69,43 @@ export function StripeUnlockButton() {
 
   return (
     <>
-      <CButton onClick={start} disabled={busy || (cfg !== null && !cfg.configured)}>
+      <CButton
+        onClick={() => setShowAccountChoice(true)}
+        disabled={busy || (cfg !== null && !cfg.configured)}
+      >
         {busy ? "Opening checkout…" : "Unlock full dossier — $4"}
       </CButton>
+      {showAccountChoice && !open && (
+        <div className="mt-4 rounded-xl border border-border bg-background p-5">
+          <h3 className="text-lg font-semibold text-foreground">Keep your Cosmic Dossier?</h3>
+          <p className="mt-2 text-sm text-muted-foreground">
+            Create a free account or sign in before checkout, or continue as a guest. Saved
+            dossiers and purchase recovery are not available yet.
+          </p>
+          <div className="mt-4 flex flex-wrap gap-3">
+            <a href="/sign-in" className="rounded-full border border-border px-4 py-2 text-sm text-primary">
+              Create account / Sign in
+            </a>
+            <button
+              type="button"
+              className="rounded-full bg-primary px-4 py-2 text-sm text-primary-foreground"
+              onClick={() => {
+                setShowAccountChoice(false);
+                void start();
+              }}
+            >
+              Continue to $4 checkout
+            </button>
+            <button
+              type="button"
+              className="rounded-full px-4 py-2 text-sm text-muted-foreground"
+              onClick={() => setShowAccountChoice(false)}
+            >
+              Not now
+            </button>
+          </div>
+        </div>
+      )}
       {cfg && !cfg.configured && (
         <p className="mt-2 text-[0.7rem] text-muted-foreground">
           Payments aren&apos;t configured yet (missing Stripe keys).
