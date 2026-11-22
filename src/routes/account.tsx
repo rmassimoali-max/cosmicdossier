@@ -31,7 +31,9 @@ function AccountPage() {
       .finally(() => {
         if (active) setLoading(false);
       });
-    return () => { active = false; };
+    return () => {
+      active = false;
+    };
   }, [getAccount]);
 
   return (
@@ -39,12 +41,15 @@ function AccountPage() {
       <div className="panel p-8">
         <h1 className="font-display text-4xl text-gold">My account</h1>
         {loading ? (
-          <p role="status" className="mt-4">Checking your account…</p>
+          <p role="status" className="mt-4">
+            Checking your account…
+          </p>
         ) : email ? (
           <>
             <p className="mt-4 text-muted-foreground">Signed in as {email}</p>
             <p className="mt-4 text-sm text-muted-foreground">
-              Saved dossiers and purchase recovery are coming next. Signing in does not unlock a paid report.
+              Saved dossiers and purchase recovery are coming next. Signing in does not unlock a
+              paid report.
             </p>
             <button
               type="button"
@@ -58,7 +63,11 @@ function AccountPage() {
           </>
         ) : (
           <p className="mt-4 text-muted-foreground">
-            You're not signed in. <Link to="/sign-in" className="text-primary">Sign in by email</Link>.
+            You're not signed in.{" "}
+            <Link to="/sign-in" className="text-primary">
+              Sign in by email
+            </Link>
+            .
           </p>
         )}
       </div>
