@@ -33,7 +33,9 @@ function SignInPage() {
           window.location.assign("/account");
           return;
         }
-        setMessage("Account requested. Check your email to confirm your address, then sign in here.");
+        setMessage(
+          "Account requested. Check your email to confirm your address, then sign in here.",
+        );
         setMode("sign-in");
       } else {
         await signIn({ data: { email, password } });
