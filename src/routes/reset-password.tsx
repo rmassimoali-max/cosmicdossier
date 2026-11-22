@@ -46,24 +46,34 @@ function ResetPassword() {
       query.get("error");
     const authorizationCode = query.get("code");
     const directToken = query.has("token") || fragment.has("token");
-    window.history.replaceState(null, "", "/reset-password");
+    // Keep the original redirect intact until the recovery attempt has settled.
+    // Clearing it before validation can hide the credentials during initialization.
+    const clearRecoveryUrl = () => {
+      window.history.replaceState(null, "", "/reset-password");
+    };
     if (providerError) {
       setLinkError(
         providerError === "otp_expired"
           ? "This recovery link has expired or was already used. Please request a new one."
           : "Supabase could not complete this recovery link. Please request a new one.",
       );
+      clearRecoveryUrl();
       setStatus("error");
     } else if (tokenHash && type === "recovery") {
       void verify({ data: { tokenHash } })
-        .then(() => setStatus("ready"))
+        .then(() => {
+          clearRecoveryUrl();
+          setStatus("ready");
+        })
         .catch(() => {
+          clearRecoveryUrl();
           setLinkError("Recovery token verification failed. Please request a fresh link.");
           setStatus("error");
         });
     } else if (accessToken && refreshToken && type === "recovery") {
       void accept({ data: { accessToken, refreshToken } })
         .then((result) => {
+          clearRecoveryUrl();
           if (result.success) {
             setStatus("ready");
             return;
@@ -76,6 +86,7 @@ function ResetPassword() {
           setStatus("error");
         })
         .catch(() => {
+          clearRecoveryUrl();
           setLinkError(
             "The recovery validation request failed before completion. Please request a fresh link.",
           );
@@ -92,6 +103,7 @@ function ResetPassword() {
         );
       else if (!tokenHash && !accessToken)
         setLinkError("No recovery credentials were found in this link. Please request a new one.");
+      clearRecoveryUrl();
       setStatus("error");
     }
   }, [accept, verify]);
