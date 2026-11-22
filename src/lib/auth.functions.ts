@@ -182,7 +182,13 @@ export const verifyRecoveryToken = createServerFn({ method: "POST" })
   .handler(async ({ data }) => {
     const payload = await authRequest("verify", { token_hash: data.tokenHash, type: "recovery" });
     saveTokens(payload);
-    setCookie(RECOVERY, "1", { httpOnly: true, secure: process.env["NODE_ENV"] === "production", sameSite: "lax", path: "/", maxAge: 600 });
+    setCookie(RECOVERY, "1", {
+      httpOnly: true,
+      secure: process.env["NODE_ENV"] === "production",
+      sameSite: "lax",
+      path: "/",
+      maxAge: 600,
+    });
     return { success: true };
   });
 
@@ -193,7 +199,13 @@ export const acceptRecoverySession = createServerFn({ method: "POST" })
     const user = await authRequest("user", undefined, data.accessToken);
     if (typeof user["id"] !== "string") throw new Error("Invalid recovery session.");
     saveTokens({ access_token: data.accessToken, refresh_token: data.refreshToken });
-    setCookie(RECOVERY, "1", { httpOnly: true, secure: process.env["NODE_ENV"] === "production", sameSite: "lax", path: "/", maxAge: 600 });
+    setCookie(RECOVERY, "1", {
+      httpOnly: true,
+      secure: process.env["NODE_ENV"] === "production",
+      sameSite: "lax",
+      path: "/",
+      maxAge: 600,
+    });
     return { success: true };
   });
 
