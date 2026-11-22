@@ -166,7 +166,7 @@ function Landing() {
           <span aria-hidden>→</span>
         </Link>
         <p className="mt-6 text-xs text-muted-foreground/80">
-          Free preview · $4 unlocks the full report · no account · astrology treated as symbolic
+          Free preview · $4 one-time full report unlock · no account required · astrology treated as symbolic
           language, not prophecy
         </p>
         <p className="animate-drift-in mt-10 max-w-md text-balance text-sm text-foreground/80">
