@@ -109,6 +109,9 @@ function SignInPage() {
             {pending ? "Please wait…" : mode === "register" ? "Create free account" : "Sign in"}
           </button>
         </form>
+        {mode === "sign-in" && (
+          <Link to="/forgot-password" className="mt-4 block text-sm text-primary">Forgot password?</Link>
+        )}
         <button
           type="button"
           className="mt-5 text-sm text-primary"
