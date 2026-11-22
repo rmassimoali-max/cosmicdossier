@@ -57,18 +57,26 @@ function ResetPassword() {
     } else if (tokenHash && type === "recovery") {
       void verify({ data: { tokenHash } })
         .then(() => setStatus("ready"))
-        .catch(() => { setLinkError("Recovery token verification failed. Please request a fresh link."); setStatus("error"); });
+        .catch(() => {
+          setLinkError("Recovery token verification failed. Please request a fresh link.");
+          setStatus("error");
+        });
     } else if (accessToken && refreshToken && type === "recovery") {
       void accept({ data: { accessToken, refreshToken } })
         .then(() => setStatus("ready"))
-        .catch(() => { setLinkError("Recovery session validation failed. Please request a fresh link."); setStatus("error"); });
+        .catch(() => {
+          setLinkError("Recovery session validation failed. Please request a fresh link.");
+          setStatus("error");
+        });
     } else {
       if (authorizationCode)
         setLinkError(
           "This recovery link uses an unsupported sign-in code. Please request a new link.",
         );
       else if (directToken)
-        setLinkError("The recovery link contained a token in an unsupported format. Please request a new one.");
+        setLinkError(
+          "The recovery link contained a token in an unsupported format. Please request a new one.",
+        );
       else if (!tokenHash && !accessToken)
         setLinkError("No recovery credentials were found in this link. Please request a new one.");
       setStatus("error");
