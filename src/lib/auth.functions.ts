@@ -5,6 +5,7 @@ import { getAuthCallbackUrl, readSupabasePublicConfig } from "./supabase-config"
 
 const ACCESS = "cd_auth_access";
 const REFRESH = "cd_auth_refresh";
+const RECOVERY = "cd_auth_recovery";
 const emailSchema = z.object({ email: z.string().trim().email().max(254) });
 const credentialsSchema = z.object({
   email: z.string().trim().email().max(254),
@@ -76,6 +77,7 @@ function saveTokens(payload: Record<string, unknown>) {
 function clearTokens() {
   deleteCookie(ACCESS, { path: "/" });
   deleteCookie(REFRESH, { path: "/" });
+  deleteCookie(RECOVERY, { path: "/" });
 }
 
 export const registerAccount = createServerFn({ method: "POST" })
@@ -180,6 +182,7 @@ export const verifyRecoveryToken = createServerFn({ method: "POST" })
   .handler(async ({ data }) => {
     const payload = await authRequest("verify", { token_hash: data.tokenHash, type: "recovery" });
     saveTokens(payload);
+    setCookie(RECOVERY, "1", { httpOnly: true, secure: process.env["NODE_ENV"] === "production", sameSite: "lax", path: "/", maxAge: 600 });
     return { success: true };
   });
 
@@ -190,6 +193,7 @@ export const acceptRecoverySession = createServerFn({ method: "POST" })
     const user = await authRequest("user", undefined, data.accessToken);
     if (typeof user["id"] !== "string") throw new Error("Invalid recovery session.");
     saveTokens({ access_token: data.accessToken, refresh_token: data.refreshToken });
+    setCookie(RECOVERY, "1", { httpOnly: true, secure: process.env["NODE_ENV"] === "production", sameSite: "lax", path: "/", maxAge: 600 });
     return { success: true };
   });
 
@@ -197,7 +201,7 @@ export const changeRecoveredPassword = createServerFn({ method: "POST" })
   .inputValidator((input: unknown) => passwordSchema.parse(input))
   .handler(async ({ data }) => {
     const token = getCookie(ACCESS);
-    if (!token) throw new Error("Recovery session expired.");
+    if (!token || getCookie(RECOVERY) !== "1") throw new Error("Recovery session expired.");
     const { url, publishableKey } = config();
     const response = await fetch(`${url}/auth/v1/user`, {
       method: "PUT",
