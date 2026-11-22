@@ -1,6 +1,6 @@
 import { createFileRoute, Link } from "@tanstack/react-router";
 import { useServerFn } from "@tanstack/react-start";
-import { useEffect, useState } from "react";
+import { useEffect, useRef, useState } from "react";
 import {
   acceptRecoverySession,
   changeRecoveredPassword,
@@ -21,11 +21,15 @@ function ResetPassword() {
   const verify = useServerFn(verifyRecoveryToken);
   const change = useServerFn(changeRecoveredPassword);
   const [status, setStatus] = useState<"checking" | "ready" | "error" | "done">("checking");
+  const recoveryAttempted = useRef(false);
   const [password, setPassword] = useState("");
   const [confirm, setConfirm] = useState("");
   const [pending, setPending] = useState(false);
   const [error, setError] = useState("");
   useEffect(() => {
+    // A recovery token is single-use. React may run effects twice in development.
+    if (recoveryAttempted.current) return;
+    recoveryAttempted.current = true;
     const query = new URLSearchParams(window.location.search);
     const fragment = new URLSearchParams(window.location.hash.slice(1));
     const tokenHash = query.get("token_hash");
