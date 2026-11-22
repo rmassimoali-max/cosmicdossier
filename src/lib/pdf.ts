@@ -80,11 +80,9 @@ export async function downloadDossierPdf(args: {
     {
       heading: "Enneagram",
       text: p.enneagramType
-        ? `${p.enneagramType}${isValidEnneagramWing(p.enneagramType, p.enneagramWing)
-              ? `w${p.enneagramWing}`
-              : ""}${
-            p.enneagramInstinct ? ` · ${p.enneagramInstinct}` : ""
-          }`
+        ? `${p.enneagramType}${
+            isValidEnneagramWing(p.enneagramType, p.enneagramWing) ? `w${p.enneagramWing}` : ""
+          }${p.enneagramInstinct ? ` · ${p.enneagramInstinct}` : ""}`
         : "—",
     },
     { heading: "Attachment style", text: p.attachment || "—" },
