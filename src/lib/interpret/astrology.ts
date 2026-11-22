@@ -157,7 +157,9 @@ export function placementText(label: string, sign: string, house: number | null,
 
 export function aspectText(a: string, b: string, type: string) {
   const meaning = ASPECT_MEANING[type] ?? "interact";
-  return `${a} ${type} ${b}: the ${a} theme (${PLANET_FOCUS[a] ?? PLANET_THEME[a]?.domain ?? a}) and the ${b} theme (${PLANET_FOCUS[b] ?? PLANET_THEME[b]?.domain ?? b}) ${meaning}.`;
+  return `${a} ${type} ${b}: the ${a} theme (${
+    PLANET_FOCUS[a] ?? PLANET_THEME[a]?.domain ?? a
+  }) and the ${b} theme (${PLANET_FOCUS[b] ?? PLANET_THEME[b]?.domain ?? b}) ${meaning}.`;
 }
 
 export function elementText(elements: Record<string, number>) {
