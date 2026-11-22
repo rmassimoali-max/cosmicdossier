@@ -5,10 +5,7 @@ import { requestMagicLink } from "@/lib/auth.functions";
 
 export const Route = createFileRoute("/sign-in")({
   head: () => ({
-    meta: [
-      { title: "Sign in | Cosmic Dossier" },
-      { name: "robots", content: "noindex, nofollow" },
-    ],
+    meta: [{ title: "Sign in | Cosmic Dossier" }, { name: "robots", content: "noindex, nofollow" }],
   }),
   component: SignInPage,
 });
@@ -40,7 +37,8 @@ function SignInPage() {
       <div className="panel p-8">
         <h1 className="font-display text-4xl text-gold">Your Cosmic Dossier account</h1>
         <p className="mt-4 text-sm text-muted-foreground">
-          Sign in with a secure email link. No password required. Assessments remain free without an account.
+          Sign in with a secure email link. No password required. Assessments remain free without an
+          account.
         </p>
         {sent ? (
           <p role="status" className="mt-6 text-foreground">
@@ -48,7 +46,9 @@ function SignInPage() {
           </p>
         ) : (
           <form onSubmit={(event) => void submit(event)} className="mt-6 flex flex-col gap-4">
-            <label htmlFor="auth-email" className="text-sm">Email address</label>
+            <label htmlFor="auth-email" className="text-sm">
+              Email address
+            </label>
             <input
               id="auth-email"
               type="email"
@@ -60,7 +60,11 @@ function SignInPage() {
               className="rounded-lg border border-border bg-background px-4 py-3 text-foreground"
               placeholder="you@example.com"
             />
-            {error && <p role="alert" className="text-sm text-destructive">{error}</p>}
+            {error && (
+              <p role="alert" className="text-sm text-destructive">
+                {error}
+              </p>
+            )
             <button
               type="submit"
               disabled={pending}
