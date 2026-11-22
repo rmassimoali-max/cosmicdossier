@@ -34,7 +34,7 @@ function TestsHub() {
         <p className="-mt-2 max-w-2xl text-sm leading-relaxed text-muted-foreground">
           Free, anonymous assessments grounded in published research. Everything is scored in your
           browser — nothing you answer is sent anywhere. Each result can feed directly into your
-          full Cosmic Dossier, where it is cross-read against the other four systems.
+          full Cosmic Dossier, where it can be considered alongside your other completed assessments.
         </p>
 
         {TEST_CATEGORIES.map((category) => {
@@ -72,12 +72,11 @@ function TestsHub() {
         <div className="panel mt-14 p-6 text-center sm:p-8">
           <p className="tracking-cosmic text-xs text-primary/80">THE DOSSIER CONNECTION</p>
           <h2 className="mt-2 font-display text-2xl text-gold">
-            One test is a data point. Five are a portrait.
+            One test is a data point. Together, they reveal patterns.
           </h2>
           <p className="mx-auto mt-3 max-w-xl text-sm leading-relaxed text-muted-foreground">
             Each test here stands alone — but the Cosmic Dossier synthesis cross-reads your results
-            against astrology, MBTI, Enneagram, attachment and the Big Five to find the pattern
-            underneath them all.
+            alongside your other completed assessments and any astrology details you choose to add.
           </p>
           <GoldLink to="/input" className="mt-5 inline-flex">
             Build My Dossier →
