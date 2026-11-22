@@ -39,7 +39,9 @@ function AuthCallback() {
     <main className="mx-auto flex min-h-screen max-w-lg flex-col justify-center px-6 py-24">
       <div className="panel p-8">
         <h1 className="font-display text-3xl text-gold">Cosmic Dossier sign-in</h1>
-        <p role="status" className="mt-4 text-muted-foreground">{status}</p>
+        <p role="status" className="mt-4 text-muted-foreground">
+          {status}
+        </p>
         <Link to={success ? "/account" : "/sign-in"} className="mt-6 inline-block text-primary">
           {success ? "Go to my account" : "Back to sign-in"}
         </Link>
