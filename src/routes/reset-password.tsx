@@ -63,9 +63,22 @@ function ResetPassword() {
         });
     } else if (accessToken && refreshToken && type === "recovery") {
       void accept({ data: { accessToken, refreshToken } })
-        .then(() => setStatus("ready"))
+        .then((result) => {
+          if (result.success) {
+            setStatus("ready");
+            return;
+          }
+          setLinkError(
+            result.reason === "provider_validation_failed"
+              ? "Supabase rejected the recovery session during validation. Please request a fresh link."
+              : "Supabase returned an unexpected recovery user response. Please request a fresh link.",
+          );
+          setStatus("error");
+        })
         .catch(() => {
-          setLinkError("Recovery session validation failed. Please request a fresh link.");
+          setLinkError(
+            "The recovery validation request failed before completion. Please request a fresh link.",
+          );
           setStatus("error");
         });
     } else {
