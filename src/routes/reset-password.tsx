@@ -26,7 +26,9 @@ function ResetPassword() {
   const [confirm, setConfirm] = useState("");
   const [pending, setPending] = useState(false);
   const [error, setError] = useState("");
-  const [linkError, setLinkError] = useState("This recovery link is invalid or expired. Please request a new one.");
+  const [linkError, setLinkError] = useState(
+    "This recovery link is invalid or expired. Please request a new one.",
+  );
   useEffect(() => {
     // A recovery token is single-use. React may run effects twice in development.
     if (recoveryAttempted.current) return;
@@ -37,11 +39,19 @@ function ResetPassword() {
     const type = query.get("type") ?? fragment.get("type");
     const accessToken = fragment.get("access_token");
     const refreshToken = fragment.get("refresh_token");
-    const providerError = fragment.get("error_code") ?? query.get("error_code") ?? fragment.get("error") ?? query.get("error");
+    const providerError =
+      fragment.get("error_code") ??
+      query.get("error_code") ??
+      fragment.get("error") ??
+      query.get("error");
     const authorizationCode = query.get("code");
     window.history.replaceState(null, "", "/reset-password");
     if (providerError) {
-      setLinkError(providerError === "otp_expired" ? "This recovery link has expired or was already used. Please request a new one." : "Supabase could not complete this recovery link. Please request a new one.");
+      setLinkError(
+        providerError === "otp_expired"
+          ? "This recovery link has expired or was already used. Please request a new one."
+          : "Supabase could not complete this recovery link. Please request a new one.",
+      );
       setStatus("error");
     } else if (tokenHash && type === "recovery") {
       void verify({ data: { tokenHash } })
@@ -52,8 +62,12 @@ function ResetPassword() {
         .then(() => setStatus("ready"))
         .catch(() => setStatus("error"));
     } else {
-      if (authorizationCode) setLinkError("This recovery link uses an unsupported sign-in code. Please request a new link.");
-      else if (!tokenHash && !accessToken) setLinkError("No recovery credentials were found in this link. Please request a new one.");
+      if (authorizationCode)
+        setLinkError(
+          "This recovery link uses an unsupported sign-in code. Please request a new link.",
+        );
+      else if (!tokenHash && !accessToken)
+        setLinkError("No recovery credentials were found in this link. Please request a new one.");
       setStatus("error");
     }
   }, [accept, verify]);
