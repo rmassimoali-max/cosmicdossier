@@ -26,27 +26,34 @@ function ResetPassword() {
   const [confirm, setConfirm] = useState("");
   const [pending, setPending] = useState(false);
   const [error, setError] = useState("");
+  const [linkError, setLinkError] = useState("This recovery link is invalid or expired. Please request a new one.");
   useEffect(() => {
     // A recovery token is single-use. React may run effects twice in development.
     if (recoveryAttempted.current) return;
     recoveryAttempted.current = true;
     const query = new URLSearchParams(window.location.search);
     const fragment = new URLSearchParams(window.location.hash.slice(1));
-    const tokenHash = query.get("token_hash");
-    const type = query.get("type");
+    const tokenHash = query.get("token_hash") ?? fragment.get("token_hash");
+    const type = query.get("type") ?? fragment.get("type");
     const accessToken = fragment.get("access_token");
     const refreshToken = fragment.get("refresh_token");
-    const fragmentType = fragment.get("type");
+    const providerError = fragment.get("error_code") ?? query.get("error_code") ?? fragment.get("error") ?? query.get("error");
+    const authorizationCode = query.get("code");
     window.history.replaceState(null, "", "/reset-password");
-    if (tokenHash && type === "recovery") {
+    if (providerError) {
+      setLinkError(providerError === "otp_expired" ? "This recovery link has expired or was already used. Please request a new one." : "Supabase could not complete this recovery link. Please request a new one.");
+      setStatus("error");
+    } else if (tokenHash && type === "recovery") {
       void verify({ data: { tokenHash } })
         .then(() => setStatus("ready"))
         .catch(() => setStatus("error"));
-    } else if (accessToken && refreshToken && fragmentType === "recovery") {
+    } else if (accessToken && refreshToken && type === "recovery") {
       void accept({ data: { accessToken, refreshToken } })
         .then(() => setStatus("ready"))
         .catch(() => setStatus("error"));
     } else {
+      if (authorizationCode) setLinkError("This recovery link uses an unsupported sign-in code. Please request a new link.");
+      else if (!tokenHash && !accessToken) setLinkError("No recovery credentials were found in this link. Please request a new one.");
       setStatus("error");
     }
   }, [accept, verify]);
@@ -80,7 +87,7 @@ function ResetPassword() {
         )}
         {status === "error" && (
           <p role="alert" className="mt-4">
-            This recovery link is invalid or expired. Please request a new one.
+            {linkError}
           </p>
         )}
         {status === "done" && (
