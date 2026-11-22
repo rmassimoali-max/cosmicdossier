@@ -1,3 +1,4 @@
+import { isValidEnneagramWing } from "../enneagram-wing";
 // Enneagram interpretation library.
 
 export type EnneaProfile = {
@@ -191,6 +192,6 @@ export const WING_NOTE: Record<string, string> = {};
 export function wingText(core: number, wing: number): string {
   const w = ENNEAGRAM_LIBRARY[wing];
   const c = ENNEAGRAM_LIBRARY[core];
-  if (!w || !c) return "";
+  if (!w || !c || !isValidEnneagramWing(core, wing)) return "";
   return `Your ${core}w${wing} flavour means the ${c.name.replace("The ", "").toLowerCase()} engine runs with ${w.name.replace("The ", "").toLowerCase()} colouring: ${w.coreMotivation.toLowerCase().replace(/\.$/, "")} shows up as a secondary current inside your main motivation.`;
 }
