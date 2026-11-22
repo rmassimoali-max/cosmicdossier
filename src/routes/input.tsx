@@ -3,6 +3,7 @@ import { useState } from "react";
 import { StarField } from "@/components/cosmic/StarField";
 import { CButton, Field, SectionTitle, SelectInput, TextInput } from "@/components/cosmic/ui";
 import { ENNEAGRAM_NAMES, INSTINCTS, MBTI_TYPES } from "@/lib/assessments";
+import { isValidEnneagramWing, validEnneagramWings } from "@/lib/enneagram-wing";
 import { emptyPerson, setSession, useSession, type PersonInput } from "@/lib/session";
 import { getAssessmentEntries, getAssessmentCategories } from "@/lib/assessment-discovery";
 
@@ -134,13 +135,26 @@ function PersonCard({
               placeholder="Type"
               value={person.enneagramType ?? ""}
               onChange={(e) =>
-                set({ enneagramType: e.target.value, enneagramEstimates: undefined })
+                set({
+                  enneagramType: e.target.value,
+                  enneagramWing: isValidEnneagramWing(e.target.value, person.enneagramWing)
+                    ? person.enneagramWing
+                    : undefined,
+                  enneagramEstimates: undefined,
+                })
               }
             />
             <SelectInput
-              options={Object.keys(ENNEAGRAM_NAMES).map((n) => ({ value: n, label: `w${n}` }))}
+              options={validEnneagramWings(person.enneagramType).map((n) => ({
+                value: n,
+                label: `w${n}`,
+              }))}
               placeholder="Wing"
-              value={person.enneagramWing ?? ""}
+              value={
+                isValidEnneagramWing(person.enneagramType, person.enneagramWing)
+                  ? person.enneagramWing
+                  : ""
+              }
               onChange={(e) => set({ enneagramWing: e.target.value })}
             />
             <SelectInput

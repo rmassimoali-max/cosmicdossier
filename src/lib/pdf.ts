@@ -1,6 +1,7 @@
 import type { Dossier, PersonInput } from "./session";
 import { ageFrom } from "./session";
 import type { NatalChart } from "./astro";
+import { isValidEnneagramWing } from "./enneagram-wing";
 
 type Block = { heading?: string; text?: string; gap?: number };
 
@@ -79,9 +80,9 @@ export async function downloadDossierPdf(args: {
     {
       heading: "Enneagram",
       text: p.enneagramType
-        ? `${p.enneagramType}${p.enneagramWing ? `w${p.enneagramWing}` : ""}${
-            p.enneagramInstinct ? ` · ${p.enneagramInstinct}` : ""
-          }`
+        ? `${p.enneagramType}${
+            isValidEnneagramWing(p.enneagramType, p.enneagramWing) ? `w${p.enneagramWing}` : ""
+          }${p.enneagramInstinct ? ` · ${p.enneagramInstinct}` : ""}`
         : "—",
     },
     { heading: "Attachment style", text: p.attachment || "—" },
