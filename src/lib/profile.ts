@@ -10,6 +10,7 @@ import {
 } from "./interpret/attachment";
 import { BIG_FIVE, band, type Band, type BigFiveTrait } from "./interpret/bigfive";
 import { TESTS } from "./tests";
+import { isValidEnneagramWing } from "./enneagram-wing";
 
 export type Profile = {
   person: PersonInput;
@@ -110,7 +111,9 @@ export function buildProfile(person: PersonInput, chart?: NatalChart | undefined
     bigFive: person.bigFive,
     bands,
     ennea,
-    wing: person.enneagramWing ? Number(person.enneagramWing) : undefined,
+    wing: isValidEnneagramWing(person.enneagramType, person.enneagramWing)
+      ? Number(person.enneagramWing)
+      : undefined,
     instinct: person.enneagramInstinct,
     attachment,
     hexaco: person.hexaco,
