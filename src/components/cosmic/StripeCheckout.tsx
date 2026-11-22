@@ -79,11 +79,14 @@ export function StripeUnlockButton() {
         <div className="mt-4 rounded-xl border border-border bg-background p-5">
           <h3 className="text-lg font-semibold text-foreground">Keep your Cosmic Dossier?</h3>
           <p className="mt-2 text-sm text-muted-foreground">
-            Create a free account or sign in before checkout, or continue as a guest. Saved
-            dossiers and purchase recovery are not available yet.
+            Create a free account or sign in before checkout, or continue as a guest. Saved dossiers
+            and purchase recovery are not available yet.
           </p>
           <div className="mt-4 flex flex-wrap gap-3">
-            <a href="/sign-in" className="rounded-full border border-border px-4 py-2 text-sm text-primary">
+            <a
+              href="/sign-in"
+              className="rounded-full border border-border px-4 py-2 text-sm text-primary"
+            >
               Create account / Sign in
             </a>
             <button
