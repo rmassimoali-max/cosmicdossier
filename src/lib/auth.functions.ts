@@ -10,6 +10,9 @@ const credentialsSchema = z.object({
   email: z.string().trim().email().max(254),
   password: z.string().min(8).max(128),
 });
+const passwordSchema = z.object({ password: z.string().min(8).max(128) });
+const recoverySchema = z.object({ tokenHash: z.string().min(16).max(2048) });
+const recoverySessionSchema = z.object({ accessToken: z.string().min(16), refreshToken: z.string().min(16) });
 const callbackSchema = z.object({
   tokenHash: z.string().min(16).max(2048),
   type: z.enum(["magiclink", "email", "signup"]),
@@ -76,7 +79,7 @@ export const registerAccount = createServerFn({ method: "POST" })
   .inputValidator((input: unknown) => credentialsSchema.parse(input))
   .handler(async ({ data }) => {
     const siteUrl = process.env["AUTH_SITE_URL"] ?? "https://www.cosmicdossier.com";
-    const confirmUrl = new URL("/sign-in", siteUrl).toString();
+    const confirmUrl = new URL("/auth/confirmed", siteUrl).toString();
     const payload = await authRequest(`signup?redirect_to=${encodeURIComponent(confirmUrl)}`, data);
     if (typeof payload["access_token"] === "string") {
       saveTokens(payload);
@@ -152,3 +155,52 @@ export const signOutAccount = createServerFn({ method: "POST" }).handler(async (
   clearTokens();
   return { success: true };
 });
+
+/** Always return a neutral response so callers cannot enumerate account emails. */
+export const requestPasswordReset = createServerFn({ method: "POST" })
+  .inputValidator((input: unknown) => emailSchema.parse(input))
+  .handler(async ({ data }) => {
+    const siteUrl = process.env["AUTH_SITE_URL"] ?? "https://www.cosmicdossier.com";
+    const redirectTo = new URL("/reset-password", siteUrl).toString();
+    try {
+      await authRequest(`recover?redirect_to=${encodeURIComponent(redirectTo)}`, { email: data.email });
+    } catch {
+      // Do not expose account existence or provider-specific recovery errors.
+    }
+    return { sent: true };
+  });
+
+export const verifyRecoveryToken = createServerFn({ method: "POST" })
+  .inputValidator((input: unknown) => recoverySchema.parse(input))
+  .handler(async ({ data }) => {
+    const payload = await authRequest("verify", { token_hash: data.tokenHash, type: "recovery" });
+    saveTokens(payload);
+    return { success: true };
+  });
+
+/** Supabase's default recovery template redirects with tokens in the URL fragment. */
+export const acceptRecoverySession = createServerFn({ method: "POST" })
+  .inputValidator((input: unknown) => recoverySessionSchema.parse(input))
+  .handler(async ({ data }) => {
+    const user = await authRequest("user", undefined, data.accessToken);
+    if (typeof user["id"] !== "string") throw new Error("Invalid recovery session.");
+    saveTokens({ access_token: data.accessToken, refresh_token: data.refreshToken });
+    return { success: true };
+  });
+
+export const changeRecoveredPassword = createServerFn({ method: "POST" })
+  .inputValidator((input: unknown) => passwordSchema.parse(input))
+  .handler(async ({ data }) => {
+    const token = getCookie(ACCESS);
+    if (!token) throw new Error("Recovery session expired.");
+    const { url, publishableKey } = config();
+    const response = await fetch(`${url}/auth/v1/user`, {
+      method: "PUT",
+      headers: { apikey: publishableKey, Authorization: `Bearer ${token}`, "Content-Type": "application/json" },
+      body: JSON.stringify({ password: data.password }),
+      cache: "no-store",
+    });
+    if (!response.ok) throw new Error("Could not update password.");
+    clearTokens();
+    return { success: true };
+  });
