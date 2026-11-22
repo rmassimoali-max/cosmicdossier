@@ -139,7 +139,7 @@ export function placementText(label: string, sign: string, house: number | null,
   const focus = PLANET_FOCUS[label] ?? planet.domain;
   const article = /^[aeiou]/i.test(style.adj) ? "an" : "a";
   const parts = [
-    `${label} in ${sign}: symbolically, ${focus} takes on ${article} ${style.adj} quality. In this placement, the ${label} theme ${style.mode}.`,
+    `${label} in ${sign}: symbolically, this placement brings ${article} ${style.adj} quality to ${focus}. The ${label} theme ${style.mode}.`,
   ];
   if (house && HOUSE_THEME[house]) {
     parts.push(
@@ -157,7 +157,7 @@ export function placementText(label: string, sign: string, house: number | null,
 
 export function aspectText(a: string, b: string, type: string) {
   const meaning = ASPECT_MEANING[type] ?? "interact";
-  return `${a} ${type} ${b}: ${lower(PLANET_THEME[a]?.domain ?? a)} and ${lower(PLANET_THEME[b]?.domain ?? b)} ${meaning}.`;
+  return `${a} ${type} ${b}: the ${a} theme (${PLANET_FOCUS[a] ?? PLANET_THEME[a]?.domain ?? a}) and the ${b} theme (${PLANET_FOCUS[b] ?? PLANET_THEME[b]?.domain ?? b}) ${meaning}.`;
 }
 
 export function elementText(elements: Record<string, number>) {
@@ -187,7 +187,6 @@ export function modalityText(m: Record<string, number>) {
 
 const ordinal = (n: number) =>
   `${n}${["th", "st", "nd", "rd"][n % 10 > 3 || (n >= 11 && n <= 13) ? 0 : n % 10]}`;
-const lower = (s: string) => s.charAt(0).toLowerCase() + s.slice(1);
 
 export const ASTROLOGY_DISCLAIMER =
   "Astrology is included here as an interpretive, symbolic language for self-reflection — a set of images to think with, not a measurement of personality. The psychological sections are self-report estimates, not clinical instruments.";
