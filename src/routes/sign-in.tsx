@@ -64,7 +64,7 @@ function SignInPage() {
               <p role="alert" className="text-sm text-destructive">
                 {error}
               </p>
-            )
+            )}
             <button
               type="submit"
               disabled={pending}
