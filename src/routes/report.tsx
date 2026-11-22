@@ -9,6 +9,7 @@ import { computeNatalChart } from "@/lib/astro.functions";
 import { buildDossier, buildSynastry } from "@/lib/generate";
 import { downloadDossierPdf } from "@/lib/pdf";
 import { useUnlocked } from "@/lib/unlock";
+import { isValidEnneagramWing } from "@/lib/enneagram-wing";
 import { buildUnlockOffer } from "@/lib/unlock-offer";
 import type { UnlockOffer } from "@/lib/unlock-offer";
 import {
@@ -24,6 +25,7 @@ export const Route = createFileRoute("/report")({
   head: () => ({
     meta: [
       { title: "Your Cosmic Dossier" },
+      { name: "robots", content: "noindex, nofollow, noarchive" },
       {
         name: "description",
         content:
@@ -168,7 +170,11 @@ function IdentityStrip({ person, chart }: { person: PersonInput; chart?: NatalCh
     [
       "Enneagram",
       person.enneagramType
-        ? `${person.enneagramType}${person.enneagramWing ? `w${person.enneagramWing}` : ""}`
+        ? `${person.enneagramType}${
+            isValidEnneagramWing(person.enneagramType, person.enneagramWing)
+              ? `w${person.enneagramWing}`
+              : ""
+          }`
         : "—",
     ],
     ["Attachment", person.attachment || "—"],
