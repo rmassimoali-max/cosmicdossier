@@ -12,7 +12,10 @@ const credentialsSchema = z.object({
 });
 const passwordSchema = z.object({ password: z.string().min(8).max(128) });
 const recoverySchema = z.object({ tokenHash: z.string().min(16).max(2048) });
-const recoverySessionSchema = z.object({ accessToken: z.string().min(16), refreshToken: z.string().min(16) });
+const recoverySessionSchema = z.object({
+  accessToken: z.string().min(16),
+  refreshToken: z.string().min(16),
+});
 const callbackSchema = z.object({
   tokenHash: z.string().min(16).max(2048),
   type: z.enum(["magiclink", "email", "signup"]),
@@ -163,7 +166,9 @@ export const requestPasswordReset = createServerFn({ method: "POST" })
     const siteUrl = process.env["AUTH_SITE_URL"] ?? "https://www.cosmicdossier.com";
     const redirectTo = new URL("/reset-password", siteUrl).toString();
     try {
-      await authRequest(`recover?redirect_to=${encodeURIComponent(redirectTo)}`, { email: data.email });
+      await authRequest(`recover?redirect_to=${encodeURIComponent(redirectTo)}`, {
+        email: data.email,
+      });
     } catch {
       // Do not expose account existence or provider-specific recovery errors.
     }
@@ -196,7 +201,11 @@ export const changeRecoveredPassword = createServerFn({ method: "POST" })
     const { url, publishableKey } = config();
     const response = await fetch(`${url}/auth/v1/user`, {
       method: "PUT",
-      headers: { apikey: publishableKey, Authorization: `Bearer ${token}`, "Content-Type": "application/json" },
+      headers: {
+        apikey: publishableKey,
+        Authorization: `Bearer ${token}`,
+        "Content-Type": "application/json",
+      },
       body: JSON.stringify({ password: data.password }),
       cache: "no-store",
     });

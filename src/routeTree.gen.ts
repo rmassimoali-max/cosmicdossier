@@ -10,14 +10,20 @@
 
 import { Route as rootRouteImport } from './routes/__root'
 import { Route as IndexRouteImport } from './routes/index'
+import { Route as AccountRouteImport } from './routes/account'
+import { Route as ForgotPasswordRouteImport } from './routes/forgot-password'
 import { Route as InputRouteImport } from './routes/input'
 import { Route as ReportRouteImport } from './routes/report'
+import { Route as ResetPasswordRouteImport } from './routes/reset-password'
+import { Route as SignInRouteImport } from './routes/sign-in'
 import { Route as ArchetypeSlugRouteImport } from './routes/archetype/$slug'
 import { Route as ArticlesIndexRouteImport } from './routes/articles/index'
 import { Route as ArticlesSlugRouteImport } from './routes/articles/$slug'
 import { Route as AssessmentKindRouteImport } from './routes/assessment.$kind'
 import { Route as AttachmentIndexRouteImport } from './routes/attachment/index'
 import { Route as AttachmentSlugRouteImport } from './routes/attachment/$slug'
+import { Route as AuthCallbackRouteImport } from './routes/auth/callback'
+import { Route as AuthConfirmedRouteImport } from './routes/auth/confirmed'
 import { Route as MbtiIndexRouteImport } from './routes/mbti/index'
 import { Route as MbtiTypeRouteImport } from './routes/mbti/$type'
 import { Route as PersonalityDisordersIndexRouteImport } from './routes/personality-disorders/index'
@@ -33,6 +39,16 @@ const IndexRoute = IndexRouteImport.update({
   path: '/',
   getParentRoute: () => rootRouteImport,
 } as any)
+const AccountRoute = AccountRouteImport.update({
+  id: '/account',
+  path: '/account',
+  getParentRoute: () => rootRouteImport,
+} as any)
+const ForgotPasswordRoute = ForgotPasswordRouteImport.update({
+  id: '/forgot-password',
+  path: '/forgot-password',
+  getParentRoute: () => rootRouteImport,
+} as any)
 const InputRoute = InputRouteImport.update({
   id: '/input',
   path: '/input',
@@ -41,6 +57,16 @@ const InputRoute = InputRouteImport.update({
 const ReportRoute = ReportRouteImport.update({
   id: '/report',
   path: '/report',
+  getParentRoute: () => rootRouteImport,
+} as any)
+const ResetPasswordRoute = ResetPasswordRouteImport.update({
+  id: '/reset-password',
+  path: '/reset-password',
+  getParentRoute: () => rootRouteImport,
+} as any)
+const SignInRoute = SignInRouteImport.update({
+  id: '/sign-in',
+  path: '/sign-in',
   getParentRoute: () => rootRouteImport,
 } as any)
 const ArchetypeSlugRoute = ArchetypeSlugRouteImport.update({
@@ -71,6 +97,16 @@ const AttachmentIndexRoute = AttachmentIndexRouteImport.update({
 const AttachmentSlugRoute = AttachmentSlugRouteImport.update({
   id: '/attachment/$slug',
   path: '/attachment/$slug',
+  getParentRoute: () => rootRouteImport,
+} as any)
+const AuthCallbackRoute = AuthCallbackRouteImport.update({
+  id: '/auth/callback',
+  path: '/auth/callback',
+  getParentRoute: () => rootRouteImport,
+} as any)
+const AuthConfirmedRoute = AuthConfirmedRouteImport.update({
+  id: '/auth/confirmed',
+  path: '/auth/confirmed',
   getParentRoute: () => rootRouteImport,
 } as any)
 const MbtiIndexRoute = MbtiIndexRouteImport.update({
@@ -123,12 +159,18 @@ const ZodiacSlugRoute = ZodiacSlugRouteImport.update({
 
 export interface FileRoutesByFullPath {
   '/': typeof IndexRoute
+  '/account': typeof AccountRoute
+  '/forgot-password': typeof ForgotPasswordRoute
   '/input': typeof InputRoute
   '/report': typeof ReportRoute
+  '/reset-password': typeof ResetPasswordRoute
+  '/sign-in': typeof SignInRoute
   '/archetype/$slug': typeof ArchetypeSlugRoute
   '/articles/$slug': typeof ArticlesSlugRoute
   '/assessment/$kind': typeof AssessmentKindRoute
   '/attachment/$slug': typeof AttachmentSlugRoute
+  '/auth/callback': typeof AuthCallbackRoute
+  '/auth/confirmed': typeof AuthConfirmedRoute
   '/mbti/$type': typeof MbtiTypeRoute
   '/personality-disorders/$slug': typeof PersonalityDisordersSlugRoute
   '/systems/$slug': typeof SystemsSlugRoute
@@ -143,12 +185,18 @@ export interface FileRoutesByFullPath {
 }
 export interface FileRoutesByTo {
   '/': typeof IndexRoute
+  '/account': typeof AccountRoute
+  '/forgot-password': typeof ForgotPasswordRoute
   '/input': typeof InputRoute
   '/report': typeof ReportRoute
+  '/reset-password': typeof ResetPasswordRoute
+  '/sign-in': typeof SignInRoute
   '/archetype/$slug': typeof ArchetypeSlugRoute
   '/articles/$slug': typeof ArticlesSlugRoute
   '/assessment/$kind': typeof AssessmentKindRoute
   '/attachment/$slug': typeof AttachmentSlugRoute
+  '/auth/callback': typeof AuthCallbackRoute
+  '/auth/confirmed': typeof AuthConfirmedRoute
   '/mbti/$type': typeof MbtiTypeRoute
   '/personality-disorders/$slug': typeof PersonalityDisordersSlugRoute
   '/systems/$slug': typeof SystemsSlugRoute
@@ -164,12 +212,18 @@ export interface FileRoutesByTo {
 export interface FileRoutesById {
   __root__: typeof rootRouteImport
   '/': typeof IndexRoute
+  '/account': typeof AccountRoute
+  '/forgot-password': typeof ForgotPasswordRoute
   '/input': typeof InputRoute
   '/report': typeof ReportRoute
+  '/reset-password': typeof ResetPasswordRoute
+  '/sign-in': typeof SignInRoute
   '/archetype/$slug': typeof ArchetypeSlugRoute
   '/articles/$slug': typeof ArticlesSlugRoute
   '/assessment/$kind': typeof AssessmentKindRoute
   '/attachment/$slug': typeof AttachmentSlugRoute
+  '/auth/callback': typeof AuthCallbackRoute
+  '/auth/confirmed': typeof AuthConfirmedRoute
   '/mbti/$type': typeof MbtiTypeRoute
   '/personality-disorders/$slug': typeof PersonalityDisordersSlugRoute
   '/systems/$slug': typeof SystemsSlugRoute
@@ -186,12 +240,18 @@ export interface FileRouteTypes {
   fileRoutesByFullPath: FileRoutesByFullPath
   fullPaths:
     | '/'
+    | '/account'
+    | '/forgot-password'
     | '/input'
     | '/report'
+    | '/reset-password'
+    | '/sign-in'
     | '/archetype/$slug'
     | '/articles/$slug'
     | '/assessment/$kind'
     | '/attachment/$slug'
+    | '/auth/callback'
+    | '/auth/confirmed'
     | '/mbti/$type'
     | '/personality-disorders/$slug'
     | '/systems/$slug'
@@ -206,12 +266,18 @@ export interface FileRouteTypes {
   fileRoutesByTo: FileRoutesByTo
   to:
     | '/'
+    | '/account'
+    | '/forgot-password'
     | '/input'
     | '/report'
+    | '/reset-password'
+    | '/sign-in'
     | '/archetype/$slug'
     | '/articles/$slug'
     | '/assessment/$kind'
     | '/attachment/$slug'
+    | '/auth/callback'
+    | '/auth/confirmed'
     | '/mbti/$type'
     | '/personality-disorders/$slug'
     | '/systems/$slug'
@@ -226,12 +292,18 @@ export interface FileRouteTypes {
   id:
     | '__root__'
     | '/'
+    | '/account'
+    | '/forgot-password'
     | '/input'
     | '/report'
+    | '/reset-password'
+    | '/sign-in'
     | '/archetype/$slug'
     | '/articles/$slug'
     | '/assessment/$kind'
     | '/attachment/$slug'
+    | '/auth/callback'
+    | '/auth/confirmed'
     | '/mbti/$type'
     | '/personality-disorders/$slug'
     | '/systems/$slug'
@@ -247,12 +319,18 @@ export interface FileRouteTypes {
 }
 export interface RootRouteChildren {
   IndexRoute: typeof IndexRoute
+  AccountRoute: typeof AccountRoute
+  ForgotPasswordRoute: typeof ForgotPasswordRoute
   InputRoute: typeof InputRoute
   ReportRoute: typeof ReportRoute
+  ResetPasswordRoute: typeof ResetPasswordRoute
+  SignInRoute: typeof SignInRoute
   ArchetypeSlugRoute: typeof ArchetypeSlugRoute
   ArticlesSlugRoute: typeof ArticlesSlugRoute
   AssessmentKindRoute: typeof AssessmentKindRoute
   AttachmentSlugRoute: typeof AttachmentSlugRoute
+  AuthCallbackRoute: typeof AuthCallbackRoute
+  AuthConfirmedRoute: typeof AuthConfirmedRoute
   MbtiTypeRoute: typeof MbtiTypeRoute
   PersonalityDisordersSlugRoute: typeof PersonalityDisordersSlugRoute
   SystemsSlugRoute: typeof SystemsSlugRoute
@@ -275,6 +353,20 @@ declare module '@tanstack/react-router' {
       preLoaderRoute: typeof IndexRouteImport
       parentRoute: typeof rootRouteImport
     }
+    '/account': {
+      id: '/account'
+      path: '/account'
+      fullPath: '/account'
+      preLoaderRoute: typeof AccountRouteImport
+      parentRoute: typeof rootRouteImport
+    }
+    '/forgot-password': {
+      id: '/forgot-password'
+      path: '/forgot-password'
+      fullPath: '/forgot-password'
+      preLoaderRoute: typeof ForgotPasswordRouteImport
+      parentRoute: typeof rootRouteImport
+    }
     '/input': {
       id: '/input'
       path: '/input'
@@ -287,6 +379,20 @@ declare module '@tanstack/react-router' {
       path: '/report'
       fullPath: '/report'
       preLoaderRoute: typeof ReportRouteImport
+      parentRoute: typeof rootRouteImport
+    }
+    '/reset-password': {
+      id: '/reset-password'
+      path: '/reset-password'
+      fullPath: '/reset-password'
+      preLoaderRoute: typeof ResetPasswordRouteImport
+      parentRoute: typeof rootRouteImport
+    }
+    '/sign-in': {
+      id: '/sign-in'
+      path: '/sign-in'
+      fullPath: '/sign-in'
+      preLoaderRoute: typeof SignInRouteImport
       parentRoute: typeof rootRouteImport
     }
     '/archetype/$slug': {
@@ -329,6 +435,20 @@ declare module '@tanstack/react-router' {
       path: '/attachment/$slug'
       fullPath: '/attachment/$slug'
       preLoaderRoute: typeof AttachmentSlugRouteImport
+      parentRoute: typeof rootRouteImport
+    }
+    '/auth/callback': {
+      id: '/auth/callback'
+      path: '/auth/callback'
+      fullPath: '/auth/callback'
+      preLoaderRoute: typeof AuthCallbackRouteImport
+      parentRoute: typeof rootRouteImport
+    }
+    '/auth/confirmed': {
+      id: '/auth/confirmed'
+      path: '/auth/confirmed'
+      fullPath: '/auth/confirmed'
+      preLoaderRoute: typeof AuthConfirmedRouteImport
       parentRoute: typeof rootRouteImport
     }
     '/mbti/': {
@@ -399,12 +519,18 @@ declare module '@tanstack/react-router' {
 
 const rootRouteChildren: RootRouteChildren = {
   IndexRoute: IndexRoute,
+  AccountRoute: AccountRoute,
+  ForgotPasswordRoute: ForgotPasswordRoute,
   InputRoute: InputRoute,
   ReportRoute: ReportRoute,
+  ResetPasswordRoute: ResetPasswordRoute,
+  SignInRoute: SignInRoute,
   ArchetypeSlugRoute: ArchetypeSlugRoute,
   ArticlesSlugRoute: ArticlesSlugRoute,
   AssessmentKindRoute: AssessmentKindRoute,
   AttachmentSlugRoute: AttachmentSlugRoute,
+  AuthCallbackRoute: AuthCallbackRoute,
+  AuthConfirmedRoute: AuthConfirmedRoute,
   MbtiTypeRoute: MbtiTypeRoute,
   PersonalityDisordersSlugRoute: PersonalityDisordersSlugRoute,
   SystemsSlugRoute: SystemsSlugRoute,

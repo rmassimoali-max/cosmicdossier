@@ -110,7 +110,9 @@ function SignInPage() {
           </button>
         </form>
         {mode === "sign-in" && (
-          <Link to="/forgot-password" className="mt-4 block text-sm text-primary">Forgot password?</Link>
+          <Link to="/forgot-password" className="mt-4 block text-sm text-primary">
+            Forgot password?
+          </Link>
         )}
         <button
           type="button"
