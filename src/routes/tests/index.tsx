@@ -34,7 +34,8 @@ function TestsHub() {
         <p className="-mt-2 max-w-2xl text-sm leading-relaxed text-muted-foreground">
           Free, anonymous assessments grounded in published research. Everything is scored in your
           browser — nothing you answer is sent anywhere. Each result can feed directly into your
-          full Cosmic Dossier, where it can be considered alongside your other completed assessments.
+          full Cosmic Dossier, where it can be considered alongside your other completed
+          assessments.
         </p>
 
         {TEST_CATEGORIES.map((category) => {
