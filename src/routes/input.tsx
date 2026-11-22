@@ -145,9 +145,16 @@ function PersonCard({
               }
             />
             <SelectInput
-              options={validEnneagramWings(person.enneagramType).map((n) => ({ value: n, label: `w${n}` }))}
+              options={validEnneagramWings(person.enneagramType).map((n) => ({
+                value: n,
+                label: `w${n}`,
+              }))}
               placeholder="Wing"
-              value={isValidEnneagramWing(person.enneagramType, person.enneagramWing) ? person.enneagramWing : ""}
+              value={
+                isValidEnneagramWing(person.enneagramType, person.enneagramWing)
+                  ? person.enneagramWing
+                  : ""
+              }
               onChange={(e) => set({ enneagramWing: e.target.value })}
             />
             <SelectInput
