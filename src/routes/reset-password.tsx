@@ -144,7 +144,7 @@ function ResetPassword() {
       }
       recoveryWindow.__cdRecoveryAttempt = previousResult
         ? Promise.resolve(previousResult)
-        : initializeRecovery(accept, verify);
+        : initializeRecovery(verify);
     }
     let active = true;
     void recoveryWindow.__cdRecoveryAttempt?.then((result) => {
