@@ -15,7 +15,7 @@ const passwordSchema = z.object({ password: z.string().min(8).max(128) });
 const recoverySchema = z.object({ tokenHash: z.string().min(16).max(2048) });
 const recoverySessionSchema = z.object({
   accessToken: z.string().min(16),
-  refreshToken: z.string().min(16),
+  refreshToken: z.string().min(1),
 });
 const callbackSchema = z.object({
   tokenHash: z.string().min(16).max(2048),
