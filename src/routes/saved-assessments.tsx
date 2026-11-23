@@ -70,7 +70,11 @@ function SavedAssessmentsPage() {
   };
 
   const deleteItem = async (item: SavedAssessment) => {
-    if (!window.confirm(`Delete saved result "${item.display_label ?? item.assessment_slug}"? This cannot be undone.`)) {
+    if (
+      !window.confirm(
+        `Delete saved result "${item.display_label ?? item.assessment_slug}"? This cannot be undone.`,
+      )
+    ) {
       return;
     }
     setError("");
@@ -96,13 +100,21 @@ function SavedAssessmentsPage() {
         Your account's saved results, available across devices. Restoring adds an assessment to
         Person 1 in your current local dossier; it doesn't overwrite your other assessments.
       </p>
-      {error ? <p role="alert" className="mt-5 text-sm text-destructive">{error}</p> : null}
+      {error ? (
+        <p role="alert" className="mt-5 text-sm text-destructive">
+          {error}
+        </p>
+      ) : null}
       {status === "loading" ? (
-        <p role="status" className="mt-8 text-muted-foreground">Loading saved results…</p>
+        <p role="status" className="mt-8 text-muted-foreground">
+          Loading saved results…
+        </p>
       ) : status === "error" ? (
         <div className="panel mt-8 p-6">
           <p role="alert">Couldn't load your saved assessments. Please sign in and try again.</p>
-          <Link to="/sign-in" className="mt-4 inline-block text-primary">Sign in</Link>
+          <Link to="/sign-in" className="mt-4 inline-block text-primary">
+            Sign in
+          </Link>
         </div>
       ) : items.length === 0 ? (
         <div className="panel mt-8 p-6">
@@ -116,7 +128,9 @@ function SavedAssessmentsPage() {
           {items.map((item) => (
             <article key={item.id} className="panel p-6">
               <h2 className="font-display text-2xl text-foreground">
-                {item.display_label ?? testBySlug(item.assessment_slug)?.name ?? item.assessment_slug}
+                {item.display_label ??
+                  testBySlug(item.assessment_slug)?.name ??
+                  item.assessment_slug}
               </h2>
               <p className="mt-2 text-xs text-muted-foreground">
                 Saved {new Date(item.created_at).toLocaleDateString()}
