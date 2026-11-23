@@ -35,7 +35,8 @@ const destinations = [
   },
   {
     title: "Purchases & Unlocks",
-    description: "Account-linked purchase history is coming soon. Existing receipts still work as before.",
+    description:
+      "Account-linked purchase history is coming soon. Existing receipts still work as before.",
     to: "/account",
     action: "Account settings",
   },
