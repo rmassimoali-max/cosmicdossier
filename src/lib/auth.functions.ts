@@ -13,10 +13,6 @@ const credentialsSchema = z.object({
 });
 const passwordSchema = z.object({ password: z.string().min(8).max(128) });
 const recoverySchema = z.object({ tokenHash: z.string().min(16).max(2048) });
-const recoverySessionSchema = z.object({
-  accessToken: z.string().min(16),
-  refreshToken: z.string().min(1),
-});
 const callbackSchema = z.object({
   tokenHash: z.string().min(16).max(2048),
   type: z.enum(["magiclink", "email", "signup"]),
@@ -50,6 +46,8 @@ async function authRequest(
 }
 
 function saveTokens(payload: Record<string, unknown>) {
+  // A new session must never inherit permission from an earlier recovery session.
+  deleteCookie(RECOVERY, { path: "/" });
   const access = payload["access_token"];
   const refresh = payload["refresh_token"];
   const expires = payload["expires_in"];
@@ -204,6 +202,7 @@ export const requestPasswordReset = createServerFn({ method: "POST" })
     return { sent: true };
   });
 
+/** Only a one-time Supabase recovery OTP can grant password-reset permission. */
 export const verifyRecoveryToken = createServerFn({ method: "POST" })
   .inputValidator((input: unknown) => recoverySchema.parse(input))
   .handler(async ({ data }) => {
@@ -216,42 +215,6 @@ export const verifyRecoveryToken = createServerFn({ method: "POST" })
       path: "/",
       maxAge: 600,
     });
-    return { success: true };
-  });
-
-/** Supabase's default recovery template redirects with tokens in the URL fragment. */
-export const acceptRecoverySession = createServerFn({ method: "POST" })
-  .inputValidator((input: unknown) => recoverySessionSchema.parse(input))
-  .handler(async ({ data }) => {
-    // Safe, stage-only diagnostics: never log tokens, passwords, emails or URLs.
-    console.info("[recovery] session handler started");
-    let user: Record<string, unknown>;
-    try {
-      user = await authRequest("user", undefined, data.accessToken);
-    } catch {
-      console.warn("[recovery] provider user validation failed");
-      return { success: false as const, reason: "provider_validation_failed" as const };
-    }
-    if (typeof user["id"] !== "string") {
-      console.warn("[recovery] provider user response missing id");
-      return { success: false as const, reason: "invalid_user_response" as const };
-    }
-    console.info("[recovery] provider validation passed");
-    try {
-      saveTokens({ access_token: data.accessToken, refresh_token: data.refreshToken });
-      setCookie(RECOVERY, "1", {
-        httpOnly: true,
-        secure: process.env["NODE_ENV"] === "production",
-        sameSite: "lax",
-        path: "/",
-        maxAge: 600,
-      });
-    } catch {
-      console.error("[recovery] session cookie creation failed");
-      clearTokens();
-      return { success: false as const, reason: "session_cookie_failed" as const };
-    }
-    console.info("[recovery] session handler completed");
     return { success: true };
   });
 
