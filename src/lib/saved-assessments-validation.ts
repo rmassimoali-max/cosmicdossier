@@ -20,16 +20,34 @@ export const saveAssessmentSchema = z
       });
       return;
     }
+    const actualKeys = Object.keys(data.scores);
+    // Some scoring engines (MBTI and Enneagram) produce dynamic result keys
+    // rather than the display dimensions used by the other tests.
     const expectedKeys = test.dimensions.map((dimension) => dimension.key).sort();
-    const actualKeys = Object.keys(data.scores).sort();
-    if (
-      expectedKeys.length !== actualKeys.length ||
-      expectedKeys.some((key, index) => key !== actualKeys[index])
-    ) {
+    const matchesDimensions =
+      actualKeys.length === expectedKeys.length &&
+      actualKeys.slice().sort().every((key, index) => key === expectedKeys[index]);
+    const matchesMbti =
+      data.assessmentSlug === "mbti" &&
+      actualKeys.length === 16 &&
+      actualKeys.every((key) => /^[EI][SN][TF][JP]$/.test(key));
+    const matchesEnneagram =
+      data.assessmentSlug === "enneagram" &&
+      actualKeys.length >= 3 &&
+      actualKeys.length <= 16 &&
+      actualKeys.includes("core") &&
+      actualKeys.includes("wing") &&
+      Number.isInteger(data.scores["core"]) &&
+      (data.scores["core"] ?? 0) >= 1 &&
+      (data.scores["core"] ?? 0) <= 9 &&
+      Number.isInteger(data.scores["wing"]) &&
+      (data.scores["wing"] ?? 0) >= 1 &&
+      (data.scores["wing"] ?? 0) <= 9;
+    if (!matchesDimensions && !matchesMbti && !matchesEnneagram) {
       ctx.addIssue({
         code: "custom",
         path: ["scores"],
-        message: "Scores do not match this assessment's dimensions.",
+        message: "Scores do not match this assessment's scoring format.",
       });
     }
     if (JSON.stringify(data).length > 8192) {
