@@ -1,6 +1,6 @@
 # Phase 2: Saved Assessments (implementation and safety contract)
 
-Status: design checkpoint. **No database migration has been applied.** Do not enable cloud writes in Vercel Preview or Production until an isolated Supabase staging environment has passed tests.
+Status: design checkpoint. **No database migration has been applied.** Owner chose existing Supabase Free project instead of paid staging. Build and review the migration and server functions in this GitHub branch; do not execute the production migration until the owner approves a separate production-schema checkpoint. Preview and production share one Supabase project, so preview tests may affect real database rows once the schema is enabled.
 
 ## Existing behavior (preserve)
 - Tests score locally and can be used without signing in.
@@ -54,9 +54,10 @@ Implement TanStack server functions using the existing HttpOnly auth cookies and
 8. Refresh, logout, and switching between two accounts never leak saved results.
 
 ## Deployment sequence
-1. Set up an isolated Supabase staging branch/project and preview environment variables. Supabase branching may incur hourly charges; obtain owner approval before provisioning.
-2. Implement schema, API and UI on this GitHub branch; run RLS cross-account tests on staging.
-3. Review and approve a production migration separately, then deploy additive schema before enabling cloud-save functionality.
-4. Merge only with explicit owner approval and successful preview tests.
+1. Implement schema, API, validation and UI on this GitHub branch without executing production SQL.
+2. Review the additive schema and RLS policies, and run static/unit checks. Test SQL locally if practical; do not require paid Supabase branching.
+3. Ask the owner for explicit approval of the production schema change; apply only the reviewed additive migration to the existing Free project and run RLS cross-account tests with test users.
+4. Enable the cloud-save feature in a draft PR and run preview checks. Preview and production share the database, so test only dedicated test accounts and avoid destructive fixtures.
+5. Merge only with explicit owner approval and successful checks.
 
 Reference: https://supabase.com/docs/guides/api/securing-your-api
