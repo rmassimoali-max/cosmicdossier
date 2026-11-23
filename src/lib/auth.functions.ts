@@ -205,14 +205,19 @@ export const acceptRecoverySession = createServerFn({ method: "POST" })
     if (typeof user["id"] !== "string") {
       return { success: false as const, reason: "invalid_user_response" as const };
     }
-    saveTokens({ access_token: data.accessToken, refresh_token: data.refreshToken });
-    setCookie(RECOVERY, "1", {
-      httpOnly: true,
-      secure: process.env["NODE_ENV"] === "production",
-      sameSite: "lax",
-      path: "/",
-      maxAge: 600,
-    });
+    try {
+      saveTokens({ access_token: data.accessToken, refresh_token: data.refreshToken });
+      setCookie(RECOVERY, "1", {
+        httpOnly: true,
+        secure: process.env["NODE_ENV"] === "production",
+        sameSite: "lax",
+        path: "/",
+        maxAge: 600,
+      });
+    } catch {
+      clearTokens();
+      return { success: false as const, reason: "session_cookie_failed" as const };
+    }
     return { success: true };
   });
 
