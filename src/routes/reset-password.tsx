@@ -1,11 +1,8 @@
 import { createFileRoute, Link } from "@tanstack/react-router";
 import { useServerFn } from "@tanstack/react-start";
-import { useEffect, useRef, useState } from "react";
-import {
-  acceptRecoverySession,
-  changeRecoveredPassword,
-  verifyRecoveryToken,
-} from "@/lib/auth.functions";
+import { useEffect, useState } from "react";
+import { changeRecoveredPassword, verifyRecoveryToken } from "@/lib/auth.functions";
+import { recoveryTokenFromUrl } from "@/lib/recovery-guards";
 
 export const Route = createFileRoute("/reset-password")({
   head: () => ({
@@ -16,40 +13,146 @@ export const Route = createFileRoute("/reset-password")({
   }),
   component: ResetPassword,
 });
+type RecoveryResult = { status: "ready" | "error"; message?: string };
+const RECOVERY_RESULT_KEY = "cd_recovery_last_result";
+
+function rememberRecoveryResult(result: RecoveryResult): RecoveryResult {
+  // Store only a safe outcome, never a token, password, or URL.
+  if (result.status === "error") {
+    window.sessionStorage.setItem(RECOVERY_RESULT_KEY, JSON.stringify(result));
+  } else {
+    window.sessionStorage.removeItem(RECOVERY_RESULT_KEY);
+  }
+  return result;
+}
+
+function classifyRecoveryRequestError(error: unknown): string {
+  if (error instanceof TypeError) {
+    return "The recovery server request could not connect. Please try again later.";
+  }
+  if (error instanceof Error && error.name === "ZodError") {
+    return "The recovery server rejected the request format. Please request a fresh link.";
+  }
+  // Only display a fixed diagnostic category. Never surface exception messages:
+  // transport errors can include sensitive request details.
+  if (error instanceof Error) {
+    if (error.name === "AbortError") {
+      return "The recovery request was interrupted. Please request a fresh link.";
+    }
+    return "The recovery server returned an application error. Please request a fresh link.";
+  }
+  return "The recovery server returned an unexpected error. Please request a fresh link.";
+}
+
+// The in-flight attempt belongs to this browser window, not a server module.
+// A remount can reuse it without persisting credentials in browser storage.
+type RecoveryWindow = Window & { __cdRecoveryAttempt?: Promise<RecoveryResult> };
+
+async function initializeRecovery(
+  verify: (options: { data: { tokenHash: string } }) => Promise<unknown>,
+): Promise<RecoveryResult> {
+  const query = new URLSearchParams(window.location.search);
+  const fragment = new URLSearchParams(window.location.hash.slice(1));
+  const tokenHash = recoveryTokenFromUrl(window.location.search, window.location.hash);
+  const providerError =
+    fragment.get("error_code") ??
+    query.get("error_code") ??
+    fragment.get("error") ??
+    query.get("error");
+  const authorizationCode = query.get("code");
+  const directToken =
+    query.has("token") ||
+    fragment.has("token") ||
+    fragment.has("access_token") ||
+    fragment.has("refresh_token");
+  // Capture the recovery-only token hash, then immediately clear credentials from the URL.
+  window.history.replaceState(window.history.state, "", "/reset-password");
+  const finish = rememberRecoveryResult;
+  if (providerError) {
+    return finish({
+      status: "error",
+      message:
+        providerError === "otp_expired"
+          ? "This recovery link has expired or was already used. Please request a new one."
+          : "Supabase could not complete this recovery link. Please request a new one.",
+    });
+  }
+  // Reject ordinary session fragments. Only Supabase verification of a recovery OTP
+  // may establish password-reset authorization.
+  if (tokenHash) {
+    try {
+      await verify({ data: { tokenHash } });
+      return finish({ status: "ready" });
+    } catch {
+      return finish({
+        status: "error",
+        message: "Recovery token verification failed. Please request a fresh link.",
+      });
+    }
+  }
+  return finish({
+    status: "error",
+    message: authorizationCode
+      ? "This recovery link uses an unsupported sign-in code. Please request a new link."
+      : directToken
+        ? "The recovery link contained a token in an unsupported format. Please request a new one."
+        : "No recovery credentials were found in this link. Please request a new one.",
+  });
+}
+
 function ResetPassword() {
-  const accept = useServerFn(acceptRecoverySession);
   const verify = useServerFn(verifyRecoveryToken);
   const change = useServerFn(changeRecoveredPassword);
   const [status, setStatus] = useState<"checking" | "ready" | "error" | "done">("checking");
-  const recoveryAttempted = useRef(false);
   const [password, setPassword] = useState("");
   const [confirm, setConfirm] = useState("");
   const [pending, setPending] = useState(false);
   const [error, setError] = useState("");
+  const [linkError, setLinkError] = useState(
+    "This recovery link is invalid or expired. Please request a new one.",
+  );
   useEffect(() => {
-    // A recovery token is single-use. React may run effects twice in development.
-    if (recoveryAttempted.current) return;
-    recoveryAttempted.current = true;
-    const query = new URLSearchParams(window.location.search);
-    const fragment = new URLSearchParams(window.location.hash.slice(1));
-    const tokenHash = query.get("token_hash");
-    const type = query.get("type");
-    const accessToken = fragment.get("access_token");
-    const refreshToken = fragment.get("refresh_token");
-    const fragmentType = fragment.get("type");
-    window.history.replaceState(null, "", "/reset-password");
-    if (tokenHash && type === "recovery") {
-      void verify({ data: { tokenHash } })
-        .then(() => setStatus("ready"))
-        .catch(() => setStatus("error"));
-    } else if (accessToken && refreshToken && fragmentType === "recovery") {
-      void accept({ data: { accessToken, refreshToken } })
-        .then(() => setStatus("ready"))
-        .catch(() => setStatus("error"));
-    } else {
-      setStatus("error");
+    // Reuse an in-flight or settled attempt if React remounts this route.
+    // A fresh redirect with credentials starts a new attempt.
+    const recoveryWindow = window as RecoveryWindow;
+    const hasNewRedirect = Boolean(window.location.search || window.location.hash);
+    if (hasNewRedirect) {
+      window.sessionStorage.removeItem(RECOVERY_RESULT_KEY);
+      recoveryWindow.__cdRecoveryAttempt = initializeRecovery(verify);
+    } else if (!recoveryWindow.__cdRecoveryAttempt) {
+      const prior = window.sessionStorage.getItem(RECOVERY_RESULT_KEY);
+      let previousResult: RecoveryResult | undefined;
+      if (prior) {
+        try {
+          const parsed: unknown = JSON.parse(prior);
+          if (
+            parsed &&
+            typeof parsed === "object" &&
+            "status" in parsed &&
+            parsed.status === "error" &&
+            "message" in parsed &&
+            typeof parsed.message === "string"
+          ) {
+            previousResult = { status: "error", message: parsed.message };
+          }
+        } catch {
+          window.sessionStorage.removeItem(RECOVERY_RESULT_KEY);
+        }
+      }
+      recoveryWindow.__cdRecoveryAttempt = previousResult
+        ? Promise.resolve(previousResult)
+        : initializeRecovery(verify);
     }
-  }, [accept, verify]);
+    let active = true;
+    void recoveryWindow.__cdRecoveryAttempt?.then((result) => {
+      if (!active) return;
+      if (result.message) setLinkError(result.message);
+      setStatus(result.status);
+    });
+    return () => {
+      active = false;
+    };
+  }, [verify]);
   async function submit(event: React.FormEvent<HTMLFormElement>) {
     event.preventDefault();
     if (pending || password !== confirm) {
@@ -80,7 +183,7 @@ function ResetPassword() {
         )}
         {status === "error" && (
           <p role="alert" className="mt-4">
-            This recovery link is invalid or expired. Please request a new one.
+            {linkError}
           </p>
         )}
         {status === "done" && (

@@ -2,9 +2,11 @@ import { createServerFn } from "@tanstack/react-start";
 import { deleteCookie, getCookie, setCookie } from "@tanstack/react-start/server";
 import { z } from "zod";
 import { getAuthCallbackUrl, readSupabasePublicConfig } from "./supabase-config";
+import { hasRecoveryAuthorization } from "./recovery-guards";
 
 const ACCESS = "cd_auth_access";
 const REFRESH = "cd_auth_refresh";
+const RECOVERY = "cd_auth_recovery";
 const emailSchema = z.object({ email: z.string().trim().email().max(254) });
 const credentialsSchema = z.object({
   email: z.string().trim().email().max(254),
@@ -12,10 +14,6 @@ const credentialsSchema = z.object({
 });
 const passwordSchema = z.object({ password: z.string().min(8).max(128) });
 const recoverySchema = z.object({ tokenHash: z.string().min(16).max(2048) });
-const recoverySessionSchema = z.object({
-  accessToken: z.string().min(16),
-  refreshToken: z.string().min(16),
-});
 const callbackSchema = z.object({
   tokenHash: z.string().min(16).max(2048),
   type: z.enum(["magiclink", "email", "signup"]),
@@ -49,6 +47,8 @@ async function authRequest(
 }
 
 function saveTokens(payload: Record<string, unknown>) {
+  // A new session must never inherit permission from an earlier recovery session.
+  deleteCookie(RECOVERY, { path: "/" });
   const access = payload["access_token"];
   const refresh = payload["refresh_token"];
   const expires = payload["expires_in"];
@@ -76,6 +76,7 @@ function saveTokens(payload: Record<string, unknown>) {
 function clearTokens() {
   deleteCookie(ACCESS, { path: "/" });
   deleteCookie(REFRESH, { path: "/" });
+  deleteCookie(RECOVERY, { path: "/" });
 }
 
 export const registerAccount = createServerFn({ method: "POST" })
@@ -175,21 +176,19 @@ export const requestPasswordReset = createServerFn({ method: "POST" })
     return { sent: true };
   });
 
+/** Only a one-time Supabase recovery OTP can grant password-reset permission. */
 export const verifyRecoveryToken = createServerFn({ method: "POST" })
   .inputValidator((input: unknown) => recoverySchema.parse(input))
   .handler(async ({ data }) => {
     const payload = await authRequest("verify", { token_hash: data.tokenHash, type: "recovery" });
     saveTokens(payload);
-    return { success: true };
-  });
-
-/** Supabase's default recovery template redirects with tokens in the URL fragment. */
-export const acceptRecoverySession = createServerFn({ method: "POST" })
-  .inputValidator((input: unknown) => recoverySessionSchema.parse(input))
-  .handler(async ({ data }) => {
-    const user = await authRequest("user", undefined, data.accessToken);
-    if (typeof user["id"] !== "string") throw new Error("Invalid recovery session.");
-    saveTokens({ access_token: data.accessToken, refresh_token: data.refreshToken });
+    setCookie(RECOVERY, "1", {
+      httpOnly: true,
+      secure: process.env["NODE_ENV"] === "production",
+      sameSite: "lax",
+      path: "/",
+      maxAge: 600,
+    });
     return { success: true };
   });
 
@@ -197,7 +196,9 @@ export const changeRecoveredPassword = createServerFn({ method: "POST" })
   .inputValidator((input: unknown) => passwordSchema.parse(input))
   .handler(async ({ data }) => {
     const token = getCookie(ACCESS);
-    if (!token) throw new Error("Recovery session expired.");
+    if (!hasRecoveryAuthorization(token, getCookie(RECOVERY))) {
+      throw new Error("Recovery session expired.");
+    }
     const { url, publishableKey } = config();
     const response = await fetch(`${url}/auth/v1/user`, {
       method: "PUT",
