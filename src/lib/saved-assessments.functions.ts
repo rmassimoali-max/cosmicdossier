@@ -58,7 +58,10 @@ export const listSavedAssessments = createServerFn({ method: "GET" }).handler(as
     "?select=id,assessment_slug,display_label,result_version,scores,dossier_patch,source_label,created_at&order=created_at.desc&limit=100",
     "GET",
   );
-  return z.array(rowSchema).parse(payload);
+  return z.array(rowSchema).parse(payload).map(({ dossier_patch, ...row }) => ({
+    ...row,
+    dossier_patch_json: JSON.stringify(dossier_patch),
+  }));
 });
 
 export const saveAssessment = createServerFn({ method: "POST" })
@@ -75,7 +78,8 @@ export const saveAssessment = createServerFn({ method: "POST" })
     });
     const saved = z.array(rowSchema).parse(payload);
     if (saved.length !== 1) throw new Error("Assessment was not saved.");
-    return saved[0];
+    const { dossier_patch, ...row } = saved[0];
+    return { ...row, dossier_patch_json: JSON.stringify(dossier_patch) };
   });
 
 export const deleteSavedAssessment = createServerFn({ method: "POST" })
