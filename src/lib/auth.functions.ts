@@ -2,6 +2,7 @@ import { createServerFn } from "@tanstack/react-start";
 import { deleteCookie, getCookie, setCookie } from "@tanstack/react-start/server";
 import { z } from "zod";
 import { getAuthCallbackUrl, readSupabasePublicConfig } from "./supabase-config";
+import { hasRecoveryAuthorization } from "./recovery-guards";
 
 const ACCESS = "cd_auth_access";
 const REFRESH = "cd_auth_refresh";
@@ -222,7 +223,7 @@ export const changeRecoveredPassword = createServerFn({ method: "POST" })
   .inputValidator((input: unknown) => passwordSchema.parse(input))
   .handler(async ({ data }) => {
     const token = getCookie(ACCESS);
-    if (!token || getCookie(RECOVERY) !== "1") throw new Error("Recovery session expired.");
+    if (!hasRecoveryAuthorization(token, getCookie(RECOVERY))) throw new Error("Recovery session expired.");
     const { url, publishableKey } = config();
     const response = await fetch(`${url}/auth/v1/user`, {
       method: "PUT",
