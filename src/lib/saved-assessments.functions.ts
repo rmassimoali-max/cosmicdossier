@@ -78,7 +78,9 @@ export const saveAssessment = createServerFn({ method: "POST" })
     });
     const saved = z.array(rowSchema).parse(payload);
     if (saved.length !== 1) throw new Error("Assessment was not saved.");
-    const { dossier_patch, ...row } = saved[0];
+    const record = saved[0];
+    if (!record) throw new Error("Assessment was not saved.");
+    const { dossier_patch, ...row } = record;
     return { ...row, dossier_patch_json: JSON.stringify(dossier_patch) };
   });
 
