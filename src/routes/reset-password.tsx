@@ -5,6 +5,7 @@ import {
   changeRecoveredPassword,
   verifyRecoveryToken,
 } from "@/lib/auth.functions";
+import { recoveryTokenFromUrl } from "@/lib/recovery-guards";
 
 export const Route = createFileRoute("/reset-password")({
   head: () => ({
@@ -55,8 +56,7 @@ async function initializeRecovery(
 ): Promise<RecoveryResult> {
   const query = new URLSearchParams(window.location.search);
   const fragment = new URLSearchParams(window.location.hash.slice(1));
-  const tokenHash = query.get("token_hash") ?? fragment.get("token_hash");
-  const type = query.get("type") ?? fragment.get("type");
+  const tokenHash = recoveryTokenFromUrl(window.location.search, window.location.hash);
   const providerError =
     fragment.get("error_code") ??
     query.get("error_code") ??
@@ -82,7 +82,7 @@ async function initializeRecovery(
   }
   // Reject ordinary session fragments. Only Supabase verification of a recovery OTP
   // may establish password-reset authorization.
-  if (tokenHash && type === "recovery") {
+  if (tokenHash) {
     try {
       await verify({ data: { tokenHash } });
       return finish({ status: "ready" });
