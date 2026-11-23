@@ -58,10 +58,13 @@ export const listSavedAssessments = createServerFn({ method: "GET" }).handler(as
     "?select=id,assessment_slug,display_label,result_version,scores,dossier_patch,source_label,created_at&order=created_at.desc&limit=100",
     "GET",
   );
-  return z.array(rowSchema).parse(payload).map(({ dossier_patch, ...row }) => ({
-    ...row,
-    dossier_patch_json: JSON.stringify(dossier_patch),
-  }));
+  return z
+    .array(rowSchema)
+    .parse(payload)
+    .map(({ dossier_patch, ...row }) => ({
+      ...row,
+      dossier_patch_json: JSON.stringify(dossier_patch),
+    }));
 });
 
 export const saveAssessment = createServerFn({ method: "POST" })
