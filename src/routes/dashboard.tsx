@@ -44,9 +44,7 @@ const destinations = [
 function DashboardPage() {
   const getAccount = useServerFn(getCurrentAccount);
   const [email, setEmail] = useState<string | null>(null);
-  const [status, setStatus] = useState<"loading" | "signed-in" | "signed-out" | "error">(
-    "loading",
-  );
+  const [status, setStatus] = useState<"loading" | "signed-in" | "signed-out" | "error">("loading");
 
   useEffect(() => {
     let active = true;
@@ -89,9 +87,7 @@ function DashboardPage() {
             </div>
           ) : (
             <>
-              <p className="mt-5 text-muted-foreground">
-                Sign in to open your personal dashboard.
-              </p>
+              <p className="mt-5 text-muted-foreground">Sign in to open your personal dashboard.</p>
               <Link to="/sign-in" className="mt-5 inline-block text-sm text-primary">
                 Sign in to continue
               </Link>
@@ -121,8 +117,8 @@ function DashboardPage() {
           Continue your exploration
         </h2>
         <p className="mt-2 text-sm text-muted-foreground">
-          Your current assessments and reports remain on this device for now. Cloud saving is
-          coming in a future release.
+          Your current assessments and reports remain on this device for now. Cloud saving is coming
+          in a future release.
         </p>
         <div className="mt-5 grid gap-4 sm:grid-cols-2">
           {destinations.map((item) => (
