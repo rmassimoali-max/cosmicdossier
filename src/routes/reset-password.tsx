@@ -29,7 +29,6 @@ async function initializeRecovery(
   }>,
   verify: (options: { data: { tokenHash: string } }) => Promise<unknown>,
 ): Promise<RecoveryResult> {
-  const originalUrl = window.location.href;
   const query = new URLSearchParams(window.location.search);
   const fragment = new URLSearchParams(window.location.hash.slice(1));
   const tokenHash = query.get("token_hash") ?? fragment.get("token_hash");
@@ -43,12 +42,9 @@ async function initializeRecovery(
     query.get("error");
   const authorizationCode = query.get("code");
   const directToken = query.has("token") || fragment.has("token");
-  const finish = (result: RecoveryResult): RecoveryResult => {
-    if (window.location.href === originalUrl) {
-      window.history.replaceState(window.history.state, "", "/reset-password");
-    }
-    return result;
-  };
+  // Credentials are captured by this single shared attempt before removing them from the URL.
+  window.history.replaceState(window.history.state, "", "/reset-password");
+  const finish = (result: RecoveryResult): RecoveryResult => result;
   if (providerError) {
     return finish({
       status: "error",
