@@ -473,7 +473,8 @@ function Results({
       <div className="panel p-6">
         <h3 className="font-display text-xl text-foreground">Keep this result</h3>
         <p className="mt-2 text-sm text-muted-foreground">
-          Save to your account to access this assessment on other devices. The free results and Add to Dossier option remain available without saving.
+          Save to your account to access this assessment on other devices. The free results and Add to
+          Dossier option remain available without saving.
         </p>
         <button
           type="button"
