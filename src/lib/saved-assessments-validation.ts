@@ -1,10 +1,7 @@
 import { z } from "zod";
 import { testBySlug } from "./tests";
 
-const numericScores = z.record(
-  z.string().min(1).max(80),
-  z.number().finite().min(0).max(100),
-);
+const numericScores = z.record(z.string().min(1).max(80), z.number().finite().min(0).max(100));
 
 export const saveAssessmentSchema = z
   .object({
