@@ -1,4 +1,6 @@
 import { Link, useRouterState } from "@tanstack/react-router";
+import { useServerFn } from "@tanstack/react-start";
+import { getCurrentAccount, signOutAccount } from "@/lib/auth.functions";
 import { useEffect, useId, useRef, useState } from "react";
 import { CButton } from "@/components/cosmic/ui";
 import { ARCHETYPES } from "@/lib/archetypes";
@@ -46,13 +48,30 @@ export function SiteNav() {
   const [open, setOpen] = useState(false);
   const [expanded, setExpanded] = useState<Record<string, boolean>>({});
   const [checkoutActive, setCheckoutActive] = useState(false);
+  const [accountOpen, setAccountOpen] = useState(false);
+  const [accountEmail, setAccountEmail] = useState<string | null>(null);
+  const [accountStatus, setAccountStatus] = useState<"loading" | "ready" | "error">("loading");
+  const getAccount = useServerFn(getCurrentAccount);
+  const signOut = useServerFn(signOutAccount);
   const rootRef = useRef<HTMLDivElement>(null);
   const panelId = useId();
   const location = useRouterState({ select: (state) => state.location.href });
 
   useEffect(() => {
     setOpen(false);
-  }, [location]);
+    setAccountOpen(false);
+    let active = true;
+    void getAccount()
+      .then((account) => {
+        if (!active) return;
+        setAccountEmail(account.email);
+        setAccountStatus("ready");
+      })
+      .catch(() => {
+        if (active) setAccountStatus("error");
+      });
+    return () => { active = false; };
+  }, [location, getAccount]);
 
   useEffect(() => {
     if (!open) return;
@@ -137,6 +156,56 @@ export function SiteNav() {
           <path d="M4 6h16M4 12h16M4 18h16" />
         </svg>
       </CButton>
+      <div className="fixed top-3 right-3 z-40 max-w-[calc(100vw-5rem)] text-right">
+        {accountStatus === "loading" ? (
+          <span className="inline-flex min-h-11 items-center rounded-full border border-border bg-background/80 px-4 text-xs text-muted-foreground backdrop-blur">
+            Checking account…
+          </span>
+        ) : accountStatus === "error" ? (
+          <Link to="/account" className="inline-flex min-h-11 items-center rounded-full border border-border bg-background/80 px-4 text-xs text-primary backdrop-blur">
+            Check account
+          </Link>
+        ) : !accountEmail ? (
+          <Link to="/sign-in" className="inline-flex min-h-11 items-center rounded-full border border-border bg-background/80 px-4 text-sm text-primary backdrop-blur">
+            Sign in
+          </Link>
+        ) : (
+          <>
+            <button
+              type="button"
+              aria-expanded={accountOpen}
+              aria-controls="cosmic-account-menu"
+              onClick={() => setAccountOpen((current) => !current)}
+              className="inline-flex min-h-11 max-w-full items-center gap-2 rounded-full border border-border bg-background/90 px-4 py-2 text-left text-xs text-foreground backdrop-blur hover:border-primary/60"
+            >
+              <span className="min-w-0">
+                <span className="block text-[10px] text-primary">Your cosmic space</span>
+                <span className="block truncate">{accountEmail}</span>
+              </span>
+              <span aria-hidden="true">⌄</span>
+            </button>
+            {accountOpen ? (
+              <nav id="cosmic-account-menu" aria-label="Account" className="panel mt-2 ml-auto flex w-56 flex-col p-3 text-left">
+                <Link to="/dashboard" className="rounded px-3 py-2 text-sm hover:text-primary">My Dashboard</Link>
+                <Link to="/saved-assessments" className="rounded px-3 py-2 text-sm hover:text-primary">Saved Assessments</Link>
+                <Link to="/account" className="rounded px-3 py-2 text-sm hover:text-primary">Account Settings</Link>
+                <button
+                  type="button"
+                  className="rounded px-3 py-2 text-left text-sm text-muted-foreground hover:text-primary"
+                  onClick={() => {
+                    void signOut().then(() => {
+                      setAccountEmail(null);
+                      setAccountOpen(false);
+                    }).catch(() => setAccountStatus("error"));
+                  }}
+                >
+                  Sign out
+                </button>
+              </nav>
+            ) : null}
+          </>
+        )}
+      </div>
       <nav
         id={panelId}
         aria-label="Site"
