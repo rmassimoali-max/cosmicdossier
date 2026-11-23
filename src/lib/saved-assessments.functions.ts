@@ -43,7 +43,7 @@ async function authorizedRequest(
       "Content-Type": "application/json",
       Prefer: "return=representation",
     },
-    ...(body ? { body: JSON.stringify(body) } : {}),
+    ...(body ? { body: JSON.stringify({ ...body, user_id: userId }) } : {}),
     cache: "no-store",
   });
   if (!response.ok) {
