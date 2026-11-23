@@ -66,7 +66,9 @@ function TestFlow({ test, r, person }: { test: TestDef; r: string | undefined; p
   const navigate = useNavigate();
   const getAccount = useServerFn(getCurrentAccount);
   const save = useServerFn(saveAssessment);
-  const [saveStatus, setSaveStatus] = useState<"idle" | "saving" | "saved" | "error" | "sign-in">("idle");
+  const [saveStatus, setSaveStatus] = useState<"idle" | "saving" | "saved" | "error" | "sign-in">(
+    "idle",
+  );
 
   const saveToAccount = async () => {
     if (!scores || !test.dossierPatch || saveStatus === "saving") return;
@@ -471,8 +473,7 @@ function Results({
       <div className="panel p-6">
         <h3 className="font-display text-xl text-foreground">Keep this result</h3>
         <p className="mt-2 text-sm text-muted-foreground">
-          Save to your account to access this assessment on other devices. The free results
-          and Add to Dossier option remain available without saving.
+          Save to your account to access this assessment on other devices. The free results and Add to Dossier option remain available without saving.
         </p>
         <button
           type="button"
@@ -480,11 +481,18 @@ function Results({
           onClick={onSave}
           className="mt-4 rounded-full border border-primary px-5 py-2 text-sm text-primary disabled:opacity-50"
         >
-          {saveStatus === "saving" ? "Saving…" : saveStatus === "saved" ? "Saved to account" : "Save to my assessments"}
+          {saveStatus === "saving"
+            ? "Saving…"
+            : saveStatus === "saved"
+              ? "Saved to account"
+              : "Save to my assessments"}
         </button>
         {saveStatus === "sign-in" ? (
           <p className="mt-3 text-sm text-muted-foreground">
-            <Link to="/sign-in" className="text-primary">Sign in</Link> to save this result.
+            <Link to="/sign-in" className="text-primary">
+              Sign in
+            </Link>{" "}
+            to save this result.
           </p>
         ) : null}
         {saveStatus === "error" ? (
