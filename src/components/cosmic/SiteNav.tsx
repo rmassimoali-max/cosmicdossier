@@ -70,7 +70,9 @@ export function SiteNav() {
       .catch(() => {
         if (active) setAccountStatus("error");
       });
-    return () => { active = false; };
+    return () => {
+      active = false;
+    };
   }, [location, getAccount]);
 
   useEffect(() => {
@@ -162,11 +164,17 @@ export function SiteNav() {
             Checking account…
           </span>
         ) : accountStatus === "error" ? (
-          <Link to="/account" className="inline-flex min-h-11 items-center rounded-full border border-border bg-background/80 px-4 text-xs text-primary backdrop-blur">
+          <Link
+            to="/account"
+            className="inline-flex min-h-11 items-center rounded-full border border-border bg-background/80 px-4 text-xs text-primary backdrop-blur"
+          >
             Check account
           </Link>
         ) : !accountEmail ? (
-          <Link to="/sign-in" className="inline-flex min-h-11 items-center rounded-full border border-border bg-background/80 px-4 text-sm text-primary backdrop-blur">
+          <Link
+            to="/sign-in"
+            className="inline-flex min-h-11 items-center rounded-full border border-border bg-background/80 px-4 text-sm text-primary backdrop-blur"
+          >
             Sign in
           </Link>
         ) : (
@@ -185,18 +193,33 @@ export function SiteNav() {
               <span aria-hidden="true">⌄</span>
             </button>
             {accountOpen ? (
-              <nav id="cosmic-account-menu" aria-label="Account" className="panel mt-2 ml-auto flex w-56 flex-col p-3 text-left">
-                <Link to="/dashboard" className="rounded px-3 py-2 text-sm hover:text-primary">My Dashboard</Link>
-                <Link to="/saved-assessments" className="rounded px-3 py-2 text-sm hover:text-primary">Saved Assessments</Link>
-                <Link to="/account" className="rounded px-3 py-2 text-sm hover:text-primary">Account Settings</Link>
+              <nav
+                id="cosmic-account-menu"
+                aria-label="Account"
+                className="panel mt-2 ml-auto flex w-56 flex-col p-3 text-left"
+              >
+                <Link to="/dashboard" className="rounded px-3 py-2 text-sm hover:text-primary">
+                  My Dashboard
+                </Link>
+                <Link
+                  to="/saved-assessments"
+                  className="rounded px-3 py-2 text-sm hover:text-primary"
+                >
+                  Saved Assessments
+                </Link>
+                <Link to="/account" className="rounded px-3 py-2 text-sm hover:text-primary">
+                  Account Settings
+                </Link>
                 <button
                   type="button"
                   className="rounded px-3 py-2 text-left text-sm text-muted-foreground hover:text-primary"
                   onClick={() => {
-                    void signOut().then(() => {
-                      setAccountEmail(null);
-                      setAccountOpen(false);
-                    }).catch(() => setAccountStatus("error"));
+                    void signOut()
+                      .then(() => {
+                        setAccountEmail(null);
+                        setAccountOpen(false);
+                      })
+                      .catch(() => setAccountStatus("error"));
                   }}
                 >
                   Sign out
