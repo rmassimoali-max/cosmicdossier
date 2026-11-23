@@ -1,5 +1,5 @@
 import { createServerFn } from "@tanstack/react-start";
-import { getCookie } from "@tanstack/react-start/server";
+import { getCookie, setCookie } from "@tanstack/react-start/server";
 import { z } from "zod";
 import { readSupabasePublicConfig } from "./supabase-config";
 import { deriveAssessmentPatch, saveAssessmentSchema } from "./saved-assessments-validation";
@@ -21,16 +21,56 @@ async function authorizedRequest(
   method: "GET" | "POST" | "DELETE",
   body?: Record<string, unknown>,
 ) {
-  const token = getCookie("cd_auth_access");
-  if (!token) throw new Error("Sign in to access saved assessments.");
+  let token = getCookie("cd_auth_access");
   const config = readSupabasePublicConfig(process.env);
   if (!config) throw new Error("Account storage is not configured.");
 
-  // Verify the cookie against Supabase Auth, rather than decoding an untrusted JWT.
-  const userResponse = await fetch(`${config.url}/auth/v1/user`, {
-    headers: { apikey: config.publishableKey, Authorization: `Bearer ${token}` },
-    cache: "no-store",
-  });
+  // Match the account page's refresh behavior when the access cookie expires.
+  // A failed refresh never grants access; Supabase verifies the resulting token.
+  const verifyUser = async (access: string) =>
+    fetch(`${config.url}/auth/v1/user`, {
+      headers: { apikey: config.publishableKey, Authorization: `Bearer ${access}` },
+      cache: "no-store",
+    });
+  let userResponse = token ? await verifyUser(token) : null;
+  if (!userResponse?.ok) {
+    const refresh = getCookie("cd_auth_refresh");
+    if (!refresh) throw new Error("Sign in to access saved assessments.");
+    const refreshed = await fetch(`${config.url}/auth/v1/token?grant_type=refresh_token`, {
+      method: "POST",
+      headers: { apikey: config.publishableKey, "Content-Type": "application/json" },
+      body: JSON.stringify({ refresh_token: refresh }),
+      cache: "no-store",
+    });
+    if (!refreshed.ok) throw new Error("Your session has expired. Please sign in again.");
+    const session = (await refreshed.json()) as {
+      access_token?: unknown;
+      refresh_token?: unknown;
+      expires_in?: unknown;
+    };
+    if (typeof session.access_token !== "string" || typeof session.refresh_token !== "string") {
+      throw new Error("Your session has expired. Please sign in again.");
+    }
+    token = session.access_token;
+    const cookieOptions = {
+      httpOnly: true,
+      secure: process.env["NODE_ENV"] === "production",
+      sameSite: "lax" as const,
+      path: "/",
+    };
+    setCookie("cd_auth_access", token, {
+      ...cookieOptions,
+      maxAge:
+        typeof session.expires_in === "number"
+          ? Math.min(Math.max(session.expires_in, 60), 3600)
+          : 3600,
+    });
+    setCookie("cd_auth_refresh", session.refresh_token, {
+      ...cookieOptions,
+      maxAge: 60 * 60 * 24 * 30,
+    });
+    userResponse = await verifyUser(token);
+  }
   if (!userResponse.ok) throw new Error("Your session has expired. Please sign in again.");
   const user = (await userResponse.json()) as { id?: unknown };
   const userId = uuidSchema.parse(user.id);
