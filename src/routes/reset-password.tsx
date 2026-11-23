@@ -2,7 +2,6 @@ import { createFileRoute, Link } from "@tanstack/react-router";
 import { useServerFn } from "@tanstack/react-start";
 import { useEffect, useState } from "react";
 import {
-  acceptRecoverySession,
   changeRecoveredPassword,
   verifyRecoveryToken,
 } from "@/lib/auth.functions";
@@ -52,26 +51,24 @@ function classifyRecoveryRequestError(error: unknown): string {
 type RecoveryWindow = Window & { __cdRecoveryAttempt?: Promise<RecoveryResult> };
 
 async function initializeRecovery(
-  accept: (options: { data: { accessToken: string; refreshToken: string } }) => Promise<{
-    success: boolean;
-    reason?: "provider_validation_failed" | "invalid_user_response" | "session_cookie_failed";
-  }>,
   verify: (options: { data: { tokenHash: string } }) => Promise<unknown>,
 ): Promise<RecoveryResult> {
   const query = new URLSearchParams(window.location.search);
   const fragment = new URLSearchParams(window.location.hash.slice(1));
   const tokenHash = query.get("token_hash") ?? fragment.get("token_hash");
   const type = query.get("type") ?? fragment.get("type");
-  const accessToken = fragment.get("access_token");
-  const refreshToken = fragment.get("refresh_token");
   const providerError =
     fragment.get("error_code") ??
     query.get("error_code") ??
     fragment.get("error") ??
     query.get("error");
   const authorizationCode = query.get("code");
-  const directToken = query.has("token") || fragment.has("token");
-  // Credentials are captured by this single shared attempt before removing them from the URL.
+  const directToken =
+    query.has("token") ||
+    fragment.has("token") ||
+    fragment.has("access_token") ||
+    fragment.has("refresh_token");
+  // Capture the recovery-only token hash, then immediately clear credentials from the URL.
   window.history.replaceState(window.history.state, "", "/reset-password");
   const finish = rememberRecoveryResult;
   if (providerError) {
@@ -83,6 +80,8 @@ async function initializeRecovery(
           : "Supabase could not complete this recovery link. Please request a new one.",
     });
   }
+  // Reject ordinary session fragments. Only Supabase verification of a recovery OTP
+  // may establish password-reset authorization.
   if (tokenHash && type === "recovery") {
     try {
       await verify({ data: { tokenHash } });
@@ -91,26 +90,6 @@ async function initializeRecovery(
       return finish({
         status: "error",
         message: "Recovery token verification failed. Please request a fresh link.",
-      });
-    }
-  }
-  if (accessToken && refreshToken && type === "recovery") {
-    try {
-      const result = await accept({ data: { accessToken, refreshToken } });
-      if (result.success) return finish({ status: "ready" });
-      return finish({
-        status: "error",
-        message:
-          result.reason === "provider_validation_failed"
-            ? "Supabase rejected the recovery session during validation. Please request a fresh link."
-            : result.reason === "session_cookie_failed"
-              ? "The server could not establish recovery cookies. Please request a fresh link."
-              : "Supabase returned an unexpected recovery user response. Please request a fresh link.",
-      });
-    } catch (error) {
-      return finish({
-        status: "error",
-        message: classifyRecoveryRequestError(error),
       });
     }
   }
@@ -125,7 +104,6 @@ async function initializeRecovery(
 }
 
 function ResetPassword() {
-  const accept = useServerFn(acceptRecoverySession);
   const verify = useServerFn(verifyRecoveryToken);
   const change = useServerFn(changeRecoveredPassword);
   const [status, setStatus] = useState<"checking" | "ready" | "error" | "done">("checking");
@@ -143,7 +121,7 @@ function ResetPassword() {
     const hasNewRedirect = Boolean(window.location.search || window.location.hash);
     if (hasNewRedirect) {
       window.sessionStorage.removeItem(RECOVERY_RESULT_KEY);
-      recoveryWindow.__cdRecoveryAttempt = initializeRecovery(accept, verify);
+      recoveryWindow.__cdRecoveryAttempt = initializeRecovery(verify);
     } else if (!recoveryWindow.__cdRecoveryAttempt) {
       const prior = window.sessionStorage.getItem(RECOVERY_RESULT_KEY);
       let previousResult: RecoveryResult | undefined;
@@ -177,7 +155,7 @@ function ResetPassword() {
     return () => {
       active = false;
     };
-  }, [accept, verify]);
+  }, [verify]);
   async function submit(event: React.FormEvent<HTMLFormElement>) {
     event.preventDefault();
     if (pending || password !== confirm) {
