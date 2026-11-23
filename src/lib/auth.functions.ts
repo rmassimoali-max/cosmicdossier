@@ -196,15 +196,20 @@ export const verifyRecoveryToken = createServerFn({ method: "POST" })
 export const acceptRecoverySession = createServerFn({ method: "POST" })
   .inputValidator((input: unknown) => recoverySessionSchema.parse(input))
   .handler(async ({ data }) => {
+    // Safe, stage-only diagnostics: never log tokens, passwords, emails or URLs.
+    console.info("[recovery] session handler started");
     let user: Record<string, unknown>;
     try {
       user = await authRequest("user", undefined, data.accessToken);
     } catch {
+      console.warn("[recovery] provider user validation failed");
       return { success: false as const, reason: "provider_validation_failed" as const };
     }
     if (typeof user["id"] !== "string") {
+      console.warn("[recovery] provider user response missing id");
       return { success: false as const, reason: "invalid_user_response" as const };
     }
+    console.info("[recovery] provider validation passed");
     try {
       saveTokens({ access_token: data.accessToken, refresh_token: data.refreshToken });
       setCookie(RECOVERY, "1", {
@@ -215,9 +220,11 @@ export const acceptRecoverySession = createServerFn({ method: "POST" })
         maxAge: 600,
       });
     } catch {
+      console.error("[recovery] session cookie creation failed");
       clearTokens();
       return { success: false as const, reason: "session_cookie_failed" as const };
     }
+    console.info("[recovery] session handler completed");
     return { success: true };
   });
 
