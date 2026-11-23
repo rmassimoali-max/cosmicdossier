@@ -1,6 +1,6 @@
 import { createFileRoute, Link } from "@tanstack/react-router";
 import { useServerFn } from "@tanstack/react-start";
-import { useEffect, useRef, useState } from "react";
+import { useEffect, useState } from "react";
 import {
   acceptRecoverySession,
   changeRecoveredPassword,
@@ -16,12 +16,92 @@ export const Route = createFileRoute("/reset-password")({
   }),
   component: ResetPassword,
 });
+type RecoveryResult = { status: "ready" | "error"; message?: string };
+
+// Shared across component remounts within this browser page, never across users or SSR requests.
+// Only the settled result is retained; tokens are not stored in browser storage.
+let recoveryAttempt: Promise<RecoveryResult> | undefined;
+
+async function initializeRecovery(
+  accept: (options: { data: { accessToken: string; refreshToken: string } }) => Promise<{
+    success: boolean;
+    reason?: "provider_validation_failed" | "invalid_user_response";
+  }>,
+  verify: (options: { data: { tokenHash: string } }) => Promise<unknown>,
+): Promise<RecoveryResult> {
+  const originalUrl = window.location.href;
+  const query = new URLSearchParams(window.location.search);
+  const fragment = new URLSearchParams(window.location.hash.slice(1));
+  const tokenHash = query.get("token_hash") ?? fragment.get("token_hash");
+  const type = query.get("type") ?? fragment.get("type");
+  const accessToken = fragment.get("access_token");
+  const refreshToken = fragment.get("refresh_token");
+  const providerError =
+    fragment.get("error_code") ??
+    query.get("error_code") ??
+    fragment.get("error") ??
+    query.get("error");
+  const authorizationCode = query.get("code");
+  const directToken = query.has("token") || fragment.has("token");
+  const finish = (result: RecoveryResult): RecoveryResult => {
+    if (window.location.href === originalUrl) {
+      window.history.replaceState(window.history.state, "", "/reset-password");
+    }
+    return result;
+  };
+  if (providerError) {
+    return finish({
+      status: "error",
+      message:
+        providerError === "otp_expired"
+          ? "This recovery link has expired or was already used. Please request a new one."
+          : "Supabase could not complete this recovery link. Please request a new one.",
+    });
+  }
+  if (tokenHash && type === "recovery") {
+    try {
+      await verify({ data: { tokenHash } });
+      return finish({ status: "ready" });
+    } catch {
+      return finish({
+        status: "error",
+        message: "Recovery token verification failed. Please request a fresh link.",
+      });
+    }
+  }
+  if (accessToken && refreshToken && type === "recovery") {
+    try {
+      const result = await accept({ data: { accessToken, refreshToken } });
+      if (result.success) return finish({ status: "ready" });
+      return finish({
+        status: "error",
+        message:
+          result.reason === "provider_validation_failed"
+            ? "Supabase rejected the recovery session during validation. Please request a fresh link."
+            : "Supabase returned an unexpected recovery user response. Please request a fresh link.",
+      });
+    } catch {
+      return finish({
+        status: "error",
+        message: "The recovery validation request failed before completion. Please request a fresh link.",
+      });
+    }
+  }
+  return finish({
+    status: "error",
+    message: authorizationCode
+      ? "This recovery link uses an unsupported sign-in code. Please request a new link."
+      : directToken
+        ? "The recovery link contained a token in an unsupported format. Please request a new one."
+        : "No recovery credentials were found in this link. Please request a new one.",
+  });
+}
+
 function ResetPassword() {
   const accept = useServerFn(acceptRecoverySession);
   const verify = useServerFn(verifyRecoveryToken);
   const change = useServerFn(changeRecoveredPassword);
   const [status, setStatus] = useState<"checking" | "ready" | "error" | "done">("checking");
-  const recoveryAttempted = useRef(false);
   const [password, setPassword] = useState("");
   const [confirm, setConfirm] = useState("");
   const [pending, setPending] = useState(false);
@@ -30,82 +110,21 @@ function ResetPassword() {
     "This recovery link is invalid or expired. Please request a new one.",
   );
   useEffect(() => {
-    // A recovery token is single-use. React may run effects twice in development.
-    if (recoveryAttempted.current) return;
-    recoveryAttempted.current = true;
-    const query = new URLSearchParams(window.location.search);
-    const fragment = new URLSearchParams(window.location.hash.slice(1));
-    const tokenHash = query.get("token_hash") ?? fragment.get("token_hash");
-    const type = query.get("type") ?? fragment.get("type");
-    const accessToken = fragment.get("access_token");
-    const refreshToken = fragment.get("refresh_token");
-    const providerError =
-      fragment.get("error_code") ??
-      query.get("error_code") ??
-      fragment.get("error") ??
-      query.get("error");
-    const authorizationCode = query.get("code");
-    const directToken = query.has("token") || fragment.has("token");
-    // Keep the original redirect intact until the recovery attempt has settled.
-    // Clearing it before validation can hide the credentials during initialization.
-    const clearRecoveryUrl = () => {
-      window.history.replaceState(null, "", "/reset-password");
-    };
-    if (providerError) {
-      setLinkError(
-        providerError === "otp_expired"
-          ? "This recovery link has expired or was already used. Please request a new one."
-          : "Supabase could not complete this recovery link. Please request a new one.",
-      );
-      clearRecoveryUrl();
-      setStatus("error");
-    } else if (tokenHash && type === "recovery") {
-      void verify({ data: { tokenHash } })
-        .then(() => {
-          clearRecoveryUrl();
-          setStatus("ready");
-        })
-        .catch(() => {
-          clearRecoveryUrl();
-          setLinkError("Recovery token verification failed. Please request a fresh link.");
-          setStatus("error");
-        });
-    } else if (accessToken && refreshToken && type === "recovery") {
-      void accept({ data: { accessToken, refreshToken } })
-        .then((result) => {
-          clearRecoveryUrl();
-          if (result.success) {
-            setStatus("ready");
-            return;
-          }
-          setLinkError(
-            result.reason === "provider_validation_failed"
-              ? "Supabase rejected the recovery session during validation. Please request a fresh link."
-              : "Supabase returned an unexpected recovery user response. Please request a fresh link.",
-          );
-          setStatus("error");
-        })
-        .catch(() => {
-          clearRecoveryUrl();
-          setLinkError(
-            "The recovery validation request failed before completion. Please request a fresh link.",
-          );
-          setStatus("error");
-        });
-    } else {
-      if (authorizationCode)
-        setLinkError(
-          "This recovery link uses an unsupported sign-in code. Please request a new link.",
-        );
-      else if (directToken)
-        setLinkError(
-          "The recovery link contained a token in an unsupported format. Please request a new one.",
-        );
-      else if (!tokenHash && !accessToken)
-        setLinkError("No recovery credentials were found in this link. Please request a new one.");
-      clearRecoveryUrl();
-      setStatus("error");
+    // Reuse an in-flight or settled attempt if React remounts this route.
+    // A fresh redirect with credentials starts a new attempt.
+    const hasNewRedirect = Boolean(window.location.search || window.location.hash);
+    if (!recoveryAttempt || hasNewRedirect) {
+      recoveryAttempt = initializeRecovery(accept, verify);
     }
+    let active = true;
+    void recoveryAttempt.then((result) => {
+      if (!active) return;
+      if (result.message) setLinkError(result.message);
+      setStatus(result.status);
+    });
+    return () => {
+      active = false;
+    };
   }, [accept, verify]);
   async function submit(event: React.FormEvent<HTMLFormElement>) {
     event.preventDefault();
