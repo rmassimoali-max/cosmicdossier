@@ -11,10 +11,14 @@ describe("recovery-only browser link acceptance", () => {
     expect(recoveryTokenFromUrl(`?token_hash=${hash}&type=recovery`, "")).toBe(hash);
   });
   test("rejects an ordinary authenticated session, even if labeled recovery", () => {
-    expect(recoveryTokenFromUrl("", "#access_token=ordinary&refresh_token=ordinary&type=recovery")).toBeNull();
+    expect(
+      recoveryTokenFromUrl("", "#access_token=ordinary&refresh_token=ordinary&type=recovery"),
+    ).toBeNull();
   });
   test("rejects a recovery hash combined with an ordinary access token", () => {
-    expect(recoveryTokenFromUrl("", `#token_hash=${hash}&type=recovery&access_token=ordinary`)).toBeNull();
+    expect(
+      recoveryTokenFromUrl("", `#token_hash=${hash}&type=recovery&access_token=ordinary`),
+    ).toBeNull();
   });
   test("rejects signup and magic-link token hashes", () => {
     expect(recoveryTokenFromUrl("", `#token_hash=${hash}&type=signup`)).toBeNull();
