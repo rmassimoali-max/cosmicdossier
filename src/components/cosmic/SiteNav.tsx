@@ -17,6 +17,7 @@ const SECTIONS: NavSection[] = [
   { label: "Start My Report", to: "/input", prominent: true },
   { label: "Home", to: "/" },
   { label: "Test Library", to: "/tests" },
+  { label: "My Dashboard", to: "/dashboard" },
   { label: "My Account", to: "/account" },
   { label: "MBTI Types", to: "/mbti" },
   { label: "Zodiac Signs", to: "/zodiac" },
