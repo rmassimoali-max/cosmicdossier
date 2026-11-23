@@ -54,7 +54,7 @@ type RecoveryWindow = Window & { __cdRecoveryAttempt?: Promise<RecoveryResult> }
 async function initializeRecovery(
   accept: (options: { data: { accessToken: string; refreshToken: string } }) => Promise<{
     success: boolean;
-    reason?: "provider_validation_failed" | "invalid_user_response";
+    reason?: "provider_validation_failed" | "invalid_user_response" | "session_cookie_failed";
   }>,
   verify: (options: { data: { tokenHash: string } }) => Promise<unknown>,
 ): Promise<RecoveryResult> {
@@ -103,7 +103,9 @@ async function initializeRecovery(
         message:
           result.reason === "provider_validation_failed"
             ? "Supabase rejected the recovery session during validation. Please request a fresh link."
-            : "Supabase returned an unexpected recovery user response. Please request a fresh link.",
+            : result.reason === "session_cookie_failed"
+              ? "The server could not establish recovery cookies. Please request a fresh link."
+              : "Supabase returned an unexpected recovery user response. Please request a fresh link.",
       });
     } catch (error) {
       return finish({
