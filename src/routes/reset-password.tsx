@@ -79,7 +79,8 @@ async function initializeRecovery(
     } catch {
       return finish({
         status: "error",
-        message: "The recovery validation request failed before completion. Please request a fresh link.",
+        message:
+          "The recovery validation request failed before completion. Please request a fresh link.",
       });
     }
   }
