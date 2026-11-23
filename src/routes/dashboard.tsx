@@ -17,9 +17,9 @@ export const Route = createFileRoute("/dashboard")({
 const destinations = [
   {
     title: "My Assessments",
-    description: "Explore the test library and continue discovering your personality.",
-    to: "/tests",
-    action: "Browse assessments",
+    description: "View saved assessment results, restore them to your dossier, or delete them.",
+    to: "/saved-assessments",
+    action: "View saved assessments",
   },
   {
     title: "My Dossiers",
@@ -118,8 +118,8 @@ function DashboardPage() {
           Continue your exploration
         </h2>
         <p className="mt-2 text-sm text-muted-foreground">
-          Your current assessments and reports remain on this device for now. Cloud saving is coming
-          in a future release.
+          Your saved assessments can sync across devices. Dossiers and reports remain on this device
+          for now.
         </p>
         <div className="mt-5 grid gap-4 sm:grid-cols-2">
           {destinations.map((item) => (
