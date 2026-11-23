@@ -17,6 +17,27 @@ export const Route = createFileRoute("/reset-password")({
   component: ResetPassword,
 });
 type RecoveryResult = { status: "ready" | "error"; message?: string };
+const RECOVERY_RESULT_KEY = "cd_recovery_last_result";
+
+function rememberRecoveryResult(result: RecoveryResult): RecoveryResult {
+  // Store only a safe outcome, never a token, password, or URL.
+  if (result.status === "error") {
+    window.sessionStorage.setItem(RECOVERY_RESULT_KEY, JSON.stringify(result));
+  } else {
+    window.sessionStorage.removeItem(RECOVERY_RESULT_KEY);
+  }
+  return result;
+}
+
+function classifyRecoveryRequestError(error: unknown): string {
+  if (error instanceof TypeError) {
+    return "The recovery server request could not connect. Please try again later.";
+  }
+  if (error instanceof Error && error.name === "ZodError") {
+    return "The recovery server rejected the request format. Please request a fresh link.";
+  }
+  return "The recovery server request failed. Please request a fresh link.";
+}
 
 // Shared across component remounts within this browser page, never across users or SSR requests.
 // Only the settled result is retained; tokens are not stored in browser storage.
@@ -44,7 +65,7 @@ async function initializeRecovery(
   const directToken = query.has("token") || fragment.has("token");
   // Credentials are captured by this single shared attempt before removing them from the URL.
   window.history.replaceState(window.history.state, "", "/reset-password");
-  const finish = (result: RecoveryResult): RecoveryResult => result;
+  const finish = rememberRecoveryResult;
   if (providerError) {
     return finish({
       status: "error",
@@ -76,11 +97,10 @@ async function initializeRecovery(
             ? "Supabase rejected the recovery session during validation. Please request a fresh link."
             : "Supabase returned an unexpected recovery user response. Please request a fresh link.",
       });
-    } catch {
+    } catch (error) {
       return finish({
         status: "error",
-        message:
-          "The recovery validation request failed before completion. Please request a fresh link.",
+        message: classifyRecoveryRequestError(error),
       });
     }
   }
@@ -110,8 +130,32 @@ function ResetPassword() {
     // Reuse an in-flight or settled attempt if React remounts this route.
     // A fresh redirect with credentials starts a new attempt.
     const hasNewRedirect = Boolean(window.location.search || window.location.hash);
-    if (!recoveryAttempt || hasNewRedirect) {
+    if (hasNewRedirect) {
+      window.sessionStorage.removeItem(RECOVERY_RESULT_KEY);
       recoveryAttempt = initializeRecovery(accept, verify);
+    } else if (!recoveryAttempt) {
+      const prior = window.sessionStorage.getItem(RECOVERY_RESULT_KEY);
+      let previousResult: RecoveryResult | undefined;
+      if (prior) {
+        try {
+          const parsed: unknown = JSON.parse(prior);
+          if (
+            parsed &&
+            typeof parsed === "object" &&
+            "status" in parsed &&
+            parsed.status === "error" &&
+            "message" in parsed &&
+            typeof parsed.message === "string"
+          ) {
+            previousResult = { status: "error", message: parsed.message };
+          }
+        } catch {
+          window.sessionStorage.removeItem(RECOVERY_RESULT_KEY);
+        }
+      }
+      recoveryAttempt = previousResult
+        ? Promise.resolve(previousResult)
+        : initializeRecovery(accept, verify);
     }
     let active = true;
     void recoveryAttempt.then((result) => {
