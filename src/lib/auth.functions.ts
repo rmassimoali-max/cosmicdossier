@@ -167,12 +167,39 @@ export const requestPasswordReset = createServerFn({ method: "POST" })
   .handler(async ({ data }) => {
     const siteUrl = process.env["AUTH_SITE_URL"] ?? "https://www.cosmicdossier.com";
     const redirectTo = new URL("/reset-password", siteUrl).toString();
+    // Diagnostic stages only. Never log emails, URLs, keys, tokens, or response bodies.
+    console.info("[recovery-request] handler started");
     try {
-      await authRequest(`recover?redirect_to=${encodeURIComponent(redirectTo)}`, {
-        email: data.email,
-      });
-    } catch {
-      // Do not expose account existence or provider-specific recovery errors.
+      const { url, publishableKey } = config();
+      console.info("[recovery-request] provider configuration available");
+      const response = await fetch(
+        `${url}/auth/v1/recover?redirect_to=${encodeURIComponent(redirectTo)}`,
+        {
+          method: "POST",
+          headers: {
+            apikey: publishableKey,
+            "Content-Type": "application/json",
+          },
+          body: JSON.stringify({ email: data.email }),
+          cache: "no-store",
+        },
+      );
+      if (response.ok) {
+        console.info("[recovery-request] provider accepted request");
+      } else {
+        console.warn("[recovery-request] provider rejected request", response.status);
+      }
+    } catch (error) {
+      // Keep the public response neutral to prevent account enumeration.
+      // Only log a coarse failure category, never exception messages.
+      console.warn(
+        "[recovery-request] request failed",
+        error instanceof Error && error.message === "Account sign-in is not configured yet."
+          ? "missing_configuration"
+          : error instanceof Error && error.message === "Invalid Supabase public configuration"
+            ? "invalid_configuration"
+            : "request_or_network_error",
+      );
     }
     return { sent: true };
   });
