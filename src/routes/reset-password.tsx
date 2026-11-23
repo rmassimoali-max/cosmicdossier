@@ -36,12 +36,20 @@ function classifyRecoveryRequestError(error: unknown): string {
   if (error instanceof Error && error.name === "ZodError") {
     return "The recovery server rejected the request format. Please request a fresh link.";
   }
-  return "The recovery server request failed. Please request a fresh link.";
+  // Only display a fixed diagnostic category. Never surface exception messages:
+  // transport errors can include sensitive request details.
+  if (error instanceof Error) {
+    if (error.name === "AbortError") {
+      return "The recovery request was interrupted. Please request a fresh link.";
+    }
+    return "The recovery server returned an application error. Please request a fresh link.";
+  }
+  return "The recovery server returned an unexpected error. Please request a fresh link.";
 }
 
-// Shared across component remounts within this browser page, never across users or SSR requests.
-// Only the settled result is retained; tokens are not stored in browser storage.
-let recoveryAttempt: Promise<RecoveryResult> | undefined;
+// The in-flight attempt belongs to this browser window, not a server module.
+// A remount can reuse it without persisting credentials in browser storage.
+type RecoveryWindow = Window & { __cdRecoveryAttempt?: Promise<RecoveryResult> };
 
 async function initializeRecovery(
   accept: (options: { data: { accessToken: string; refreshToken: string } }) => Promise<{
@@ -129,11 +137,12 @@ function ResetPassword() {
   useEffect(() => {
     // Reuse an in-flight or settled attempt if React remounts this route.
     // A fresh redirect with credentials starts a new attempt.
+    const recoveryWindow = window as RecoveryWindow;
     const hasNewRedirect = Boolean(window.location.search || window.location.hash);
     if (hasNewRedirect) {
       window.sessionStorage.removeItem(RECOVERY_RESULT_KEY);
-      recoveryAttempt = initializeRecovery(accept, verify);
-    } else if (!recoveryAttempt) {
+      recoveryWindow.__cdRecoveryAttempt = initializeRecovery(accept, verify);
+    } else if (!recoveryWindow.__cdRecoveryAttempt) {
       const prior = window.sessionStorage.getItem(RECOVERY_RESULT_KEY);
       let previousResult: RecoveryResult | undefined;
       if (prior) {
@@ -153,12 +162,12 @@ function ResetPassword() {
           window.sessionStorage.removeItem(RECOVERY_RESULT_KEY);
         }
       }
-      recoveryAttempt = previousResult
+      recoveryWindow.__cdRecoveryAttempt = previousResult
         ? Promise.resolve(previousResult)
         : initializeRecovery(accept, verify);
     }
     let active = true;
-    void recoveryAttempt.then((result) => {
+    void recoveryWindow.__cdRecoveryAttempt?.then((result) => {
       if (!active) return;
       if (result.message) setLinkError(result.message);
       setStatus(result.status);
