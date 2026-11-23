@@ -26,7 +26,10 @@ export const saveAssessmentSchema = z
     const expectedKeys = test.dimensions.map((dimension) => dimension.key).sort();
     const matchesDimensions =
       actualKeys.length === expectedKeys.length &&
-      actualKeys.slice().sort().every((key, index) => key === expectedKeys[index]);
+      actualKeys
+        .slice()
+        .sort()
+        .every((key, index) => key === expectedKeys[index]);
     const matchesMbti =
       data.assessmentSlug === "mbti" &&
       actualKeys.length === 16 &&
