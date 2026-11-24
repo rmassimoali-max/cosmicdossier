@@ -36,6 +36,29 @@ describe("deletion backend activation gate", () => {
     }
   });
 
+  test("configuration errors never echo secrets or database credentials", () => {
+    const password = "very-private-db-password";
+    const apiKey = "re_super_private_provider_key";
+    const hmac = "ab".repeat(32);
+    const badConfig = {
+      ...valid,
+      DELETION_DATABASE_URL:
+        `postgresql://deletion_worker:${password}@db.example.com/postgres?sslmode=disable`,
+      RESEND_API_KEY: apiKey,
+      DELETION_CODE_HMAC_SECRET: hmac,
+    };
+    let message = "";
+    try {
+      readDeletionBackendConfig(badConfig);
+    } catch (error) {
+      message = String(error);
+    }
+    expect(message).toContain("Deletion database");
+    for (const sensitive of [password, apiKey, hmac, badConfig.DELETION_DATABASE_URL]) {
+      expect(message).not.toContain(sensitive);
+    }
+  });
+
   test("accepts fully configured server-only settings without connecting", () => {
     const result = readDeletionBackendConfig(valid);
     expect(result?.email.from).toBe(valid.DELETION_EMAIL_FROM);
