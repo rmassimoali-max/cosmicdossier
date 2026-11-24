@@ -14,8 +14,8 @@ declare
   v_attempts integer;
 begin
   insert into auth.users(id) values (v_user), (v_other);
-  insert into public.account_deletion_challenges(user_id, token_hash, expires_at)
-  values (v_user, v_hash, now() + interval '10 minutes')
+  insert into public.account_deletion_challenges(user_id, token_hash, expires_at, delivered_at)
+  values (v_user, v_hash, now() + interval '10 minutes', now())
   returning id into v_challenge;
 
   if private.consume_account_deletion_challenge(v_challenge, v_other, v_hash) then
@@ -56,16 +56,16 @@ begin
   end if;
 
   -- Expired challenges must fail even when the supplied hash matches.
-  insert into public.account_deletion_challenges(user_id, token_hash, created_at, expires_at)
-  values (v_user, v_hash, now() - interval '11 minutes', now() - interval '1 minute')
+  insert into public.account_deletion_challenges(user_id, token_hash, created_at, expires_at, delivered_at)
+  values (v_user, v_hash, now() - interval '11 minutes', now() - interval '1 minute', now() - interval '10 minutes')
   returning id into v_challenge;
   if private.consume_account_deletion_challenge(v_challenge, v_user, v_hash) then
     raise exception 'Expired challenge was accepted';
   end if;
 
   -- Five failed attempts lock the challenge, including the correct token.
-  insert into public.account_deletion_challenges(user_id, token_hash, expires_at)
-  values (v_user, v_hash, now() + interval '10 minutes')
+  insert into public.account_deletion_challenges(user_id, token_hash, expires_at, delivered_at)
+  values (v_user, v_hash, now() + interval '10 minutes', now())
   returning id into v_challenge;
   for i in 1..5 loop
     if private.consume_account_deletion_challenge(v_challenge, v_user, v_bad_hash) then
@@ -91,8 +91,8 @@ begin
   end if;
 
   -- Malformed and absent hashes are rejected before attempting consumption.
-  insert into public.account_deletion_challenges(user_id, token_hash, expires_at)
-  values (v_user, v_hash, now() + interval '10 minutes')
+  insert into public.account_deletion_challenges(user_id, token_hash, expires_at, delivered_at)
+  values (v_user, v_hash, now() + interval '10 minutes', now())
   returning id into v_challenge;
   if private.consume_account_deletion_challenge(v_challenge, v_user, 'not-a-sha256-hash')
      or private.consume_account_deletion_challenge(v_challenge, v_user, null) then
@@ -123,8 +123,8 @@ begin
   end if;
 
   -- Successful exchange consumes the challenge and issues one authorization.
-  insert into public.account_deletion_challenges(user_id, token_hash, expires_at)
-  values (v_user, repeat('1',64), now() + interval '10 minutes')
+  insert into public.account_deletion_challenges(user_id, token_hash, expires_at, delivered_at)
+  values (v_user, repeat('1',64), now() + interval '10 minutes', now())
   returning id into v_challenge;
   v_exchange := private.exchange_account_deletion_challenge(
     v_challenge, v_user, repeat('1',64), repeat('2',64)
@@ -153,8 +153,8 @@ begin
   -- A uniqueness failure during issuance must roll back challenge consumption.
   -- The exception block is a PostgreSQL subtransaction, mirroring a failed
   -- application transaction while allowing subsequent assertions.
-  insert into public.account_deletion_challenges(user_id, token_hash, expires_at)
-  values (v_user, repeat('4',64), now() + interval '10 minutes')
+  insert into public.account_deletion_challenges(user_id, token_hash, expires_at, delivered_at)
+  values (v_user, repeat('4',64), now() + interval '10 minutes', now())
   returning id into v_challenge;
   begin
     perform private.exchange_account_deletion_challenge(
