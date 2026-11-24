@@ -83,7 +83,8 @@ function AccountPage() {
                     .finally(() => setBusy(false));
                 }}
               >
-                <label htmlFor="account-display-name" className="block text-sm text-muted-foreground">
+                <label htmlFor="account-display-name"
+                  className="block text-sm text-muted-foreground">
                   Display name
                 </label>
                 <input
@@ -95,7 +96,9 @@ function AccountPage() {
                   className="w-full rounded-lg border border-border bg-background px-3 py-3 text-sm"
                   placeholder="How should we address you?"
                 />
-                <button type="submit" disabled={busy} className="rounded-full border border-primary px-5 py-2 text-sm text-primary disabled:opacity-50">
+                <button type="submit"
+                  disabled={busy}
+                  className="rounded-full border border-primary px-5 py-2 text-sm text-primary disabled:opacity-50">
                   Save display name
                 </button>
               </form>
@@ -111,7 +114,9 @@ function AccountPage() {
                   setNotice("");
                   void changeEmail({ data: { email: newEmail } })
                     .then(() => {
-                      setNotice("Email change requested. Check your inbox for confirmation instructions.");
+                      setNotice(
+                        "Email change requested. Check your inbox for confirmation instructions.",
+                      );
                       setNewEmail("");
                     })
                     .catch(() => setError("Could not request an email change."))
@@ -131,7 +136,9 @@ function AccountPage() {
                   className="w-full rounded-lg border border-border bg-background px-3 py-3 text-sm"
                   placeholder="new@example.com"
                 />
-                <button type="submit" disabled={busy} className="rounded-full border border-primary px-5 py-2 text-sm text-primary disabled:opacity-50">
+                <button type="submit"
+                  disabled={busy}
+                  className="rounded-full border border-primary px-5 py-2 text-sm text-primary disabled:opacity-50">
                   Request email change
                 </button>
               </form>
@@ -147,7 +154,11 @@ function AccountPage() {
                   setError("");
                   setNotice("");
                   void resetPassword({ data: { email } })
-                    .then(() => setNotice("If email delivery is available, a password reset link is on its way."))
+                    .then(() =>
+                      setNotice(
+                        "If email delivery is available, a password reset link is on its way.",
+                      ),
+                    )
                     .catch(() => setError("Could not request a password reset right now."))
                     .finally(() => setBusy(false));
                 }}
@@ -162,8 +173,16 @@ function AccountPage() {
                 verification and purchase-record handling are required before enabling it.
               </p>
             </section>
-            {notice ? <p role="status" className="mt-5 text-sm text-primary">{notice}</p> : null}
-            {error ? <p role="alert" className="mt-5 text-sm text-destructive">{error}</p> : null}
+            {notice ? (
+              <p role="status" className="mt-5 text-sm text-primary">
+                {notice}
+              </p>
+            ) : null}
+            {error ? (
+              <p role="alert" className="mt-5 text-sm text-destructive">
+                {error}
+              </p>
+            ) : null}
             <Link to="/dashboard" className="mt-5 inline-block text-sm text-primary">
               Open my dashboard
             </Link>
