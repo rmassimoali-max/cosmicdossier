@@ -325,6 +325,6 @@ export const requestDeletionReauthenticationCode = createServerFn({
   if (typeof user["id"] !== "string" || typeof user["email"] !== "string") {
     throw new Error("Please sign in again.");
   }
-  await authRequest("reauthenticate", {}, token);
+  await authRequest("reauthenticate", undefined, token);
   return { requested: true, deletionEnabled: false };
 });
