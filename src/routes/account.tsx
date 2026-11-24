@@ -200,7 +200,10 @@ function AccountPage() {
                 {deletionOpen ? "Cancel deletion" : "Review account deletion"}
               </button>
               {deletionOpen ? (
-                <div id="account-deletion-confirmation" className="mt-5 space-y-3 rounded-lg border border-destructive/50 p-4">
+                <div
+                  id="account-deletion-confirmation"
+                  className="mt-5 space-y-3 rounded-lg border border-destructive/50 p-4"
+                >
                   <h3 className="font-display text-xl text-destructive">Permanent deletion</h3>
                   <p className="text-sm text-muted-foreground">
                     This cannot be undone. Before deletion can be enabled, we must finish secure
