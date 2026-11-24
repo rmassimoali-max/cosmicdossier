@@ -25,9 +25,11 @@ export function hashDeletionEmailCode(
   code: string,
 ) {
   if (secret.length < 32) throw new Error("Deletion code secret is too short.");
-  if (!/^[0-9a-f]{8}-[0-9a-f-]{27,}$/i.test(userId) ||
-      !/^[0-9a-f]{8}-[0-9a-f-]{27,}$/i.test(challengeId) ||
-      !/^\d{8}$/.test(code)) {
+  if (
+    !/^[0-9a-f]{8}-[0-9a-f-]{27,}$/i.test(userId) ||
+    !/^[0-9a-f]{8}-[0-9a-f-]{27,}$/i.test(challengeId) ||
+    !/^\d{8}$/.test(code)
+  ) {
     throw new Error("Invalid deletion code context.");
   }
   return createHmac("sha256", secret)
