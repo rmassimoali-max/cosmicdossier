@@ -38,3 +38,33 @@ if [[ "$(grep -xc 't' "$first")" != 1 || "$(grep -xc 'f' "$second")" != 1 ]]; th
   exit 1
 fi
 echo "PASS: concurrent authorization requests yield exactly one success"
+
+# Competing exchanges of one challenge must create only one authorization.
+challenge_hash=$(printf '6%.0s' {1..64})
+first_hash=$(printf '7%.0s' {1..64})
+second_hash=$(printf '8%.0s' {1..64})
+challenge_id=$(psql "$TEST_DATABASE_URL" -X -v ON_ERROR_STOP=1 -qAtc \
+  "insert into public.account_deletion_challenges(user_id,token_hash,expires_at) values ('$user_id','$challenge_hash',now()+interval '10 minutes') returning id")
+: >"$first"
+: >"$second"
+psql "$TEST_DATABASE_URL" -X -v ON_ERROR_STOP=1 -qAt <<SQL >"$first" &
+begin;
+select private.exchange_account_deletion_challenge('$challenge_id','$user_id','$challenge_hash','$first_hash');
+select pg_sleep(3);
+commit;
+SQL
+first_pid=$!
+sleep 1
+psql "$TEST_DATABASE_URL" -X -v ON_ERROR_STOP=1 -qAtc \
+  "select private.exchange_account_deletion_challenge('$challenge_id','$user_id','$challenge_hash','$second_hash')" >"$second" &
+second_pid=$!
+wait "$first_pid"
+wait "$second_pid"
+issued_count=$(psql "$TEST_DATABASE_URL" -X -v ON_ERROR_STOP=1 -qAtc \
+  "select count(*) from public.account_deletion_authorizations where user_id='$user_id' and authorization_hash in ('$first_hash','$second_hash')")
+if [[ "$(grep -Ec '^[0-9a-f-]{36}$' "$first")" != 1 || -s "$second" || "$issued_count" != 1 ]]; then
+  echo "Concurrent challenge exchange failed single-issuance assertion" >&2
+  cat "$first" "$second" >&2
+  exit 1
+fi
+echo "PASS: concurrent challenge exchanges issue exactly one authorization"
