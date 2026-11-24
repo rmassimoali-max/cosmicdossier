@@ -123,7 +123,13 @@ function AccountPage() {
                       );
                       setNewEmail("");
                     })
-                    .catch(() => setError("Could not request an email change."))
+                    .catch((reason: unknown) =>
+                      setError(
+                        reason instanceof Error
+                          ? reason.message
+                          : "Could not request an email change.",
+                      ),
+                    )
                     .finally(() => setBusy(false));
                 }}
               >
