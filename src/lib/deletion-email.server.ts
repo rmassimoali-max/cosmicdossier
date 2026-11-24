@@ -12,7 +12,7 @@ export function readDeletionEmailConfig(env: Record<string, string | undefined>)
   const apiKey = env["RESEND_API_KEY"];
   const from = env["DELETION_EMAIL_FROM"];
   if (!apiKey || !from) return null;
-  if (!/^re_[A-Za-z0-9_\-]+$/.test(apiKey) || !/^[^\r\n<>]+ <[^\s@<>]+@[^\s@<>]+>$/.test(from)) {
+  if (!/^re_[A-Za-z0-9_-]+$/.test(apiKey) || !/^[^\r\n<>]+ <[^\s@<>]+@[^\s@<>]+>$/.test(from)) {
     throw new Error("Invalid deletion email server configuration.");
   }
   return { apiKey, from };
