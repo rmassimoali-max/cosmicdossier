@@ -12,7 +12,9 @@ const valid = {
 
 describe("deletion backend activation gate", () => {
   test("defaults to disabled even when credentials exist", () => {
-    expect(readDeletionBackendConfig({ ...valid, ACCOUNT_DELETION_BACKEND_ENABLED: "false" })).toBeNull();
+    expect(
+      readDeletionBackendConfig({ ...valid, ACCOUNT_DELETION_BACKEND_ENABLED: "false" }),
+    ).toBeNull();
     expect(readDeletionBackendConfig({})).toBeNull();
   });
 
