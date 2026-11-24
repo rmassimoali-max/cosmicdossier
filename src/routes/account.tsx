@@ -34,6 +34,7 @@ function AccountPage() {
   const [busy, setBusy] = useState(false);
   const [deletionOpen, setDeletionOpen] = useState(false);
   const [deletionConfirmation, setDeletionConfirmation] = useState("");
+  const [deletionVerificationOpen, setDeletionVerificationOpen] = useState(false);
 
   useEffect(() => {
     let active = true;
@@ -195,6 +196,7 @@ function AccountPage() {
                 onClick={() => {
                   setDeletionOpen((open) => !open);
                   setDeletionConfirmation("");
+                  setDeletionVerificationOpen(false);
                 }}
               >
                 {deletionOpen ? "Cancel deletion" : "Review account deletion"}
@@ -215,10 +217,46 @@ function AccountPage() {
                   <input
                     id="account-delete-confirm"
                     value={deletionConfirmation}
-                    onChange={(event) => setDeletionConfirmation(event.target.value)}
+                    onChange={(event) => {
+                      setDeletionConfirmation(event.target.value);
+                      setDeletionVerificationOpen(false);
+                    }}
                     autoComplete="off"
                     className="w-full rounded-lg border border-border bg-background px-3 py-3 text-sm"
                   />
+                  {deletionConfirmation === "DELETE" ? (
+                    <div className="space-y-3">
+                      <button
+                        type="button"
+                        aria-expanded={deletionVerificationOpen}
+                        aria-controls="account-deletion-verification"
+                        className="rounded-full border border-border px-5 py-2 text-sm text-primary"
+                        onClick={() => setDeletionVerificationOpen((open) => !open)}
+                      >
+                        {deletionVerificationOpen
+                          ? "Hide identity verification"
+                          : "Continue to identity verification preview"}
+                      </button>
+                      {deletionVerificationOpen ? (
+                        <div
+                          id="account-deletion-verification"
+                          className="space-y-2 rounded-lg border border-border p-4"
+                        >
+                          <h4 className="font-display text-lg text-gold">
+                            Identity verification (coming next)
+                          </h4>
+                          <p className="text-sm text-muted-foreground">
+                            Before deletion is enabled, you will need to verify your identity
+                            again. Password accounts and email-link accounts will both be
+                            supported. This preview does not request credentials or send an email.
+                          </p>
+                          <p role="status" className="text-xs text-muted-foreground">
+                            Verification is not active. No account data will be deleted.
+                          </p>
+                        </div>
+                      ) : null}
+                    </div>
+                  ) : null}
                   <button
                     type="button"
                     disabled
