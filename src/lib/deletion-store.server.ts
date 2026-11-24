@@ -23,6 +23,15 @@ export function createDeletionChallengeStore(db: DeletionSqlExecutor): DeletionC
         throw new Error("Deletion verification request is unavailable. Please try again later.");
       }
     },
+    async activate(id, userId) {
+      const result = await db.query<{ activated: boolean }>(
+        "select private.activate_account_deletion_challenge($1::uuid, $2::uuid) as activated",
+        [id, userId],
+      );
+      if (result.rows.length !== 1 || result.rows[0]?.activated !== true) {
+        throw new Error("Could not activate deletion verification challenge.");
+      }
+    },
     async revoke(id, userId) {
       const result = await db.query<{ id: string }>(
         "update public.account_deletion_challenges set consumed_at = clock_timestamp() where id = $1::uuid and user_id = $2::uuid and consumed_at is null returning id",
