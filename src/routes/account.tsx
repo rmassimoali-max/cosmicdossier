@@ -315,8 +315,8 @@ function AccountPage() {
                           ) : null}
                           <div className="space-y-2 border-t border-border pt-3">
                             <p className="text-sm text-muted-foreground">
-                              Prefer email? Request a reauthentication code from Supabase.
-                              Code entry and deletion authorization are not available yet.
+                              Prefer email? Request a reauthentication code from Supabase. Code
+                              entry and deletion authorization are not available yet.
                             </p>
                             <button
                               type="button"
