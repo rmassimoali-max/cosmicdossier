@@ -42,8 +42,7 @@ describe("deletion backend activation gate", () => {
     const hmac = "ab".repeat(32);
     const badConfig = {
       ...valid,
-      DELETION_DATABASE_URL:
-        `postgresql://deletion_worker:${password}@db.example.com/postgres?sslmode=disable`,
+      DELETION_DATABASE_URL: `postgresql://deletion_worker:${password}@db.example.com/postgres?sslmode=disable`,
       RESEND_API_KEY: apiKey,
       DELETION_CODE_HMAC_SECRET: hmac,
     };
