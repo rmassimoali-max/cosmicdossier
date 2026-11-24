@@ -23,7 +23,8 @@ export function readDeletionBackendConfig(env: Record<string, string | undefined
     !parsed.username ||
     !parsed.password ||
     parsed.hash ||
-    parsed.searchParams.has("sslmode") && parsed.searchParams.get("sslmode") !== "verify-full"
+    parsed.searchParams.get("sslmode") !== "verify-full" ||
+    [...parsed.searchParams.keys()].some((key) => key !== "sslmode")
   ) {
     throw new Error("Deletion database connection must use a dedicated PostgreSQL URL.");
   }
