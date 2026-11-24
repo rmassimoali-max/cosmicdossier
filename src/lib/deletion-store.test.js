@@ -28,9 +28,9 @@ describe("server-only deletion challenge SQL adapter", () => {
         return { rows: [{ issued: false }] };
       },
     });
-    await expect(
-      store.create({ id, userId, tokenHash: "a".repeat(64), expiresAt }),
-    ).rejects.toThrow("unavailable");
+    await expect(store.create({ id, userId, tokenHash: "a".repeat(64), expiresAt })).rejects.toThrow(
+      "unavailable",
+    );
   });
 
   test("revokes only the matching account challenge", async () => {
