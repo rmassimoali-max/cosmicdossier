@@ -33,6 +33,19 @@ describe("server-only deletion challenge SQL adapter", () => {
     ).rejects.toThrow("unavailable");
   });
 
+  test("activates only a matching challenge through the private function", async () => {
+    const calls = [];
+    const store = createDeletionChallengeStore({
+      async query(statement, params) {
+        calls.push({ statement, params });
+        return { rows: [{ activated: true }] };
+      },
+    });
+    await store.activate(id, userId);
+    expect(calls[0].statement).toContain("private.activate_account_deletion_challenge");
+    expect(calls[0].params).toEqual([id, userId]);
+  });
+
   test("revokes only the matching account challenge", async () => {
     const calls = [];
     const store = createDeletionChallengeStore({
