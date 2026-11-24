@@ -89,7 +89,39 @@ begin
     raise exception 'Expired authorization was accepted';
   end if;
 
-  raise notice 'PASS: account binding, failed attempts, expiry, lockout, consumption, and replay guards';
+  -- Malformed and absent hashes are rejected before attempting consumption.
+  insert into public.account_deletion_challenges(user_id, token_hash, expires_at)
+  values (v_user, v_hash, now() + interval '10 minutes')
+  returning id into v_challenge;
+  if private.consume_account_deletion_challenge(v_challenge, v_user, 'not-a-sha256-hash')
+     or private.consume_account_deletion_challenge(v_challenge, v_user, null) then
+    raise exception 'Malformed challenge hash was accepted';
+  end if;
+  select attempts into v_attempts from public.account_deletion_challenges
+  where id = v_challenge;
+  if v_attempts <> 0 then
+    raise exception 'Malformed challenge hash incorrectly consumed an attempt';
+  end if;
+
+  insert into public.account_deletion_authorizations(
+    user_id, authorization_hash, expires_at
+  ) values (v_user, v_hash, now() + interval '5 minutes')
+  returning id into v_auth;
+  if private.consume_account_deletion_authorization(v_auth, v_user, 'not-a-sha256-hash')
+     or private.consume_account_deletion_authorization(v_auth, v_user, null) then
+    raise exception 'Malformed authorization hash was accepted';
+  end if;
+
+  -- The function independently enforces a five-minute maximum validity window.
+  insert into public.account_deletion_authorizations(
+    user_id, authorization_hash, expires_at
+  ) values (v_user, v_bad_hash, now() + interval '6 minutes')
+  returning id into v_auth;
+  if private.consume_account_deletion_authorization(v_auth, v_user, v_bad_hash) then
+    raise exception 'Overlong authorization lifetime was accepted';
+  end if;
+
+  raise notice 'PASS: binding, attempts, expiry, lockout, replay, malformed hashes, and authorization lifetime';
 end
 $$;
 
