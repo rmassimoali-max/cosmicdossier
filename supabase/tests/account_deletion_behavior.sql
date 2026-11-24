@@ -28,8 +28,12 @@ begin
   if not private.activate_account_deletion_challenge(v_auth, v_user) then
     raise exception 'Pending challenge activation failed';
   end if;
-  if private.activate_account_deletion_challenge(v_auth, v_user) then
-    raise exception 'Challenge activated more than once';
+  if not private.activate_account_deletion_challenge(v_auth, v_user) then
+    raise exception 'Idempotent activation retry was rejected';
+  end if;
+  if (select count(*) from public.account_deletion_challenges
+      where id = v_auth and delivered_at is not null) <> 1 then
+    raise exception 'Activation retry altered challenge identity';
   end if;
   if not private.consume_account_deletion_challenge(v_auth, v_user, repeat('9',64)) then
     raise exception 'Activated challenge was rejected';
