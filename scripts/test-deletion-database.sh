@@ -30,7 +30,8 @@ for file in \
   supabase/migrations/20261124000000_account_deletion_challenge_storage.sql \
   supabase/migrations/20261124000001_atomic_deletion_challenge_consume.sql \
   supabase/migrations/20261124000002_atomic_deletion_authorization_consume.sql \
-  supabase/migrations/20261124000003_atomic_deletion_challenge_exchange.sql; do
+  supabase/migrations/20261124000003_atomic_deletion_challenge_exchange.sql \
+  supabase/migrations/20261124000004_deletion_challenge_rate_limit.sql; do
   psql "$TEST_DATABASE_URL" -X -v ON_ERROR_STOP=1 -f "$file"
 done
 
@@ -39,6 +40,8 @@ psql "$TEST_DATABASE_URL" -X -v ON_ERROR_STOP=1 \
   -f supabase/tests/account_deletion_security.sql
 echo "Checking single-use verification behavior..."
 psql "$TEST_DATABASE_URL" -X -v ON_ERROR_STOP=1 -f supabase/tests/account_deletion_behavior.sql
+echo "Checking challenge issuance throttling..." 
+psql "$TEST_DATABASE_URL" -X -v ON_ERROR_STOP=1 -f supabase/tests/account_deletion_rate_limit.sql
 echo "Database security and behavior assertions passed."
 
 echo "Checking concurrent authorization consumption..."
