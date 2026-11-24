@@ -52,6 +52,17 @@ begin
     raise exception 'Wrong account activated pending challenge';
   end if;
 
+  -- A challenge that expires before the provider responds cannot activate.
+  insert into public.account_deletion_challenges(
+    user_id, token_hash, created_at, expires_at
+  ) values (
+    v_user, repeat('6',64), now() - interval '11 minutes',
+    now() - interval '1 minute'
+  ) returning id into v_exchange;
+  if private.activate_account_deletion_challenge(v_exchange, v_user) then
+    raise exception 'Expired pending challenge was activated';
+  end if;
+
   -- Revocation must prevent any subsequent activation or exchange.
   update public.account_deletion_challenges
   set consumed_at = clock_timestamp()
