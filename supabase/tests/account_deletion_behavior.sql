@@ -115,9 +115,9 @@ begin
   -- The function independently enforces a five-minute maximum validity window.
   insert into public.account_deletion_authorizations(
     user_id, authorization_hash, expires_at
-  ) values (v_user, v_bad_hash, now() + interval '6 minutes')
+  ) values (v_user, repeat('d', 64), now() + interval '6 minutes')
   returning id into v_auth;
-  if private.consume_account_deletion_authorization(v_auth, v_user, v_bad_hash) then
+  if private.consume_account_deletion_authorization(v_auth, v_user, repeat('d', 64)) then
     raise exception 'Overlong authorization lifetime was accepted';
   end if;
 
