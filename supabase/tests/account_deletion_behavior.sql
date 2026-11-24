@@ -105,7 +105,7 @@ begin
 
   insert into public.account_deletion_authorizations(
     user_id, authorization_hash, expires_at
-  ) values (v_user, v_hash, now() + interval '5 minutes')
+  ) values (v_user, repeat('c', 64), now() + interval '5 minutes')
   returning id into v_auth;
   if private.consume_account_deletion_authorization(v_auth, v_user, 'not-a-sha256-hash')
      or private.consume_account_deletion_authorization(v_auth, v_user, null) then
