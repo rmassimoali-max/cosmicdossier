@@ -150,7 +150,36 @@ begin
     raise exception 'Exchanged authorization could not be consumed';
   end if;
 
-  raise notice 'PASS: binding, attempts, expiry, lockout, replay, malformed hashes, lifetime, and atomic exchange';
+  -- A uniqueness failure during issuance must roll back challenge consumption.
+  -- The exception block is a PostgreSQL subtransaction, mirroring a failed
+  -- application transaction while allowing subsequent assertions.
+  insert into public.account_deletion_challenges(user_id, token_hash, expires_at)
+  values (v_user, repeat('4',64), now() + interval '10 minutes')
+  returning id into v_challenge;
+  begin
+    perform private.exchange_account_deletion_challenge(
+      v_challenge, v_user, repeat('4',64), repeat('2',64)
+    );
+    raise exception 'Duplicate authorization hash unexpectedly succeeded';
+  exception
+    when unique_violation then
+      null;
+  end;
+  if exists (
+    select 1 from public.account_deletion_challenges
+    where id = v_challenge and consumed_at is not null
+  ) then
+    raise exception 'Failed exchange consumed its challenge';
+  end if;
+  -- Retrying with a fresh authorization hash must still succeed.
+  v_exchange := private.exchange_account_deletion_challenge(
+    v_challenge, v_user, repeat('4',64), repeat('5',64)
+  );
+  if v_exchange is null then
+    raise exception 'Failed exchange prevented safe retry';
+  end if;
+
+  raise notice 'PASS: binding, attempts, expiry, lockout, replay, malformed hashes, lifetime, exchange, and rollback';
 end
 $$;
 
