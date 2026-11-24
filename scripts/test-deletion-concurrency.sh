@@ -62,7 +62,7 @@ wait "$first_pid"
 wait "$second_pid"
 issued_count=$(psql "$TEST_DATABASE_URL" -X -v ON_ERROR_STOP=1 -qAtc \
   "select count(*) from public.account_deletion_authorizations where user_id='$user_id' and authorization_hash in ('$first_hash','$second_hash')")
-if [[ "$(grep -Ec '^[0-9a-f-]{36}$' "$first")" != 1 || -s "$second" || "$issued_count" != 1 ]]; then
+if [[ "$(grep -Ec '^[0-9a-f-]{36}$' "$first")" != 1 || -n "$(tr -d '[:space:]' < "$second")" || "$issued_count" != 1 ]]; then
   echo "Concurrent challenge exchange failed single-issuance assertion" >&2
   cat "$first" "$second" >&2
   exit 1
