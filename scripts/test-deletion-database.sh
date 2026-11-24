@@ -29,7 +29,8 @@ echo "Applying staged deletion migrations to loopback test database..."
 for file in \
   supabase/migrations/20261124000000_account_deletion_challenge_storage.sql \
   supabase/migrations/20261124000001_atomic_deletion_challenge_consume.sql \
-  supabase/migrations/20261124000002_atomic_deletion_authorization_consume.sql; do
+  supabase/migrations/20261124000002_atomic_deletion_authorization_consume.sql \
+  supabase/migrations/20261124000003_atomic_deletion_challenge_exchange.sql; do
   psql "$TEST_DATABASE_URL" -X -v ON_ERROR_STOP=1 -f "$file"
 done
 
