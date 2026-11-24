@@ -13,15 +13,13 @@ if ! command -v psql >/dev/null 2>&1; then
   exit 1
 fi
 
-# Only loopback hosts are permitted. This intentionally rejects hosted Supabase.
-db_host="$(psql "$TEST_DATABASE_URL" -X -Atqc 'select inet_server_addr()::text' 2>/dev/null)" || {
-  echo "Unable to connect to test database." >&2
+# Validate the requested connection endpoint, not inet_server_addr(): Docker's
+# published localhost port reaches a container with a private bridge IP.
+# Reject URL parameters (including hostaddr overrides) and remote hostnames.
+if [[ ! "$TEST_DATABASE_URL" =~ ^postgres(ql)?://[^/?#@]+@((127\\.0\\.0\\.1)|(\\[::1\\])):[0-9]+/[^/?#]+$ ]]; then
+  echo "Refusing database URL: only explicit loopback TCP URLs without parameters are allowed." >&2
   exit 1
-}
-case "$db_host" in
-  127.0.0.1|::1) ;;
-  *) echo "Refusing non-loopback database host: $db_host" >&2; exit 1 ;;
-esac
+fi
 
 # Confirm that the target is a local Supabase stack with expected auth schema.
 psql "$TEST_DATABASE_URL" -X -v ON_ERROR_STOP=1 -Atqc \
