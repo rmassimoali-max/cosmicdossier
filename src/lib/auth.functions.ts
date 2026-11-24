@@ -262,6 +262,19 @@ export const requestAccountEmailChange = createServerFn({ method: "POST" })
       body: JSON.stringify({ email: data.email }),
       cache: "no-store",
     });
-    if (!response.ok) throw new Error("Could not request an email change. Please try again.");
+    if (!response.ok) {
+      const errorPayload = (await response.json().catch(() => ({}))) as Record<string, unknown>;
+      const code = errorPayload["code"] ?? errorPayload["error_code"];
+      if (code === "email_exists") {
+        throw new Error("That email address cannot be used. It may already belong to an account.");
+      }
+      if (code === "over_email_send_rate_limit" || response.status === 429) {
+        throw new Error("Too many email requests. Please wait before trying again.");
+      }
+      if (response.status === 401 || response.status === 403) {
+        throw new Error("Your session may have expired. Please sign in again.");
+      }
+      throw new Error("Could not request an email change. Please try again later.");
+    }
     return { requested: true };
   });
