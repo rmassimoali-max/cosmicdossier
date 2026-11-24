@@ -8,6 +8,7 @@ declare
   v_other uuid := '22222222-2222-4222-8222-222222222222';
   v_challenge uuid;
   v_auth uuid;
+  v_exchange uuid;
   v_hash text := repeat('a', 64);
   v_bad_hash text := repeat('b', 64);
   v_attempts integer;
@@ -121,7 +122,35 @@ begin
     raise exception 'Overlong authorization lifetime was accepted';
   end if;
 
-  raise notice 'PASS: binding, attempts, expiry, lockout, replay, malformed hashes, and authorization lifetime';
+  -- Successful exchange consumes the challenge and issues one authorization.
+  insert into public.account_deletion_challenges(user_id, token_hash, expires_at)
+  values (v_user, repeat('1',64), now() + interval '10 minutes')
+  returning id into v_challenge;
+  v_exchange := private.exchange_account_deletion_challenge(
+    v_challenge, v_user, repeat('1',64), repeat('2',64)
+  );
+  if v_exchange is null then
+    raise exception 'Valid challenge exchange was rejected';
+  end if;
+  if not exists (
+    select 1 from public.account_deletion_authorizations
+    where id = v_exchange and user_id = v_user
+      and authorization_hash = repeat('2',64) and consumed_at is null
+  ) then
+    raise exception 'Challenge exchange failed to issue authorization';
+  end if;
+  if private.exchange_account_deletion_challenge(
+    v_challenge, v_user, repeat('1',64), repeat('3',64)
+  ) is not null then
+    raise exception 'Challenge exchange was replayed';
+  end if;
+  if not private.consume_account_deletion_authorization(
+    v_exchange, v_user, repeat('2',64)
+  ) then
+    raise exception 'Exchanged authorization could not be consumed';
+  end if;
+
+  raise notice 'PASS: binding, attempts, expiry, lockout, replay, malformed hashes, lifetime, and atomic exchange';
 end
 $$;
 
