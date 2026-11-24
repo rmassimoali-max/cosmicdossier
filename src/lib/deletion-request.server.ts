@@ -8,12 +8,7 @@ import { sendDeletionVerificationEmail, type DeletionEmailConfig } from "./delet
  * policy in the database, not in process memory.
  */
 export type DeletionChallengeStore = {
-  create(input: {
-    id: string;
-    userId: string;
-    tokenHash: string;
-    expiresAt: Date;
-  }): Promise<void>;
+  create(input: { id: string; userId: string; tokenHash: string; expiresAt: Date }): Promise<void>;
   revoke(id: string, userId: string): Promise<void>;
 };
 
