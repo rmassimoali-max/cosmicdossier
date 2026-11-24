@@ -35,6 +35,36 @@ begin
     raise exception 'Activated challenge was rejected';
   end if;
 
+  -- Simulate provider failure followed by a failed database revocation.
+  -- The persisted challenge remains pending and must be unusable.
+  insert into public.account_deletion_challenges(user_id, token_hash, expires_at)
+  values (v_user, repeat('8',64), now() + interval '10 minutes')
+  returning id into v_auth;
+  if private.consume_account_deletion_challenge(v_auth, v_user, repeat('8',64)) then
+    raise exception 'Undelivered challenge was consumed after failed revocation';
+  end if;
+  if private.exchange_account_deletion_challenge(
+    v_auth, v_user, repeat('8',64), repeat('7',64)
+  ) is not null then
+    raise exception 'Undelivered challenge was exchanged after failed revocation';
+  end if;
+  if private.activate_account_deletion_challenge(v_auth, v_other) then
+    raise exception 'Wrong account activated pending challenge';
+  end if;
+
+  -- Revocation must prevent any subsequent activation or exchange.
+  update public.account_deletion_challenges
+  set consumed_at = clock_timestamp()
+  where id = v_auth and user_id = v_user;
+  if private.activate_account_deletion_challenge(v_auth, v_user) then
+    raise exception 'Revoked challenge was activated';
+  end if;
+  if private.exchange_account_deletion_challenge(
+    v_auth, v_user, repeat('8',64), repeat('7',64)
+  ) is not null then
+    raise exception 'Revoked challenge was exchanged';
+  end if;
+
   if private.consume_account_deletion_challenge(v_challenge, v_other, v_hash) then
     raise exception 'Wrong-account challenge was accepted';
   end if;
