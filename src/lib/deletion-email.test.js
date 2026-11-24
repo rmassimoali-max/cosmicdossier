@@ -1,8 +1,5 @@
 import { describe, expect, test } from "bun:test";
-import {
-  readDeletionEmailConfig,
-  sendDeletionVerificationEmail,
-} from "./deletion-email.server";
+import { readDeletionEmailConfig, sendDeletionVerificationEmail } from "./deletion-email.server";
 
 describe("server-only deletion email transport", () => {
   test("stays disabled without configured server secrets", () => {
