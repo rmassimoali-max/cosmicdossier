@@ -10,6 +10,7 @@ import { sendDeletionVerificationEmail, type DeletionEmailConfig } from "./delet
 export type DeletionChallengeStore = {
   create(input: { id: string; userId: string; tokenHash: string; expiresAt: Date }): Promise<void>;
   revoke(id: string, userId: string): Promise<void>;
+  activate(id: string, userId: string): Promise<void>;
 };
 
 export type DeletionChallengeSender = (
@@ -39,6 +40,7 @@ export async function requestDeletionEmailChallenge(input: {
   try {
     const result = await sender(emailConfig, verifiedEmail, code);
     if (!result.sent) throw new Error("Verification email was not accepted.");
+    await store.activate(id, userId);
   } catch {
     // Fail closed: if revocation fails, never claim that the challenge was
     // safely invalidated. Production adapter must retry/reconcile failures.
