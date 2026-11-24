@@ -3,6 +3,7 @@ import { useServerFn } from "@tanstack/react-start";
 import { useEffect, useState } from "react";
 import {
   getCurrentAccount,
+  previewVerifyDeletionPassword,
   requestAccountEmailChange,
   requestPasswordReset,
   signOutAccount,
@@ -25,6 +26,7 @@ function AccountPage() {
   const saveName = useServerFn(updateAccountDisplayName);
   const changeEmail = useServerFn(requestAccountEmailChange);
   const resetPassword = useServerFn(requestPasswordReset);
+  const verifyDeletionPassword = useServerFn(previewVerifyDeletionPassword);
   const [email, setEmail] = useState<string | null>(null);
   const [loading, setLoading] = useState(true);
   const [displayName, setDisplayName] = useState("");
@@ -35,6 +37,9 @@ function AccountPage() {
   const [deletionOpen, setDeletionOpen] = useState(false);
   const [deletionConfirmation, setDeletionConfirmation] = useState("");
   const [deletionVerificationOpen, setDeletionVerificationOpen] = useState(false);
+  const [deletionPassword, setDeletionPassword] = useState("");
+  const [verificationStatus, setVerificationStatus] = useState("");
+  const [verificationBusy, setVerificationBusy] = useState(false);
 
   useEffect(() => {
     let active = true;
@@ -197,6 +202,8 @@ function AccountPage() {
                   setDeletionOpen((open) => !open);
                   setDeletionConfirmation("");
                   setDeletionVerificationOpen(false);
+                  setDeletionPassword("");
+                  setVerificationStatus("");
                 }}
               >
                 {deletionOpen ? "Cancel deletion" : "Review account deletion"}
@@ -246,10 +253,58 @@ function AccountPage() {
                             Identity verification (coming next)
                           </h4>
                           <p className="text-sm text-muted-foreground">
-                            Before deletion is enabled, you will need to verify your identity again.
-                            Password accounts and email-link accounts will both be supported. This
-                            preview does not request credentials or send an email.
+                            If you use a password, you can verify it here. Email-link
+                            verification is not implemented yet. Verification does not
+                            authorize deletion, and no account will be deleted.
                           </p>
+                          <form
+                            className="space-y-3"
+                            onSubmit={(event) => {
+                              event.preventDefault();
+                              setVerificationBusy(true);
+                              setVerificationStatus("");
+                              void verifyDeletionPassword({
+                                data: { password: deletionPassword },
+                              })
+                                .then(() => setVerificationStatus(
+                                  "Password verified for this account. Deletion remains disabled.",
+                                ))
+                                .catch(() => setVerificationStatus(
+                                  "Could not verify the password. Try again or use email-link sign-in.",
+                                ))
+                                .finally(() => {
+                                  setVerificationBusy(false);
+                                  setDeletionPassword("");
+                                });
+                            }}
+                          >
+                            <label htmlFor="deletion-password" className="block text-sm">
+                              Current account password
+                            </label>
+                            <input
+                              id="deletion-password"
+                              type="password"
+                              autoComplete="current-password"
+                              value={deletionPassword}
+                              onChange={(event) => setDeletionPassword(event.target.value)}
+                              minLength={8}
+                              maxLength={128}
+                              required
+                              className="w-full rounded-lg border border-border bg-background px-3 py-3 text-sm"
+                            />
+                            <button
+                              type="submit"
+                              disabled={verificationBusy}
+                              className="rounded-full border border-primary px-5 py-2 text-sm text-primary disabled:opacity-50"
+                            >
+                              {verificationBusy ? "Verifying..." : "Verify password (preview)"}
+                            </button>
+                          </form>
+                          {verificationStatus ? (
+                            <p role="status" className="text-xs text-muted-foreground">
+                              {verificationStatus}
+                            </p>
+                          ) : null}
                           <p role="status" className="text-xs text-muted-foreground">
                             Verification is not active. No account data will be deleted.
                           </p>
