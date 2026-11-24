@@ -90,6 +90,40 @@ describe("deletion email request orchestration", () => {
     expect(state.records).toHaveLength(1);
   });
 
+  test("never activates a challenge when the provider declines delivery", async () => {
+    const state = fixture();
+    await expect(
+      requestDeletionEmailChallenge({
+        store: state.store,
+        emailConfig,
+        secret,
+        userId,
+        verifiedEmail: "owner@example.com",
+        sender: async () => ({ sent: false }),
+      }),
+    ).rejects.toThrow("Could not send deletion verification");
+    expect(state.activated).toHaveLength(0);
+    expect(state.revoked).toHaveLength(1);
+  });
+
+  test("revokes the challenge if activation fails after email acceptance", async () => {
+    const state = fixture();
+    state.store.activate = async () => {
+      throw new Error("Activation database unavailable");
+    };
+    await expect(
+      requestDeletionEmailChallenge({
+        store: state.store,
+        emailConfig,
+        secret,
+        userId,
+        verifiedEmail: "owner@example.com",
+        sender: async () => ({ sent: true }),
+      }),
+    ).rejects.toThrow("Could not send deletion verification");
+    expect(state.revoked).toEqual([{ id: state.records[0].id, owner: userId }]);
+  });
+
   test("does not deliver when storage rejects the request", async () => {
     let delivered = false;
     await expect(
