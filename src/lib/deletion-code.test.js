@@ -19,9 +19,7 @@ describe("server-only deletion email codes", () => {
   test("requires a distinct sufficiently strong server secret", () => {
     expect(readDeletionCodeSecret({})).toBeNull();
     expect(() => readDeletionCodeSecret({ DELETION_CODE_HMAC_SECRET: "weak" })).toThrow();
-    expect(
-      readDeletionCodeSecret({ DELETION_CODE_HMAC_SECRET: "ab".repeat(32) }),
-    ).toHaveLength(32);
+    expect(readDeletionCodeSecret({ DELETION_CODE_HMAC_SECRET: "ab".repeat(32) })).toHaveLength(32);
   });
 
   test("binds code digest to user, challenge, and secret", () => {
@@ -32,9 +30,16 @@ describe("server-only deletion email codes", () => {
       hashDeletionEmailCode(secret, userId, "33333333-3333-4333-8333-333333333333", "00123456"),
     );
     expect(first).not.toBe(
-      hashDeletionEmailCode(secret, "44444444-4444-4444-8444-444444444444", challengeId, "00123456"),
+      hashDeletionEmailCode(
+        secret,
+        "44444444-4444-4444-8444-444444444444",
+        challengeId,
+        "00123456",
+      ),
     );
-    expect(first).not.toBe(hashDeletionEmailCode(Buffer.alloc(32, 8), userId, challengeId, "00123456"));
+    expect(first).not.toBe(
+      hashDeletionEmailCode(Buffer.alloc(32, 8), userId, challengeId, "00123456"),
+    );
   });
 
   test("rejects malformed context and short secrets", () => {
