@@ -8,7 +8,7 @@ import { createHmac, randomInt } from "node:crypto";
 export function readDeletionCodeSecret(env: Record<string, string | undefined>) {
   const secret = env["DELETION_CODE_HMAC_SECRET"];
   if (!secret) return null;
-  if (!/^[0-9a-f]{64,}$/i.test(secret)) {
+  if (!/^(?:[0-9a-f]{2}){32,}$/i.test(secret)) {
     throw new Error("Deletion code secret must be at least 32 random bytes encoded as hex.");
   }
   return Buffer.from(secret, "hex");
