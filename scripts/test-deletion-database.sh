@@ -32,13 +32,16 @@ for file in \
   supabase/migrations/20261124000002_atomic_deletion_authorization_consume.sql \
   supabase/migrations/20261124000003_atomic_deletion_challenge_exchange.sql \
   supabase/migrations/20261124000004_deletion_challenge_rate_limit.sql \
-  supabase/migrations/20261124000005_deletion_challenge_delivery_gate.sql; do
+  supabase/migrations/20261124000005_deletion_challenge_delivery_gate.sql \
+  supabase/migrations/20261124000006_deletion_backend_role.sql; do
   psql "$TEST_DATABASE_URL" -X -v ON_ERROR_STOP=1 -f "$file"
 done
 
 echo "Checking database security..."
 psql "$TEST_DATABASE_URL" -X -v ON_ERROR_STOP=1 \
   -f supabase/tests/account_deletion_security.sql
+echo "Checking deletion backend role privileges..."
+psql "$TEST_DATABASE_URL" -X -v ON_ERROR_STOP=1 -f supabase/tests/account_deletion_role.sql
 echo "Checking single-use verification behavior..."
 psql "$TEST_DATABASE_URL" -X -v ON_ERROR_STOP=1 -f supabase/tests/account_deletion_behavior.sql
 echo "Checking challenge issuance throttling..." 
