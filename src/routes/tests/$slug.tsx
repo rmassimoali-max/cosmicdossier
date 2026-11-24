@@ -134,8 +134,8 @@ function TestFlow({ test, r, person }: { test: TestDef; r: string | undefined; p
           : test.slug === "resilience"
             ? "Exploratory Resilience Reflection · v2 (12 original items)"
             : test.slug === "attachment-style"
-            ? "Library Attachment · two dimensions"
-            : test.name;
+              ? "Library Attachment · two dimensions"
+              : test.name;
       setSession((s) =>
         person === 2
           ? {
