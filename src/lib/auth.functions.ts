@@ -311,3 +311,20 @@ export const previewVerifyDeletionPassword = createServerFn({ method: "POST" })
     }
     return { verified: true, deletionEnabled: false };
   });
+
+/**
+ * Ask Supabase to send a fresh reauthentication code to the signed-in user.
+ * This does not validate the code or authorize account deletion.
+ */
+export const requestDeletionReauthenticationCode = createServerFn({
+  method: "POST",
+}).handler(async () => {
+  const token = getCookie(ACCESS);
+  if (!token) throw new Error("Please sign in again.");
+  const user = await authRequest("user", undefined, token);
+  if (typeof user["id"] !== "string" || typeof user["email"] !== "string") {
+    throw new Error("Please sign in again.");
+  }
+  await authRequest("reauthenticate", {}, token);
+  return { requested: true, deletionEnabled: false };
+});
