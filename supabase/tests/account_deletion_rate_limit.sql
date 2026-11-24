@@ -52,7 +52,32 @@ begin
   ) then
     raise exception 'Earlier challenge remained active';
   end if;
-  raise notice 'PASS: cooldown, user isolation, expiry validation, and supersession';
+  -- Insert historical requests to reach the five-per-hour ceiling without
+  -- waiting in real time. All writes remain inside this rolled-back fixture.
+  insert into public.account_deletion_challenges(
+    id, user_id, token_hash, created_at, expires_at, consumed_at
+  )
+  select gen_random_uuid(), v_a, repeat('e',64),
+         clock_timestamp() - interval '4 minutes' * n,
+         clock_timestamp() + interval '5 minutes',
+         clock_timestamp() - interval '3 minutes' * n
+  from generate_series(1,3) as n;
+
+  -- Move the most recent request outside the one-minute cooldown.
+  update public.account_deletion_challenges
+  set created_at = clock_timestamp() - interval '2 minutes'
+  where user_id = v_a and created_at > clock_timestamp() - interval '1 minute';
+
+  if (select count(*) from public.account_deletion_challenges
+      where user_id = v_a and created_at > clock_timestamp() - interval '1 hour') <> 5 then
+    raise exception 'Hourly cap fixture did not contain five requests';
+  end if;
+  if private.issue_account_deletion_challenge(
+    gen_random_uuid(), v_a, repeat('f',64), clock_timestamp()+interval '9 minutes'
+  ) then
+    raise exception 'Hourly request cap was bypassed';
+  end if;
+  raise notice 'PASS: cooldown, hourly cap, user isolation, expiry, and supersession';
 end;
 $$;
 rollback;
