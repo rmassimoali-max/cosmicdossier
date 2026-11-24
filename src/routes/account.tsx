@@ -32,6 +32,8 @@ function AccountPage() {
   const [notice, setNotice] = useState("");
   const [error, setError] = useState("");
   const [busy, setBusy] = useState(false);
+  const [deletionOpen, setDeletionOpen] = useState(false);
+  const [deletionConfirmation, setDeletionConfirmation] = useState("");
 
   useEffect(() => {
     let active = true;
@@ -181,9 +183,54 @@ function AccountPage() {
             <section className="mt-8 border-t border-border pt-6" aria-label="Account deletion">
               <h2 className="font-display text-2xl text-gold">Delete account</h2>
               <p className="mt-3 text-sm text-muted-foreground">
-                Permanent account deletion is not available in this preview yet. Secure identity
-                verification and purchase-record handling are required before enabling it.
+                Deleting your account would permanently remove your sign-in identity and saved
+                assessments. Reports stored only in this browser are separate, and payment
+                transaction records may need to be retained for accounting or legal obligations.
               </p>
+              <button
+                type="button"
+                className="mt-4 rounded-full border border-destructive px-5 py-2 text-sm text-destructive"
+                aria-expanded={deletionOpen}
+                aria-controls="account-deletion-confirmation"
+                onClick={() => {
+                  setDeletionOpen((open) => !open);
+                  setDeletionConfirmation("");
+                }}
+              >
+                {deletionOpen ? "Cancel deletion" : "Review account deletion"}
+              </button>
+              {deletionOpen ? (
+                <div id="account-deletion-confirmation" className="mt-5 space-y-3 rounded-lg border border-destructive/50 p-4">
+                  <h3 className="font-display text-xl text-destructive">Permanent deletion</h3>
+                  <p className="text-sm text-muted-foreground">
+                    This cannot be undone. Before deletion can be enabled, we must finish secure
+                    identity verification, saved-data cleanup, and payment-record safeguards.
+                  </p>
+                  <label htmlFor="account-delete-confirm" className="block text-sm">
+                    Type DELETE to acknowledge the consequences.
+                  </label>
+                  <input
+                    id="account-delete-confirm"
+                    value={deletionConfirmation}
+                    onChange={(event) => setDeletionConfirmation(event.target.value)}
+                    autoComplete="off"
+                    className="w-full rounded-lg border border-border bg-background px-3 py-3 text-sm"
+                  />
+                  <button
+                    type="button"
+                    disabled
+                    title="Deletion is not enabled until security and payment checks are complete"
+                    className="rounded-full border border-destructive px-5 py-2 text-sm text-destructive disabled:cursor-not-allowed disabled:opacity-50"
+                  >
+                    Permanently delete account (not yet enabled)
+                  </button>
+                  {deletionConfirmation === "DELETE" ? (
+                    <p role="status" className="text-xs text-muted-foreground">
+                      Confirmation acknowledged. Actual deletion remains disabled in this preview.
+                    </p>
+                  ) : null}
+                </div>
+              ) : null}
             </section>
             {notice ? (
               <p role="status" className="mt-5 text-sm text-primary">
