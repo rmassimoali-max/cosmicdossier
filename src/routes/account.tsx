@@ -367,8 +367,8 @@ function AccountPage() {
                               className="w-full rounded-lg border border-border bg-background px-3 py-3 text-sm"
                             />
                             <p className="text-xs text-muted-foreground">
-                              Code validation is not connected yet. Entering a code here does
-                              not verify your identity or authorize deletion.
+                              Code validation is not connected yet. Entering a code here does not
+                              verify your identity or authorize deletion.
                             </p>
                           </div>
                           <p role="status" className="text-xs text-muted-foreground">
