@@ -42,14 +42,14 @@ function DashboardPage() {
   const hasDossier = Boolean(session.dossier?.p1);
   const hasDraft = Boolean(
     session.p1.name.trim() ||
-      session.p1.dob ||
-      session.p1.birthPlace ||
-      session.p1.mbti ||
-      session.p1.enneagramType ||
-      session.p1.attachment ||
-      session.p1.bigFive ||
-      Object.keys(session.p1.assessmentResults ?? {}).length ||
-      session.p2,
+    session.p1.dob ||
+    session.p1.birthPlace ||
+    session.p1.mbti ||
+    session.p1.enneagramType ||
+    session.p1.attachment ||
+    session.p1.bigFive ||
+    Object.keys(session.p1.assessmentResults ?? {}).length ||
+    session.p2,
   );
   const getAccount = useServerFn(getCurrentAccount);
   const [email, setEmail] = useState<string | null>(null);
@@ -159,10 +159,11 @@ function DashboardPage() {
                 ? "Open current dossier"
                 : hasDraft
                   ? "Continue current dossier"
-                  : "Create your first dossier"}{" →"}
+                  : "Create your first dossier"}
+              {" →"}
             </Link>
           </article>
- 
+
           {destinations.slice(1).map((item) => (
             <article key={item.title} className="panel flex flex-col p-6">
               <h3 className="font-display text-2xl text-foreground">{item.title}</h3>
@@ -174,7 +175,7 @@ function DashboardPage() {
               </Link>
             </article>
           ))}
-       </div>
+        </div>
       </section>
     </main>
   );
