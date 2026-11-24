@@ -191,7 +191,9 @@ export function SiteNav() {
               <span className="min-w-0">
                 <span className="block text-[10px] text-primary">Your cosmic space</span>
                 <span className="block truncate">
-                  {accountDisplayName?.trim() ? `${accountDisplayName.trim()}\u0027s Universe` : accountEmail}
+                  {accountDisplayName?.trim()
+                    ? `${accountDisplayName.trim()}\u0027s Universe`
+                    : accountEmail}
                 </span>
               </span>
               <span aria-hidden="true">⌄</span>
