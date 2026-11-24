@@ -10,12 +10,23 @@ begin
   end if;
   if not pg_catalog.has_schema_privilege('deletion_backend', 'private', 'USAGE')
      or not pg_catalog.has_table_privilege(
-       'deletion_backend', 'public.account_deletion_challenges', 'SELECT,INSERT,UPDATE'
+       'deletion_backend', 'public.account_deletion_challenges', 'SELECT'
      )
      or not pg_catalog.has_table_privilege(
-       'deletion_backend', 'public.account_deletion_authorizations', 'SELECT,INSERT,UPDATE'
+       'deletion_backend', 'public.account_deletion_authorizations', 'SELECT'
      ) then
     raise exception 'Deletion backend lacks required verification privileges';
+  end if;
+  if not pg_catalog.has_table_privilege(
+       'deletion_backend', 'public.account_deletion_challenges', 'INSERT'
+     ) or not pg_catalog.has_table_privilege(
+       'deletion_backend', 'public.account_deletion_challenges', 'UPDATE'
+     ) or not pg_catalog.has_table_privilege(
+       'deletion_backend', 'public.account_deletion_authorizations', 'INSERT'
+     ) or not pg_catalog.has_table_privilege(
+       'deletion_backend', 'public.account_deletion_authorizations', 'UPDATE'
+     ) then
+    raise exception 'Deletion backend lacks write privileges';
   end if;
   if pg_catalog.has_table_privilege(
        'deletion_backend', 'public.account_deletion_challenges', 'DELETE'
