@@ -4,6 +4,7 @@ import { useEffect, useState } from "react";
 import {
   getCurrentAccount,
   previewVerifyDeletionPassword,
+  requestDeletionReauthenticationCode,
   requestAccountEmailChange,
   requestPasswordReset,
   signOutAccount,
@@ -27,6 +28,7 @@ function AccountPage() {
   const changeEmail = useServerFn(requestAccountEmailChange);
   const resetPassword = useServerFn(requestPasswordReset);
   const verifyDeletionPassword = useServerFn(previewVerifyDeletionPassword);
+  const requestDeletionCode = useServerFn(requestDeletionReauthenticationCode);
   const [email, setEmail] = useState<string | null>(null);
   const [loading, setLoading] = useState(true);
   const [displayName, setDisplayName] = useState("");
@@ -40,6 +42,8 @@ function AccountPage() {
   const [deletionPassword, setDeletionPassword] = useState("");
   const [verificationStatus, setVerificationStatus] = useState("");
   const [verificationBusy, setVerificationBusy] = useState(false);
+  const [emailVerificationBusy, setEmailVerificationBusy] = useState(false);
+  const [emailVerificationStatus, setEmailVerificationStatus] = useState("");
 
   useEffect(() => {
     let active = true;
@@ -309,6 +313,40 @@ function AccountPage() {
                               {verificationStatus}
                             </p>
                           ) : null}
+                          <div className="space-y-2 border-t border-border pt-3">
+                            <p className="text-sm text-muted-foreground">
+                              Prefer email? Request a reauthentication code from Supabase.
+                              Code entry and deletion authorization are not available yet.
+                            </p>
+                            <button
+                              type="button"
+                              disabled={emailVerificationBusy}
+                              className="rounded-full border border-primary px-5 py-2 text-sm text-primary disabled:opacity-50"
+                              onClick={() => {
+                                setEmailVerificationBusy(true);
+                                setEmailVerificationStatus("");
+                                void requestDeletionCode()
+                                  .then(() =>
+                                    setEmailVerificationStatus(
+                                      "Code requested. Check your email. Deletion remains disabled.",
+                                    ),
+                                  )
+                                  .catch(() =>
+                                    setEmailVerificationStatus(
+                                      "Could not request a code. Please try again later.",
+                                    ),
+                                  )
+                                  .finally(() => setEmailVerificationBusy(false));
+                              }}
+                            >
+                              {emailVerificationBusy ? "Requesting..." : "Send verification code"}
+                            </button>
+                            {emailVerificationStatus ? (
+                              <p role="status" className="text-xs text-muted-foreground">
+                                {emailVerificationStatus}
+                              </p>
+                            ) : null}
+                          </div>
                           <p role="status" className="text-xs text-muted-foreground">
                             Verification is not active. No account data will be deleted.
                           </p>
