@@ -31,7 +31,8 @@ for file in \
   supabase/migrations/20261124000001_atomic_deletion_challenge_consume.sql \
   supabase/migrations/20261124000002_atomic_deletion_authorization_consume.sql \
   supabase/migrations/20261124000003_atomic_deletion_challenge_exchange.sql \
-  supabase/migrations/20261124000004_deletion_challenge_rate_limit.sql; do
+  supabase/migrations/20261124000004_deletion_challenge_rate_limit.sql \
+  supabase/migrations/20261124000005_deletion_challenge_delivery_gate.sql; do
   psql "$TEST_DATABASE_URL" -X -v ON_ERROR_STOP=1 -f "$file"
 done
 
