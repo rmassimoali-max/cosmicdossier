@@ -1,4 +1,4 @@
-import { randomBytes, randomUUID, createHash } from "node:crypto";
+import { randomBytes, createHash } from "node:crypto";
 import { hashDeletionEmailCode } from "./deletion-code.server";
 import type { DeletionSqlExecutor } from "./deletion-store.server";
 
