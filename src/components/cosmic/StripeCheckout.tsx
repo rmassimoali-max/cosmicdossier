@@ -105,8 +105,8 @@ export function StripeUnlockButton() {
           {accountEmail ? (
             <p className="mt-2 text-sm text-muted-foreground">
               Signed in as <span className="text-foreground">{accountEmail}</span>. You can continue
-              to checkout. Your saved assessments remain in your account, but complete dossiers
-              and purchase recovery are not available across devices yet.
+              to checkout. Your saved assessments remain in your account, but complete dossiers and
+              purchase recovery are not available across devices yet.
             </p>
           ) : (
             <p className="mt-2 text-sm text-muted-foreground">
