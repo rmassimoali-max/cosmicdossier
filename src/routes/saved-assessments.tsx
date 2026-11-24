@@ -2,6 +2,7 @@ import { createFileRoute, Link, useNavigate } from "@tanstack/react-router";
 import { useServerFn } from "@tanstack/react-start";
 import { useEffect, useState } from "react";
 import { deleteSavedAssessment, listSavedAssessments } from "@/lib/saved-assessments.functions";
+import { getCurrentAccount } from "@/lib/auth.functions";
 import { setSession } from "@/lib/session";
 import { testBySlug } from "@/lib/tests";
 
@@ -21,9 +22,11 @@ function SavedAssessmentsPage() {
   const navigate = useNavigate();
   const load = useServerFn(listSavedAssessments);
   const remove = useServerFn(deleteSavedAssessment);
+  const getAccount = useServerFn(getCurrentAccount);
   const [items, setItems] = useState<SavedAssessment[]>([]);
   const [status, setStatus] = useState<"loading" | "ready" | "error">("loading");
   const [error, setError] = useState("");
+  const [needsSignIn, setNeedsSignIn] = useState(false);
   const [busyId, setBusyId] = useState<string | null>(null);
 
   useEffect(() => {
@@ -34,13 +37,20 @@ function SavedAssessmentsPage() {
         setItems(rows);
         setStatus("ready");
       })
-      .catch(() => {
+      .catch(async () => {
+        if (!active) return;
+        try {
+          const account = await getAccount();
+          if (active) setNeedsSignIn(!account.email);
+        } catch {
+          if (active) setNeedsSignIn(false);
+        }
         if (active) setStatus("error");
       });
     return () => {
       active = false;
     };
-  }, [load]);
+  }, [load, getAccount]);
 
   const restore = (item: SavedAssessment) => {
     const test = testBySlug(item.assessment_slug);
@@ -111,10 +121,16 @@ function SavedAssessmentsPage() {
         </p>
       ) : status === "error" ? (
         <div className="panel mt-8 p-6">
-          <p role="alert">Couldn't load your saved assessments. Please sign in and try again.</p>
-          <Link to="/sign-in" className="mt-4 inline-block text-primary">
-            Sign in
-          </Link>
+          <p role="alert">
+            {needsSignIn
+              ? "Your session has ended. Please sign in to view saved assessments."
+              : "Couldn't load saved assessments right now. Your account may still be signed in. Please try reloading this page."}
+          </p>
+          {needsSignIn ? (
+            <Link to="/sign-in" className="mt-4 inline-block text-primary">
+              Sign in
+            </Link>
+          ) : null}
         </div>
       ) : items.length === 0 ? (
         <div className="panel mt-8 p-6">
