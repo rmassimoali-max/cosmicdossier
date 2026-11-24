@@ -205,7 +205,10 @@ export function SiteNav() {
                 className="panel mt-2 ml-auto flex w-56 flex-col p-3 text-left"
               >
                 {accountDisplayName?.trim() ? (
-                  <p className="truncate px-3 py-2 text-xs text-muted-foreground" title={accountEmail}>
+                  <p
+                    className="truncate px-3 py-2 text-xs text-muted-foreground"
+                    title={accountEmail}
+                  >
                     {accountEmail}
                   </p>
                 ) : null}
