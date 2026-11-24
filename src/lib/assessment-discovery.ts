@@ -34,7 +34,9 @@ export function getAssessmentEntries(person: PersonInput): AssessmentEntry[] {
       label: "MBTI",
       category: "Personality",
       completed: Boolean(person.mbtiEstimates?.length || person.assessmentResults?.["mbti"]),
-      manuallyEntered: Boolean(person.mbti && !person.mbtiEstimates?.length && !person.assessmentResults?.["mbti"]),
+      manuallyEntered: Boolean(
+        person.mbti && !person.mbtiEstimates?.length && !person.assessmentResults?.["mbti"],
+      ),
       detail: legacyDetail(person, "mbti"),
       legacy: true,
     },
@@ -42,8 +44,14 @@ export function getAssessmentEntries(person: PersonInput): AssessmentEntry[] {
       slug: "enneagram",
       label: "Enneagram",
       category: "Personality",
-      completed: Boolean(person.enneagramEstimates?.length || person.assessmentResults?.["enneagram"]),
-      manuallyEntered: Boolean(person.enneagramType && !person.enneagramEstimates?.length && !person.assessmentResults?.["enneagram"]),
+      completed: Boolean(
+        person.enneagramEstimates?.length || person.assessmentResults?.["enneagram"],
+      ),
+      manuallyEntered: Boolean(
+        person.enneagramType &&
+          !person.enneagramEstimates?.length &&
+          !person.assessmentResults?.["enneagram"],
+      ),
       detail: legacyDetail(person, "enneagram"),
       legacy: true,
     },
@@ -51,8 +59,14 @@ export function getAssessmentEntries(person: PersonInput): AssessmentEntry[] {
       slug: "attachment",
       label: "Attachment Style",
       category: "Relationships & Attachment",
-      completed: Boolean(person.attachmentEstimates?.length || person.assessmentResults?.["attachment-style"]),
-      manuallyEntered: Boolean(person.attachment && !person.attachmentEstimates?.length && !person.assessmentResults?.["attachment-style"]),
+      completed: Boolean(
+        person.attachmentEstimates?.length || person.assessmentResults?.["attachment-style"],
+      ),
+      manuallyEntered: Boolean(
+        person.attachment &&
+          !person.attachmentEstimates?.length &&
+          !person.assessmentResults?.["attachment-style"],
+      ),
       detail: legacyDetail(person, "attachment"),
       legacy: true,
     },
