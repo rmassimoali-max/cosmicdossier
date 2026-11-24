@@ -63,9 +63,7 @@ describe("deletion email request orchestration", () => {
         },
       }),
     ).rejects.toThrow("Could not send deletion verification");
-    expect(state.revoked).toEqual([
-      { id: state.records[0].id, owner: userId },
-    ]);
+    expect(state.revoked).toEqual([{ id: state.records[0].id, owner: userId }]);
   });
 
   test("does not deliver when storage rejects the request", async () => {
