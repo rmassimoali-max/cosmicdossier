@@ -50,6 +50,7 @@ export function SiteNav() {
   const [checkoutActive, setCheckoutActive] = useState(false);
   const [accountOpen, setAccountOpen] = useState(false);
   const [accountEmail, setAccountEmail] = useState<string | null>(null);
+  const [accountDisplayName, setAccountDisplayName] = useState<string | null>(null);
   const [accountStatus, setAccountStatus] = useState<"loading" | "ready" | "error">("loading");
   const getAccount = useServerFn(getCurrentAccount);
   const signOut = useServerFn(signOutAccount);
@@ -65,6 +66,7 @@ export function SiteNav() {
       .then((account) => {
         if (!active) return;
         setAccountEmail(account.email);
+        setAccountDisplayName(account.displayName);
         setAccountStatus("ready");
       })
       .catch(() => {
@@ -188,7 +190,9 @@ export function SiteNav() {
             >
               <span className="min-w-0">
                 <span className="block text-[10px] text-primary">Your cosmic space</span>
-                <span className="block truncate">{accountEmail}</span>
+                <span className="block truncate">
+                  {accountDisplayName?.trim() ? `${accountDisplayName.trim()}\u0027s Universe` : accountEmail}
+                </span>
               </span>
               <span aria-hidden="true">⌄</span>
             </button>
@@ -198,6 +202,11 @@ export function SiteNav() {
                 aria-label="Account"
                 className="panel mt-2 ml-auto flex w-56 flex-col p-3 text-left"
               >
+                {accountDisplayName?.trim() ? (
+                  <p className="truncate px-3 py-2 text-xs text-muted-foreground" title={accountEmail}>
+                    {accountEmail}
+                  </p>
+                ) : null}
                 <Link to="/dashboard" className="rounded px-3 py-2 text-sm hover:text-primary">
                   My Dashboard
                 </Link>
@@ -217,6 +226,7 @@ export function SiteNav() {
                     void signOut()
                       .then(() => {
                         setAccountEmail(null);
+                        setAccountDisplayName(null);
                         setAccountOpen(false);
                       })
                       .catch(() => setAccountStatus("error"));
