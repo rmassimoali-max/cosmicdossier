@@ -8,12 +8,17 @@ const secret = Buffer.alloc(32, 4);
 function fixture() {
   const records = [];
   const revoked = [];
+  const activated = [];
   return {
     records,
     revoked,
+    activated,
     store: {
       async create(record) {
         records.push(record);
+      },
+      async activate(id, owner) {
+        activated.push({ id, owner });
       },
       async revoke(id, owner) {
         revoked.push({ id, owner });
@@ -47,6 +52,7 @@ describe("deletion email request orchestration", () => {
     expect(result.expiresAt).toBe("2026-11-24T12:10:00.000Z");
     expect(JSON.stringify(result)).not.toContain(sentCode);
     expect(state.revoked).toHaveLength(0);
+    expect(state.activated).toEqual([{ id: state.records[0].id, owner: userId }]);
   });
 
   test("revokes a persisted challenge when delivery fails", async () => {
@@ -93,6 +99,7 @@ describe("deletion email request orchestration", () => {
             throw new Error("Rate limit reached");
           },
           async revoke() {},
+          async activate() {},
         },
         emailConfig,
         secret,
