@@ -16,7 +16,7 @@ fi
 # Validate the requested connection endpoint, not inet_server_addr(): Docker's
 # published localhost port reaches a container with a private bridge IP.
 # Reject URL parameters (including hostaddr overrides) and remote hostnames.
-if [[ ! "$TEST_DATABASE_URL" =~ ^postgres(ql)?://[^/?#@]+@((127\\.0\\.0\\.1)|(\\[::1\\])):[0-9]+/[^/?#]+$ ]]; then
+if [[ ! "$TEST_DATABASE_URL" =~ ^postgres(ql)?://[^/?#@]+@((127\.0\.0\.1)|(\[::1\])):[0-9]+/[^/?#]+$ ]]; then
   echo "Refusing database URL: only explicit loopback TCP URLs without parameters are allowed." >&2
   exit 1
 fi
