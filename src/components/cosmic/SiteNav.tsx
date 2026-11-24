@@ -221,9 +221,13 @@ export function SiteNav() {
                 >
                   Saved Assessments
                 </Link>
-                <Link to="/account" className="rounded px-3 py-2 text-sm hover:text-primary">
+                <a
+                  href="/account"
+                  onClick={() => setAccountOpen(false)}
+                  className="rounded px-3 py-2 text-sm hover:text-primary"
+                >
                   Account Settings
-                </Link>
+                </a>
                 <button
                   type="button"
                   className="rounded px-3 py-2 text-left text-sm text-muted-foreground hover:text-primary"
