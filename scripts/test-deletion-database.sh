@@ -37,6 +37,5 @@ echo "Checking database security..."
 psql "$TEST_DATABASE_URL" -X -v ON_ERROR_STOP=1 \
   -f supabase/tests/account_deletion_security.sql
 echo "Checking single-use verification behavior..."
-psql "$TEST_DATABASE_URL" -X -v ON_ERROR_STOP=1 \\
-  -f supabase/tests/account_deletion_behavior.sql
+psql "$TEST_DATABASE_URL" -X -v ON_ERROR_STOP=1 -f supabase/tests/account_deletion_behavior.sql
 echo "Database security and behavior assertions passed."
