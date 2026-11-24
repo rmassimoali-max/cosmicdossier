@@ -1,7 +1,13 @@
 import { createFileRoute, Link } from "@tanstack/react-router";
 import { useServerFn } from "@tanstack/react-start";
 import { useEffect, useState } from "react";
-import { getCurrentAccount, signOutAccount } from "@/lib/auth.functions";
+import {
+  getCurrentAccount,
+  requestAccountEmailChange,
+  requestPasswordReset,
+  signOutAccount,
+  updateAccountDisplayName,
+} from "@/lib/auth.functions";
 
 export const Route = createFileRoute("/account")({
   head: () => ({
@@ -16,14 +22,25 @@ export const Route = createFileRoute("/account")({
 function AccountPage() {
   const getAccount = useServerFn(getCurrentAccount);
   const signOut = useServerFn(signOutAccount);
+  const saveName = useServerFn(updateAccountDisplayName);
+  const changeEmail = useServerFn(requestAccountEmailChange);
+  const resetPassword = useServerFn(requestPasswordReset);
   const [email, setEmail] = useState<string | null>(null);
   const [loading, setLoading] = useState(true);
+  const [displayName, setDisplayName] = useState("");
+  const [newEmail, setNewEmail] = useState("");
+  const [notice, setNotice] = useState("");
+  const [error, setError] = useState("");
+  const [busy, setBusy] = useState(false);
 
   useEffect(() => {
     let active = true;
     void getAccount()
       .then((account) => {
-        if (active) setEmail(account.email);
+        if (active) {
+          setEmail(account.email);
+          setDisplayName(account.displayName ?? "");
+        }
       })
       .catch(() => {
         if (active) setEmail(null);
@@ -48,9 +65,105 @@ function AccountPage() {
           <>
             <p className="mt-4 text-muted-foreground">Signed in as {email}</p>
             <p className="mt-4 text-sm text-muted-foreground">
-              Saved dossiers and purchase recovery are coming next. Signing in does not unlock a
-              paid report.
+              Saved assessments belong to this account. Complete dossiers and purchase recovery
+              across devices are not available yet.
             </p>
+            <section className="mt-8 border-t border-border pt-6" aria-label="Profile settings">
+              <h2 className="font-display text-2xl text-gold">Profile</h2>
+              <form
+                className="mt-4 space-y-3"
+                onSubmit={(event) => {
+                  event.preventDefault();
+                  setBusy(true);
+                  setError("");
+                  setNotice("");
+                  void saveName({ data: { displayName } })
+                    .then(() => setNotice("Display name updated."))
+                    .catch(() => setError("Could not save your display name."))
+                    .finally(() => setBusy(false));
+                }}
+              >
+                <label htmlFor="account-display-name" className="block text-sm text-muted-foreground">
+                  Display name
+                </label>
+                <input
+                  id="account-display-name"
+                  value={displayName}
+                  onChange={(event) => setDisplayName(event.target.value)}
+                  maxLength={60}
+                  required
+                  className="w-full rounded-lg border border-border bg-background px-3 py-3 text-sm"
+                  placeholder="How should we address you?"
+                />
+                <button type="submit" disabled={busy} className="rounded-full border border-primary px-5 py-2 text-sm text-primary disabled:opacity-50">
+                  Save display name
+                </button>
+              </form>
+            </section>
+            <section className="mt-8 border-t border-border pt-6" aria-label="Email and security">
+              <h2 className="font-display text-2xl text-gold">Email &amp; security</h2>
+              <form
+                className="mt-4 space-y-3"
+                onSubmit={(event) => {
+                  event.preventDefault();
+                  setBusy(true);
+                  setError("");
+                  setNotice("");
+                  void changeEmail({ data: { email: newEmail } })
+                    .then(() => {
+                      setNotice("Email change requested. Check your inbox for confirmation instructions.");
+                      setNewEmail("");
+                    })
+                    .catch(() => setError("Could not request an email change."))
+                    .finally(() => setBusy(false));
+                }}
+              >
+                <label htmlFor="account-new-email" className="block text-sm text-muted-foreground">
+                  New email address
+                </label>
+                <input
+                  id="account-new-email"
+                  type="email"
+                  value={newEmail}
+                  onChange={(event) => setNewEmail(event.target.value)}
+                  maxLength={254}
+                  required
+                  className="w-full rounded-lg border border-border bg-background px-3 py-3 text-sm"
+                  placeholder="new@example.com"
+                />
+                <button type="submit" disabled={busy} className="rounded-full border border-primary px-5 py-2 text-sm text-primary disabled:opacity-50">
+                  Request email change
+                </button>
+              </form>
+              <p className="mt-5 text-sm text-muted-foreground">
+                Need a new password? Request a secure reset link at your current email.
+              </p>
+              <button
+                type="button"
+                disabled={busy}
+                className="mt-3 rounded-full border border-border px-5 py-2 text-sm text-primary disabled:opacity-50"
+                onClick={() => {
+                  setBusy(true);
+                  setError("");
+                  setNotice("");
+                  void resetPassword({ data: { email } })
+                    .then(() => setNotice("If email delivery is available, a password reset link is on its way."))
+                    .catch(() => setError("Could not request a password reset right now."))
+                    .finally(() => setBusy(false));
+                }}
+              >
+                Send password reset link
+              </button>
+            </section>
+            <section className="mt-8 border-t border-border pt-6" aria-label="Account deletion">
+              <h2 className="font-display text-2xl text-gold">Delete account</h2>
+              <p className="mt-3 text-sm text-muted-foreground">
+                Permanent account deletion is not available in this preview yet. Secure identity
+                verification and purchase-record handling are required before enabling it.
+              </p>
+            </section>
+            {notice ? <p role="status" className="mt-5 text-sm text-primary">{notice}</p> : null}
+            {error ? <p role="alert" className="mt-5 text-sm text-destructive">{error}</p> : null}
             <Link to="/dashboard" className="mt-5 inline-block text-sm text-primary">
               Open my dashboard
             </Link>
