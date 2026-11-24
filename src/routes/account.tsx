@@ -44,6 +44,7 @@ function AccountPage() {
   const [verificationBusy, setVerificationBusy] = useState(false);
   const [emailVerificationBusy, setEmailVerificationBusy] = useState(false);
   const [emailVerificationStatus, setEmailVerificationStatus] = useState("");
+  const [deletionEmailCode, setDeletionEmailCode] = useState("");
 
   useEffect(() => {
     let active = true;
@@ -346,6 +347,29 @@ function AccountPage() {
                                 {emailVerificationStatus}
                               </p>
                             ) : null}
+                          </div>
+                          <div className="space-y-2 border-t border-border pt-3">
+                            <label htmlFor="deletion-email-code" className="block text-sm">
+                              Email verification code (preview only)
+                            </label>
+                            <input
+                              id="deletion-email-code"
+                              type="text"
+                              inputMode="numeric"
+                              autoComplete="one-time-code"
+                              pattern="[0-9]{8}"
+                              maxLength={8}
+                              value={deletionEmailCode}
+                              onChange={(event) =>
+                                setDeletionEmailCode(event.target.value.replace(/[^0-9]/g, ""))
+                              }
+                              placeholder="8-digit code"
+                              className="w-full rounded-lg border border-border bg-background px-3 py-3 text-sm"
+                            />
+                            <p className="text-xs text-muted-foreground">
+                              Code validation is not connected yet. Entering a code here does
+                              not verify your identity or authorize deletion.
+                            </p>
                           </div>
                           <p role="status" className="text-xs text-muted-foreground">
                             Verification is not active. No account data will be deleted.
