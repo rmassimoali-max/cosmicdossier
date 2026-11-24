@@ -68,3 +68,38 @@ if [[ "$(grep -Ec '^[0-9a-f-]{36}$' "$first")" != 1 || -n "$(tr -d '[:space:]' <
   exit 1
 fi
 echo "PASS: concurrent challenge exchanges issue exactly one authorization"
+
+# Activation and revocation racing must leave the challenge unusable.
+# The activation transaction holds its row lock until commit; revocation
+# must wait, then mark the challenge consumed regardless of delivery status.
+race_hash=$(printf '9%.0s' {1..64})
+race_id=$(psql "$TEST_DATABASE_URL" -X -v ON_ERROR_STOP=1 -qAtc \
+  "insert into public.account_deletion_challenges(user_id,token_hash,expires_at) values ('$user_id','$race_hash',now()+interval '10 minutes') returning id")
+: >"$first"
+: >"$second"
+psql "$TEST_DATABASE_URL" -X -v ON_ERROR_STOP=1 -qAt <<SQL >"$first" &
+begin;
+select private.activate_account_deletion_challenge('$race_id','$user_id');
+select pg_sleep(3);
+commit;
+SQL
+first_pid=$!
+sleep 1
+psql "$TEST_DATABASE_URL" -X -v ON_ERROR_STOP=1 -qAtc \
+  "update public.account_deletion_challenges set consumed_at=clock_timestamp() where id='$race_id' and user_id='$user_id' and consumed_at is null returning id" >"$second" &
+second_pid=$!
+wait "$first_pid"
+wait "$second_pid"
+final_state=$(psql "$TEST_DATABASE_URL" -X -v ON_ERROR_STOP=1 -qAtc \
+  "select (delivered_at is not null)::text || ':' || (consumed_at is not null)::text from public.account_deletion_challenges where id='$race_id'")
+replay=$(psql "$TEST_DATABASE_URL" -X -v ON_ERROR_STOP=1 -qAtc \
+  "select private.activate_account_deletion_challenge('$race_id','$user_id')")
+exchange=$(psql "$TEST_DATABASE_URL" -X -v ON_ERROR_STOP=1 -qAtc \
+  "select private.exchange_account_deletion_challenge('$race_id','$user_id','$race_hash','$first_hash')")
+if [[ "$(grep -xc 't' "$first")" != 1 || "$(grep -xc "$race_id" "$second")" != 1 || "$final_state" != 'true:true' || "$replay" != 'f' || -n "$exchange" ]]; then
+  echo "Concurrent activation/revocation failed fail-closed assertion" >&2
+  cat "$first" "$second" >&2
+  echo "state=$final_state retry=$replay exchange=$exchange" >&2
+  exit 1
+fi
+echo "PASS: concurrent activation and revocation leave challenge unusable"
