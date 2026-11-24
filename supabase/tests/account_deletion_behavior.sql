@@ -18,6 +18,23 @@ begin
   values (v_user, v_hash, now() + interval '10 minutes', now())
   returning id into v_challenge;
 
+  -- A persisted but unactivated challenge cannot be consumed.
+  insert into public.account_deletion_challenges(user_id, token_hash, expires_at)
+  values (v_user, repeat('9',64), now() + interval '10 minutes')
+  returning id into v_auth;
+  if private.consume_account_deletion_challenge(v_auth, v_user, repeat('9',64)) then
+    raise exception 'Pending email challenge was accepted';
+  end if;
+  if not private.activate_account_deletion_challenge(v_auth, v_user) then
+    raise exception 'Pending challenge activation failed';
+  end if;
+  if private.activate_account_deletion_challenge(v_auth, v_user) then
+    raise exception 'Challenge activated more than once';
+  end if;
+  if not private.consume_account_deletion_challenge(v_auth, v_user, repeat('9',64)) then
+    raise exception 'Activated challenge was rejected';
+  end if;
+
   if private.consume_account_deletion_challenge(v_challenge, v_other, v_hash) then
     raise exception 'Wrong-account challenge was accepted';
   end if;
