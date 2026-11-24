@@ -131,6 +131,8 @@ function TestFlow({ test, r, person }: { test: TestDef; r: string | undefined; p
       const sourceName =
         test.slug === "big-five"
           ? "Mini-IPIP · 20 items"
+          : test.slug === "resilience"
+            ? "Exploratory Resilience Reflection · v2 (12 original items)"
           : test.slug === "attachment-style"
             ? "Library Attachment · two dimensions"
             : test.name;
