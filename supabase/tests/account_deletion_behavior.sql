@@ -55,8 +55,8 @@ begin
   end if;
 
   -- Expired challenges must fail even when the supplied hash matches.
-  insert into public.account_deletion_challenges(user_id, token_hash, expires_at)
-  values (v_user, v_hash, now() - interval '1 minute')
+  insert into public.account_deletion_challenges(user_id, token_hash, created_at, expires_at)
+  values (v_user, v_hash, now() - interval '11 minutes', now() - interval '1 minute')
   returning id into v_challenge;
   if private.consume_account_deletion_challenge(v_challenge, v_user, v_hash) then
     raise exception 'Expired challenge was accepted';
@@ -82,8 +82,8 @@ begin
 
   -- Expired authorization cannot be used.
   insert into public.account_deletion_authorizations(
-    user_id, authorization_hash, expires_at
-  ) values (v_user, v_bad_hash, now() - interval '1 minute')
+    user_id, authorization_hash, created_at, expires_at
+  ) values (v_user, v_bad_hash, now() - interval '6 minutes', now() - interval '1 minute')
   returning id into v_auth;
   if private.consume_account_deletion_authorization(v_auth, v_user, v_bad_hash) then
     raise exception 'Expired authorization was accepted';
