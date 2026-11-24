@@ -246,9 +246,9 @@ function AccountPage() {
                             Identity verification (coming next)
                           </h4>
                           <p className="text-sm text-muted-foreground">
-                            Before deletion is enabled, you will need to verify your identity
-                            again. Password accounts and email-link accounts will both be
-                            supported. This preview does not request credentials or send an email.
+                            Before deletion is enabled, you will need to verify your identity again.
+                            Password accounts and email-link accounts will both be supported. This
+                            preview does not request credentials or send an email.
                           </p>
                           <p role="status" className="text-xs text-muted-foreground">
                             Verification is not active. No account data will be deleted.
