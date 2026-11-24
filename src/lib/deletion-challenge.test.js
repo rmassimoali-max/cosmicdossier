@@ -20,16 +20,11 @@ describe("account deletion challenge guards", () => {
   test("rejects expired, consumed, and exhausted challenges", () => {
     const { token, record } = issueDeletionChallenge("user-a", now);
     expect(checkDeletionChallenge(record, "user-a", token, record.expiresAt)).toBe(false);
+    expect(checkDeletionChallenge({ ...record, consumedAt: now }, "user-a", token, now)).toBe(
+      false,
+    );
     expect(
-      checkDeletionChallenge({ ...record, consumedAt: now }, "user-a", token, now),
-    ).toBe(false);
-    expect(
-      checkDeletionChallenge(
-        { ...record, attempts: DELETION_MAX_ATTEMPTS },
-        "user-a",
-        token,
-        now,
-      ),
+      checkDeletionChallenge({ ...record, attempts: DELETION_MAX_ATTEMPTS }, "user-a", token, now),
     ).toBe(false);
   });
   test("does not generate reusable challenges", () => {
