@@ -34,7 +34,8 @@ for file in \
   supabase/migrations/20261124000004_deletion_challenge_rate_limit.sql \
   supabase/migrations/20261124000005_deletion_challenge_delivery_gate.sql \
   supabase/migrations/20261124000006_deletion_backend_role.sql \
-  supabase/migrations/20261124000007_deletion_backend_rls.sql; do
+  supabase/migrations/20261124000007_deletion_backend_rls.sql \
+  supabase/migrations/20261124000008_idempotent_deletion_activation.sql; do
   psql "$TEST_DATABASE_URL" -X -v ON_ERROR_STOP=1 -f "$file"
 done
 
