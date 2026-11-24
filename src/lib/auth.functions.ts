@@ -143,7 +143,9 @@ export const getCurrentAccount = createServerFn({ method: "GET" }).handler(async
     const user = await authRequest("user", undefined, token);
     const metadata = user["user_metadata"];
     const displayName =
-      metadata && typeof metadata === "object" && "display_name" in metadata &&
+      metadata &&
+      typeof metadata === "object" &&
+      "display_name" in metadata &&
       typeof metadata.display_name === "string"
         ? metadata.display_name
         : null;
