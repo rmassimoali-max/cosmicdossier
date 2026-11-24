@@ -124,6 +124,32 @@ describe("deletion email request orchestration", () => {
     expect(state.revoked).toEqual([{ id: state.records[0].id, owner: userId }]);
   });
 
+  test("retries ambiguous activation without sending a second email", async () => {
+    const state = fixture();
+    let activationCalls = 0;
+    let emailCalls = 0;
+    state.store.activate = async (id, owner) => {
+      activationCalls += 1;
+      if (activationCalls === 1) throw new Error("Response lost after database commit");
+      state.activated.push({ id, owner });
+    };
+    const result = await requestDeletionEmailChallenge({
+      store: state.store,
+      emailConfig,
+      secret,
+      userId,
+      verifiedEmail: "owner@example.com",
+      sender: async () => {
+        emailCalls += 1;
+        return { sent: true };
+      },
+    });
+    expect(result.sent).toBe(true);
+    expect(emailCalls).toBe(1);
+    expect(activationCalls).toBe(2);
+    expect(state.revoked).toHaveLength(0);
+  });
+
   test("does not deliver when storage rejects the request", async () => {
     let delivered = false;
     await expect(
