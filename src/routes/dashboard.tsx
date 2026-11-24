@@ -162,7 +162,19 @@ function DashboardPage() {
                   : "Create your first dossier"}{" →"}
             </Link>
           </article>
-        </div>
+ 
+          {destinations.slice(1).map((item) => (
+            <article key={item.title} className="panel flex flex-col p-6">
+              <h3 className="font-display text-2xl text-foreground">{item.title}</h3>
+              <p className="mt-3 flex-1 text-sm leading-relaxed text-muted-foreground">
+                {item.description}
+              </p>
+              <Link to={item.to} className="mt-5 inline-block text-sm text-primary">
+                {item.action} →
+              </Link>
+            </article>
+          ))}
+       </div>
       </section>
     </main>
   );
