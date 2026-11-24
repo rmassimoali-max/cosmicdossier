@@ -20,6 +20,8 @@ describe("server-only deletion email codes", () => {
     expect(readDeletionCodeSecret({})).toBeNull();
     expect(() => readDeletionCodeSecret({ DELETION_CODE_HMAC_SECRET: "weak" })).toThrow();
     expect(readDeletionCodeSecret({ DELETION_CODE_HMAC_SECRET: "ab".repeat(32) })).toHaveLength(32);
+    expect(() => readDeletionCodeSecret({ DELETION_CODE_HMAC_SECRET: "a".repeat(65) })).toThrow();
+    expect(() => readDeletionCodeSecret({ DELETION_CODE_HMAC_SECRET: "a".repeat(63) })).toThrow();
   });
 
   test("binds code digest to user, challenge, and secret", () => {
