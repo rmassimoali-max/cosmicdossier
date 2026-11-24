@@ -40,7 +40,13 @@ export async function requestDeletionEmailChallenge(input: {
   try {
     const result = await sender(emailConfig, verifiedEmail, code);
     if (!result.sent) throw new Error("Verification email was not accepted.");
-    await store.activate(id, userId);
+    // A successful DB commit can lose its response. Retry only activation,
+    // never email delivery. The SQL function is idempotent for active records.
+    try {
+      await store.activate(id, userId);
+    } catch {
+      await store.activate(id, userId);
+    }
   } catch {
     // Fail closed: if revocation fails, never claim that the challenge was
     // safely invalidated. Production adapter must retry/reconcile failures.
