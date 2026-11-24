@@ -83,8 +83,10 @@ function AccountPage() {
                     .finally(() => setBusy(false));
                 }}
               >
-                <label htmlFor="account-display-name"
-                  className="block text-sm text-muted-foreground">
+                <label
+                  htmlFor="account-display-name"
+                  className="block text-sm text-muted-foreground"
+                >
                   Display name
                 </label>
                 <input
@@ -96,9 +98,11 @@ function AccountPage() {
                   className="w-full rounded-lg border border-border bg-background px-3 py-3 text-sm"
                   placeholder="How should we address you?"
                 />
-                <button type="submit"
+                <button
+                  type="submit"
                   disabled={busy}
-                  className="rounded-full border border-primary px-5 py-2 text-sm text-primary disabled:opacity-50">
+                  className="rounded-full border border-primary px-5 py-2 text-sm text-primary disabled:opacity-50"
+                >
                   Save display name
                 </button>
               </form>
@@ -136,9 +140,11 @@ function AccountPage() {
                   className="w-full rounded-lg border border-border bg-background px-3 py-3 text-sm"
                   placeholder="new@example.com"
                 />
-                <button type="submit"
+                <button
+                  type="submit"
                   disabled={busy}
-                  className="rounded-full border border-primary px-5 py-2 text-sm text-primary disabled:opacity-50">
+                  className="rounded-full border border-primary px-5 py-2 text-sm text-primary disabled:opacity-50"
+                >
                   Request email change
                 </button>
               </form>
