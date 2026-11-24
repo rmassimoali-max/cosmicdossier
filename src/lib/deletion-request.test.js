@@ -66,6 +66,24 @@ describe("deletion email request orchestration", () => {
     expect(state.revoked).toEqual([{ id: state.records[0].id, owner: userId }]);
   });
 
+  test("reports revocation failure rather than claiming the challenge was invalidated", async () => {
+    const state = fixture();
+    state.store.revoke = async () => {
+      throw new Error("Database connection lost");
+    };
+    await expect(
+      requestDeletionEmailChallenge({
+        store: state.store,
+        emailConfig,
+        secret,
+        userId,
+        verifiedEmail: "owner@example.com",
+        sender: async () => ({ sent: false }),
+      }),
+    ).rejects.toThrow("delivery and revocation failed");
+    expect(state.records).toHaveLength(1);
+  });
+
   test("does not deliver when storage rejects the request", async () => {
     let delivered = false;
     await expect(
