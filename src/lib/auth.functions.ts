@@ -13,6 +13,7 @@ const credentialsSchema = z.object({
   password: z.string().min(8).max(128),
 });
 const passwordSchema = z.object({ password: z.string().min(8).max(128) });
+const displayNameSchema = z.object({ displayName: z.string().trim().min(1).max(60) });
 const recoverySchema = z.object({ tokenHash: z.string().min(16).max(2048) });
 const callbackSchema = z.object({
   tokenHash: z.string().min(16).max(2048),
@@ -126,7 +127,7 @@ export const getCurrentAccount = createServerFn({ method: "GET" }).handler(async
   let token = getCookie(ACCESS);
   if (!token) {
     const refresh = getCookie(REFRESH);
-    if (!refresh) return { email: null };
+    if (!refresh) return { email: null, displayName: null };
     try {
       const payload = await authRequest("token?grant_type=refresh_token", {
         refresh_token: refresh,
@@ -140,7 +141,13 @@ export const getCurrentAccount = createServerFn({ method: "GET" }).handler(async
   }
   try {
     const user = await authRequest("user", undefined, token);
-    return { email: typeof user["email"] === "string" ? user["email"] : null };
+    const metadata = user["user_metadata"];
+    const displayName =
+      metadata && typeof metadata === "object" && "display_name" in metadata &&
+      typeof metadata.display_name === "string"
+        ? metadata.display_name
+        : null;
+    return { email: typeof user["email"] === "string" ? user["email"] : null, displayName };
   } catch {
     clearTokens();
     return { email: null };
@@ -213,4 +220,46 @@ export const changeRecoveredPassword = createServerFn({ method: "POST" })
     if (!response.ok) throw new Error("Could not update password.");
     clearTokens();
     return { success: true };
+  });
+
+/** Display name is presentation-only metadata, never an authorization claim. */
+export const updateAccountDisplayName = createServerFn({ method: "POST" })
+  .inputValidator((input: unknown) => displayNameSchema.parse(input))
+  .handler(async ({ data }) => {
+    const token = getCookie(ACCESS);
+    if (!token) throw new Error("Please sign in again to update your profile.");
+    const { url, publishableKey } = config();
+    const response = await fetch(`${url}/auth/v1/user`, {
+      method: "PUT",
+      headers: {
+        apikey: publishableKey,
+        Authorization: `Bearer ${token}`,
+        "Content-Type": "application/json",
+      },
+      body: JSON.stringify({ data: { display_name: data.displayName } }),
+      cache: "no-store",
+    });
+    if (!response.ok) throw new Error("Could not update your display name. Please try again.");
+    return { success: true };
+  });
+
+/** Supabase handles confirmation of the new address; do not change local login state early. */
+export const requestAccountEmailChange = createServerFn({ method: "POST" })
+  .inputValidator((input: unknown) => emailSchema.parse(input))
+  .handler(async ({ data }) => {
+    const token = getCookie(ACCESS);
+    if (!token) throw new Error("Please sign in again to change your email.");
+    const { url, publishableKey } = config();
+    const response = await fetch(`${url}/auth/v1/user`, {
+      method: "PUT",
+      headers: {
+        apikey: publishableKey,
+        Authorization: `Bearer ${token}`,
+        "Content-Type": "application/json",
+      },
+      body: JSON.stringify({ email: data.email }),
+      cache: "no-store",
+    });
+    if (!response.ok) throw new Error("Could not request an email change. Please try again.");
+    return { requested: true };
   });
