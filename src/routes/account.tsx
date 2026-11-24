@@ -316,8 +316,8 @@ function AccountPage() {
                           ) : null}
                           <div className="space-y-2 border-t border-border pt-3">
                             <p className="text-sm text-muted-foreground">
-                              Prefer email? Request a reauthentication code from Supabase. Code
-                              entry and deletion authorization are not available yet.
+                              Supabase reauthentication codes are for password changes, not account
+                              deletion. A dedicated deletion challenge is coming next.
                             </p>
                             <button
                               type="button"
@@ -329,7 +329,7 @@ function AccountPage() {
                                 void requestDeletionCode()
                                   .then(() =>
                                     setEmailVerificationStatus(
-                                      "Code requested. Check your email. Deletion remains disabled.",
+                                      "Code requested for reauthentication only. Deletion remains disabled.",
                                     ),
                                   )
                                   .catch(() =>
@@ -350,7 +350,7 @@ function AccountPage() {
                           </div>
                           <div className="space-y-2 border-t border-border pt-3">
                             <label htmlFor="deletion-email-code" className="block text-sm">
-                              Email verification code (preview only)
+                              Email reauthentication code (not valid for deletion)
                             </label>
                             <input
                               id="deletion-email-code"
@@ -367,8 +367,8 @@ function AccountPage() {
                               className="w-full rounded-lg border border-border bg-background px-3 py-3 text-sm"
                             />
                             <p className="text-xs text-muted-foreground">
-                              Code validation is not connected yet. Entering a code here does not
-                              verify your identity or authorize deletion.
+                              Supabase issues this code for password changes. It cannot currently
+                              authorize account deletion. Do not enter a real code here.
                             </p>
                           </div>
                           <p role="status" className="text-xs text-muted-foreground">
