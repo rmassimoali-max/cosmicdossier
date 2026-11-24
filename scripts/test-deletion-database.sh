@@ -25,7 +25,7 @@ esac
 
 # Confirm that the target is a local Supabase stack with expected auth schema.
 psql "$TEST_DATABASE_URL" -X -v ON_ERROR_STOP=1 -Atqc \
-  "select case when to_regclass('auth.users') is not null then 'ready' else 1/0::text end" >/dev/null
+  "select to_regclass('auth.users') is not null" | grep -qx 't'
 
 echo "Applying staged deletion migrations to loopback test database..."
 for file in \
