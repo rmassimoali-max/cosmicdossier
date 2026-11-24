@@ -278,3 +278,36 @@ export const requestAccountEmailChange = createServerFn({ method: "POST" })
     }
     return { requested: true };
   });
+
+/**
+ * Verify a password against the currently signed-in account, without granting
+ * account-deletion permission or changing the active session.
+ * A successful check is informational only until a separate, short-lived,
+ * single-use deletion authorization flow is implemented.
+ */
+export const previewVerifyDeletionPassword = createServerFn({ method: "POST" })
+  .inputValidator((input: unknown) => passwordSchema.parse(input))
+  .handler(async ({ data }) => {
+    const currentToken = getCookie(ACCESS);
+    if (!currentToken) throw new Error("Please sign in again.");
+    const current = await authRequest("user", undefined, currentToken);
+    const userId = current["id"];
+    const email = current["email"];
+    if (typeof userId !== "string" || typeof email !== "string") {
+      throw new Error("Could not verify your current account.");
+    }
+    // Do not call saveTokens: a password check must not replace auth cookies.
+    const verified = await authRequest("token?grant_type=password", {
+      email,
+      password: data.password,
+    });
+    const checkedToken = verified["access_token"];
+    if (typeof checkedToken !== "string") {
+      throw new Error("Password verification failed.");
+    }
+    const checkedUser = await authRequest("user", undefined, checkedToken);
+    if (checkedUser["id"] !== userId) {
+      throw new Error("Password verification failed.");
+    }
+    return { verified: true, deletionEnabled: false };
+  });
