@@ -66,7 +66,7 @@ export function SiteNav() {
       .then((account) => {
         if (!active) return;
         setAccountEmail(account.email);
-        setAccountDisplayName(account.displayName);
+        setAccountDisplayName(account.displayName ?? null);
         setAccountStatus("ready");
       })
       .catch(() => {
