@@ -44,7 +44,7 @@ challenge_hash=$(printf '6%.0s' {1..64})
 first_hash=$(printf '7%.0s' {1..64})
 second_hash=$(printf '8%.0s' {1..64})
 challenge_id=$(psql "$TEST_DATABASE_URL" -X -v ON_ERROR_STOP=1 -qAtc \
-  "insert into public.account_deletion_challenges(user_id,token_hash,expires_at) values ('$user_id','$challenge_hash',now()+interval '10 minutes') returning id")
+  "insert into public.account_deletion_challenges(user_id,token_hash,expires_at,delivered_at) values ('$user_id','$challenge_hash',now()+interval '10 minutes',now()) returning id")
 : >"$first"
 : >"$second"
 psql "$TEST_DATABASE_URL" -X -v ON_ERROR_STOP=1 -qAt <<SQL >"$first" &
