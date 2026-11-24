@@ -253,9 +253,9 @@ function AccountPage() {
                             Identity verification (coming next)
                           </h4>
                           <p className="text-sm text-muted-foreground">
-                            If you use a password, you can verify it here. Email-link
-                            verification is not implemented yet. Verification does not
-                            authorize deletion, and no account will be deleted.
+                            If you use a password, you can verify it here. Email-link verification
+                            is not implemented yet. Verification does not authorize deletion, and no
+                            account will be deleted.
                           </p>
                           <form
                             className="space-y-3"
@@ -266,12 +266,16 @@ function AccountPage() {
                               void verifyDeletionPassword({
                                 data: { password: deletionPassword },
                               })
-                                .then(() => setVerificationStatus(
-                                  "Password verified for this account. Deletion remains disabled.",
-                                ))
-                                .catch(() => setVerificationStatus(
-                                  "Could not verify the password. Try again or use email-link sign-in.",
-                                ))
+                                .then(() =>
+                                  setVerificationStatus(
+                                    "Password verified for this account. Deletion remains disabled.",
+                                  ),
+                                )
+                                .catch(() =>
+                                  setVerificationStatus(
+                                    "Could not verify the password. Try again or use email-link sign-in.",
+                                  ),
+                                )
                                 .finally(() => {
                                   setVerificationBusy(false);
                                   setDeletionPassword("");
