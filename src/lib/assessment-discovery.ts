@@ -49,8 +49,8 @@ export function getAssessmentEntries(person: PersonInput): AssessmentEntry[] {
       ),
       manuallyEntered: Boolean(
         person.enneagramType &&
-          !person.enneagramEstimates?.length &&
-          !person.assessmentResults?.["enneagram"],
+        !person.enneagramEstimates?.length &&
+        !person.assessmentResults?.["enneagram"],
       ),
       detail: legacyDetail(person, "enneagram"),
       legacy: true,
@@ -64,8 +64,8 @@ export function getAssessmentEntries(person: PersonInput): AssessmentEntry[] {
       ),
       manuallyEntered: Boolean(
         person.attachment &&
-          !person.attachmentEstimates?.length &&
-          !person.assessmentResults?.["attachment-style"],
+        !person.attachmentEstimates?.length &&
+        !person.assessmentResults?.["attachment-style"],
       ),
       detail: legacyDetail(person, "attachment"),
       legacy: true,
