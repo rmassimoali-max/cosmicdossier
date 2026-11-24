@@ -7,6 +7,7 @@ export type AssessmentEntry = {
   label: string;
   category: string;
   completed: boolean;
+  manuallyEntered?: boolean;
   detail?: string | undefined;
   legacy: boolean;
 };
@@ -14,13 +15,13 @@ export type AssessmentEntry = {
 const CORE_EQUIVALENTS = new Set(["mbti", "enneagram", "attachment-style", "big-five"]);
 
 function legacyDetail(person: PersonInput, slug: string): string | undefined {
-  if (slug === "mbti") return person.mbtiEstimates?.length ? person.mbti : undefined;
+  if (slug === "mbti") return person.mbti;
   if (slug === "enneagram") {
-    if (!person.enneagramEstimates?.length) return undefined;
+    if (!person.enneagramType) return undefined;
     return `${person.enneagramType ?? ""}${person.enneagramWing ? `w${person.enneagramWing}` : ""}`;
   }
   if (slug === "attachment") {
-    return person.attachmentEstimates?.length ? person.attachment : undefined;
+    return person.attachment;
   }
   if (slug === "bigfive") return person.bigFive ? "Scored" : undefined;
   return undefined;
@@ -32,7 +33,8 @@ export function getAssessmentEntries(person: PersonInput): AssessmentEntry[] {
       slug: "mbti",
       label: "MBTI",
       category: "Personality",
-      completed: Boolean(person.mbtiEstimates?.length),
+      completed: Boolean(person.mbtiEstimates?.length || person.assessmentResults?.["mbti"]),
+      manuallyEntered: Boolean(person.mbti && !person.mbtiEstimates?.length && !person.assessmentResults?.["mbti"]),
       detail: legacyDetail(person, "mbti"),
       legacy: true,
     },
@@ -40,7 +42,8 @@ export function getAssessmentEntries(person: PersonInput): AssessmentEntry[] {
       slug: "enneagram",
       label: "Enneagram",
       category: "Personality",
-      completed: Boolean(person.enneagramEstimates?.length),
+      completed: Boolean(person.enneagramEstimates?.length || person.assessmentResults?.["enneagram"]),
+      manuallyEntered: Boolean(person.enneagramType && !person.enneagramEstimates?.length && !person.assessmentResults?.["enneagram"]),
       detail: legacyDetail(person, "enneagram"),
       legacy: true,
     },
@@ -48,7 +51,8 @@ export function getAssessmentEntries(person: PersonInput): AssessmentEntry[] {
       slug: "attachment",
       label: "Attachment Style",
       category: "Relationships & Attachment",
-      completed: Boolean(person.attachmentEstimates?.length),
+      completed: Boolean(person.attachmentEstimates?.length || person.assessmentResults?.["attachment-style"]),
+      manuallyEntered: Boolean(person.attachment && !person.attachmentEstimates?.length && !person.assessmentResults?.["attachment-style"]),
       detail: legacyDetail(person, "attachment"),
       legacy: true,
     },
@@ -56,7 +60,7 @@ export function getAssessmentEntries(person: PersonInput): AssessmentEntry[] {
       slug: "bigfive",
       label: "Big Five",
       category: "Personality",
-      completed: Boolean(person.bigFive),
+      completed: Boolean(person.bigFive || person.assessmentResults?.["big-five"]),
       detail: legacyDetail(person, "bigfive"),
       legacy: true,
     },
