@@ -292,7 +292,8 @@ begin
     raise exception 'Authorization expiry fixture failed to exchange';
   end if;
   update public.account_deletion_authorizations
-  set expires_at = now() - interval '1 second'
+  set created_at = now() - interval '6 minutes',
+      expires_at = now() - interval '1 minute'
   where id = v_exchange;
   if private.consume_account_deletion_authorization(
     v_exchange, v_user, repeat('f',64)
