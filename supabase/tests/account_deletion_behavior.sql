@@ -184,6 +184,35 @@ begin
     raise exception 'Overlong authorization lifetime was accepted';
   end if;
 
+  -- Wrong email codes must also count when submitted through the actual
+  -- exchange function, not only through the lower-level consume function.
+  insert into public.account_deletion_challenges(user_id, token_hash, expires_at, delivered_at)
+  values (v_user, repeat('e',64), now() + interval '10 minutes', now())
+  returning id into v_challenge;
+  for i in 1..5 loop
+    if private.exchange_account_deletion_challenge(
+      v_challenge, v_user, repeat('f',64), repeat('3',64)
+    ) is not null then
+      raise exception 'Incorrect email code exchanged for authorization';
+    end if;
+  end loop;
+  select attempts into v_attempts from public.account_deletion_challenges
+  where id = v_challenge;
+  if v_attempts <> 5 then
+    raise exception 'Wrong exchange codes did not reach attempt limit';
+  end if;
+  if private.exchange_account_deletion_challenge(
+    v_challenge, v_user, repeat('e',64), repeat('3',64)
+  ) is not null then
+    raise exception 'Correct email code bypassed exchange lockout';
+  end if;
+  if exists (
+    select 1 from public.account_deletion_authorizations
+    where user_id = v_user and authorization_hash = repeat('3',64)
+  ) then
+    raise exception 'Locked-out exchange issued an authorization';
+  end if;
+
   -- Successful exchange consumes the challenge and issues one authorization.
   insert into public.account_deletion_challenges(user_id, token_hash, expires_at, delivered_at)
   values (v_user, repeat('1',64), now() + interval '10 minutes', now())
