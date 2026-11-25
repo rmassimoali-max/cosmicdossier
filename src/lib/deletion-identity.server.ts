@@ -11,10 +11,7 @@ export function requireVerifiedDeletionIdentity(payload: Record<string, unknown>
   const validId =
     typeof id === "string" &&
     /^[0-9a-f]{8}-[0-9a-f]{4}-[1-8][0-9a-f]{3}-[89ab][0-9a-f]{3}-[0-9a-f]{12}$/i.test(id);
-  const validEmail =
-    typeof email === "string" &&
-    email.length <= 254 &&
-    /^[^\s@]+@[^\s@]+\.[^\s@]+$/.test(email);
+  const validEmail = typeof email === "string" && email.length <= 254 && /^[^\s@]+@[^\s@]+\.[^\s@]+$/.test(email);
   if (
     !validId ||
     !validEmail ||
