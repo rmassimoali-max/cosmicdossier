@@ -57,7 +57,12 @@ describe("preflighted deletion code verification", () => {
     expect(input.queries[0].params[0]).toBe(challengeId);
     expect(input.queries[0].params[1]).toBe(userId);
     expect(input.queries[0].params[2]).toBe(
-      hashDeletionEmailCode(Buffer.from(enabled.DELETION_CODE_HMAC_SECRET, "hex"), userId, challengeId, code),
+      hashDeletionEmailCode(
+        Buffer.from(enabled.DELETION_CODE_HMAC_SECRET, "hex"),
+        userId,
+        challengeId,
+        code,
+      ),
     );
     expect(JSON.stringify(input.queries)).not.toContain(code);
     expect(JSON.stringify(input.queries)).not.toContain(result.authorizationSecret);
