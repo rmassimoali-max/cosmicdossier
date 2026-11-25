@@ -24,7 +24,7 @@ export async function handleDeletionCodeVerification(input: {
     throw new Error("Invalid verification request.");
   }
   const values = body as Record<string, unknown>;
-  if (typeof values.challengeId !== "string" || typeof values.code !== "string") {
+  if (typeof values["challengeId"] !== "string" || typeof values["code"] !== "string") {
     throw new Error("A deletion challenge and verification code are required.");
   }
 
@@ -38,8 +38,8 @@ export async function handleDeletionCodeVerification(input: {
     publishableKey: input.publishableKey,
     accessToken: token,
     db: input.db,
-    challengeId: values.challengeId,
-    code: values.code,
+    challengeId: values["challengeId"],
+    code: values["code"],
     ...(input.fetcher ? { fetcher: input.fetcher } : {}),
   });
 }
