@@ -241,6 +241,33 @@ begin
     raise exception 'Exchanged authorization could not be consumed';
   end if;
 
+  -- A freshly exchanged authorization must not be consumable by another
+  -- account, even with the correct authorization hash.
+  insert into public.account_deletion_challenges(user_id, token_hash, expires_at, delivered_at)
+  values (v_user, repeat('6',64), now() + interval '10 minutes', now())
+  returning id into v_challenge;
+  v_exchange := private.exchange_account_deletion_challenge(
+    v_challenge, v_user, repeat('6',64), repeat('7',64)
+  );
+  if v_exchange is null then
+    raise exception 'Cross-account isolation fixture failed to exchange';
+  end if;
+  if private.consume_account_deletion_authorization(
+    v_exchange, v_other, repeat('7',64)
+  ) then
+    raise exception 'Another account consumed issued authorization';
+  end if;
+  if not private.consume_account_deletion_authorization(
+    v_exchange, v_user, repeat('7',64)
+  ) then
+    raise exception 'Wrong-account attempt invalidated owner authorization';
+  end if;
+  if private.consume_account_deletion_authorization(
+    v_exchange, v_user, repeat('7',64)
+  ) then
+    raise exception 'Owner authorization was replayed';
+  end if;
+
   -- A uniqueness failure during issuance must roll back challenge consumption.
   -- The exception block is a PostgreSQL subtransaction, mirroring a failed
   -- application transaction while allowing subsequent assertions.
