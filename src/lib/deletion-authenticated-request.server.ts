@@ -29,7 +29,7 @@ export async function requestAuthenticatedDeletionChallenge(input: {
     authUrl: input.authUrl,
     publishableKey: input.publishableKey,
     accessToken: input.accessToken,
-    fetcher: input.fetcher,
+    ...(input.fetcher ? { fetcher: input.fetcher } : {}),
   });
   return requestDeletionEmailChallenge({
     store: input.store,
@@ -37,7 +37,7 @@ export async function requestAuthenticatedDeletionChallenge(input: {
     secret: input.secret,
     userId: identity.userId,
     verifiedEmail: identity.verifiedEmail,
-    sender: input.sender,
-    now: input.now,
+    ...(input.sender ? { sender: input.sender } : {}),
+    ...(input.now ? { now: input.now } : {}),
   });
 }
