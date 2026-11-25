@@ -34,9 +34,7 @@ describe("server-only deletion code exchange", () => {
     expect(calls[0].statement).toContain("private.exchange_account_deletion_challenge");
     expect(calls[0].params[0]).toBe(challengeId);
     expect(calls[0].params[1]).toBe(userId);
-    expect(calls[0].params[2]).toBe(
-      hashDeletionEmailCode(secret, userId, challengeId, code),
-    );
+    expect(calls[0].params[2]).toBe(hashDeletionEmailCode(secret, userId, challengeId, code));
     expect(calls[0].params[3]).toBe(
       createHash("sha256").update(result.authorizationSecret).digest("hex"),
     );
