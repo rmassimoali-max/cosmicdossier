@@ -268,6 +268,38 @@ begin
     raise exception 'Owner authorization was replayed';
   end if;
 
+  -- The exchange path must independently reject expired email challenges.
+  insert into public.account_deletion_challenges(
+    user_id, token_hash, created_at, expires_at, delivered_at
+  ) values (
+    v_user, repeat('8',64), now() - interval '11 minutes',
+    now() - interval '1 minute', now() - interval '10 minutes'
+  ) returning id into v_challenge;
+  if private.exchange_account_deletion_challenge(
+    v_challenge, v_user, repeat('8',64), repeat('9',64)
+  ) is not null then
+    raise exception 'Expired email challenge exchanged for authorization';
+  end if;
+
+  -- Even a correctly issued authorization must be rejected after expiry.
+  insert into public.account_deletion_challenges(user_id, token_hash, expires_at, delivered_at)
+  values (v_user, repeat('9',64), now() + interval '10 minutes', now())
+  returning id into v_challenge;
+  v_exchange := private.exchange_account_deletion_challenge(
+    v_challenge, v_user, repeat('9',64), repeat('a',64)
+  );
+  if v_exchange is null then
+    raise exception 'Authorization expiry fixture failed to exchange';
+  end if;
+  update public.account_deletion_authorizations
+  set expires_at = now() - interval '1 second'
+  where id = v_exchange;
+  if private.consume_account_deletion_authorization(
+    v_exchange, v_user, repeat('a',64)
+  ) then
+    raise exception 'Expired exchanged authorization was consumed';
+  end if;
+
   -- A uniqueness failure during issuance must roll back challenge consumption.
   -- The exception block is a PostgreSQL subtransaction, mirroring a failed
   -- application transaction while allowing subsequent assertions.
