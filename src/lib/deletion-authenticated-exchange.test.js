@@ -51,6 +51,43 @@ describe("authenticated deletion code exchange", () => {
     expect(JSON.stringify(input.queries)).not.toContain(code);
   });
 
+  test("rejects malformed challenge IDs and codes before Auth or SQL", async () => {
+    for (const [badChallenge, badCode] of [
+      ["not-a-uuid", code],
+      [challengeId, "1234567"],
+      [challengeId, "123456789"],
+      [challengeId, "1234abcd"],
+      [challengeId, "12345678\\n"],
+    ]) {
+      const input = setup();
+      let authCalled = false;
+      input.challengeId = badChallenge;
+      input.code = badCode;
+      input.fetcher = async () => {
+        authCalled = true;
+        return new Response(JSON.stringify(identity));
+      };
+      await expect(exchangeAuthenticatedDeletionCode(input)).rejects.toThrow(
+        "valid deletion challenge",
+      );
+      expect(authCalled).toBe(false);
+      expect(input.queries).toHaveLength(0);
+    }
+  });
+
+  test("well-formed but incorrect codes still reach the database attempt limit", async () => {
+    const input = setup();
+    input.code = "87654321";
+    input.db.query = async (sql, params) => {
+      input.queries.push({ sql, params });
+      return { rows: [{ authorization_id: null }] };
+    };
+    await expect(exchangeAuthenticatedDeletionCode(input)).rejects.toThrow(
+      "invalid, expired, or already used",
+    );
+    expect(input.queries).toHaveLength(1);
+  });
+
   test("does not access the database when the session is invalid", async () => {
     const input = setup();
     input.fetcher = async () => new Response("{}", { status: 401 });
