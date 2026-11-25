@@ -31,9 +31,7 @@ describe("deletion verification same-origin request guard", () => {
 
   test("rejects wrong methods and mismatched hosts", () => {
     expect(() => requireDeletionRequestOrigin({ ...valid, method: "GET" })).toThrow();
-    expect(() =>
-      requireDeletionRequestOrigin({ ...valid, host: "evil.example" }),
-    ).toThrow();
+    expect(() => requireDeletionRequestOrigin({ ...valid, host: "evil.example" })).toThrow();
     expect(() => requireDeletionRequestOrigin({ ...valid, host: null })).toThrow();
   });
 
