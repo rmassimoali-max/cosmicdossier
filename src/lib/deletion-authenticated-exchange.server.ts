@@ -18,6 +18,14 @@ export async function exchangeAuthenticatedDeletionCode(input: {
   code: string;
   fetcher?: typeof fetch;
 }) {
+  if (
+    !/^[0-9a-f]{8}-[0-9a-f]{4}-[1-8][0-9a-f]{3}-[89ab][0-9a-f]{3}-[0-9a-f]{12}$/i.test(
+      input.challengeId,
+    ) ||
+    !/^[0-9]{8}$/.test(input.code)
+  ) {
+    throw new Error("A valid deletion challenge and eight-digit code are required.");
+  }
   const identity = await resolveDeletionIdentity({
     authUrl: input.authUrl,
     publishableKey: input.publishableKey,
