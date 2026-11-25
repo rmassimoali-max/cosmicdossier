@@ -286,7 +286,7 @@ begin
   values (v_user, repeat('9',64), now() + interval '10 minutes', now())
   returning id into v_challenge;
   v_exchange := private.exchange_account_deletion_challenge(
-    v_challenge, v_user, repeat('9',64), repeat('a',64)
+    v_challenge, v_user, repeat('9',64), repeat('f',64)
   );
   if v_exchange is null then
     raise exception 'Authorization expiry fixture failed to exchange';
@@ -295,7 +295,7 @@ begin
   set expires_at = now() - interval '1 second'
   where id = v_exchange;
   if private.consume_account_deletion_authorization(
-    v_exchange, v_user, repeat('a',64)
+    v_exchange, v_user, repeat('f',64)
   ) then
     raise exception 'Expired exchanged authorization was consumed';
   end if;
