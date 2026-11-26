@@ -104,7 +104,9 @@ describe("persistent verification composition", () => {
       sql.includes("private.put_deletion_session_authorization")
         ? { rows: [{ stored: false }] }
         : query(sql, params);
-    await expect(handlePostgresStoredDeletionVerification(input)).rejects.toThrow("Could not store");
+    await expect(handlePostgresStoredDeletionVerification(input)).rejects.toThrow(
+      "Could not store",
+    );
   });
 
   test("invalid encryption key fails before consuming verification", async () => {
