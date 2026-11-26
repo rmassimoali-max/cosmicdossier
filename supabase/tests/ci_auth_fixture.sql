@@ -12,7 +12,7 @@ begin
     create role service_role nologin;
   end if;
 end
-$;
+$$;
 
 create schema if not exists auth;
 create table if not exists auth.users (
