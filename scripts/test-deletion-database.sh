@@ -36,7 +36,8 @@ for file in \
   supabase/migrations/20261124000006_deletion_backend_role.sql \
   supabase/migrations/20261124000007_deletion_backend_rls.sql \
   supabase/migrations/20261124000008_idempotent_deletion_activation.sql \
-  supabase/migrations/20261124000009_deletion_session_authorization_storage.sql; do
+  supabase/migrations/20261124000009_deletion_session_authorization_storage.sql \
+  supabase/migrations/20261124000010_deletion_session_cleanup.sql; do
   psql "$TEST_DATABASE_URL" -X -v ON_ERROR_STOP=1 -f "$file"
 done
 
