@@ -43,4 +43,30 @@ begin
   end if;
 end;
 $$;
+do $$
+declare
+  a text := repeat('a',64);
+  b text := repeat('b',64);
+begin
+  perform private.put_deletion_session_authorization(a,'expired',240000);
+  update private.deletion_session_authorizations set expires_at = clock_timestamp() - interval '1 second' where slot = a;
+  perform private.put_deletion_session_authorization(b,'live',240000);
+  if exists (select 1 from private.deletion_session_authorizations where slot = a) then
+    raise exception 'Expired storage not pruned';
+  end if;
+  if private.take_deletion_session_authorization(b) is distinct from 'live' then
+    raise exception 'Cleanup removed live storage';
+  end if;
+end;
+$$;
+reset role;
+do $$
+begin
+  if has_function_privilege('anon','private.prune_deletion_session_authorizations()','EXECUTE')
+     or has_function_privilege('authenticated','private.prune_deletion_session_authorizations()','EXECUTE')
+     or has_function_privilege('service_role','private.prune_deletion_session_authorizations()','EXECUTE') then
+    raise exception 'Unexpected cleanup permission';
+  end if;
+end;
+$$;
 rollback;
