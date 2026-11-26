@@ -42,11 +42,21 @@ if (
         and not has_table_privilege(current_user, 'auth.users', 'DELETE')
         and not has_table_privilege(session_user, 'auth.users', 'DELETE') as allowed`;
     });
-    console.log(result[0]?.allowed === true ? "Deletion preview diagnostic: PASS" : "Deletion preview diagnostic: permission check failed");
+    console.log(
+      result[0]?.allowed === true
+        ? "Deletion preview diagnostic: PASS"
+        : "Deletion preview diagnostic: permission check failed",
+    );
   } catch (error) {
-    const known = ["ENETUNREACH", "EHOSTUNREACH", "ENOTFOUND", "ECONNREFUSED", "ETIMEDOUT", "CONNECT_TIMEOUT", "28P01", "28000", "42501", "CERT_HAS_EXPIRED", "UNABLE_TO_VERIFY_LEAF_SIGNATURE", "ERR_TLS_CERT_ALTNAME_INVALID"];
-    const code = known.includes(error?.code) ? error.code : "OTHER";
-    console.log(`Deletion preview diagnostic: failed at ${stage} (${code})`);
+    const rawCode = error?.code;
+    const code =
+      typeof rawCode === "string" && /^[A-Z0-9_]{1,40}$/.test(rawCode) ? rawCode : "OTHER";
+    const category = /tenant or user not found/i.test(error?.message ?? "")
+      ? "pooler identity not found"
+      : /password authentication failed/i.test(error?.message ?? "")
+        ? "authentication rejected"
+        : "unclassified";
+    console.log(`Deletion preview diagnostic: failed at ${stage} (${code}; ${category})`);
   } finally {
     if (sql) await sql.end({ timeout: 1 }).catch(() => undefined);
   }
