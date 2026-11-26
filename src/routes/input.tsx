@@ -196,9 +196,7 @@ function PersonCard({
               >
                 {assessment.completed
                   ? `✓ Completed${assessment.detail ? ` · ${assessment.detail}` : ""}`
-                  : assessment.manuallyEntered
-                    ? "· Entered manually"
-                    : "· Not yet taken"}
+                  : "· Not yet taken"}
               </span>
             </Link>
           ))}

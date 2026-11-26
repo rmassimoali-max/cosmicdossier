@@ -717,14 +717,14 @@ function executiveSummary(p: Profile): string {
   const m = matched(p);
   return join([
     p.mbti && p.ennea
-      ? `Your profile includes MBTI ${p.mbti.type} and Enneagram Type ${p.ennea.type}${p.wing ? `w${p.wing}` : ""}, based on the information and assessment results provided.`
+      ? `Possible type and motivational patterns include ${p.mbti.type} and Enneagram Type ${p.ennea.type}${p.wing ? `w${p.wing}` : ""}.`
       : p.mbti
-        ? `Your profile includes MBTI ${p.mbti.type}, based on the information or assessment result provided.`
+        ? `An MBTI preference pattern is available: ${p.mbti.type}.`
         : "",
-    p.attachment ? `Your reported attachment style is ${p.attachment.style.toLowerCase()}.` : "",
+    p.attachment ? `A relational pattern to consider is ${p.attachment.style.toLowerCase()}.` : "",
     p.bigFive ? bigFiveHeadline(p) : "",
     p.chart
-      ? `Symbolically, your natal chart features ${p.chart.sun} Sun, ${p.chart.moon} Moon, and ${p.chart.rising} Rising.`
+      ? `The natal chart may be read symbolically as ${p.chart.sun} Sun, ${p.chart.moon} Moon, and ${p.chart.rising} Rising.`
       : "",
     m.convergence.length ||
     m.construct_overlap.length ||
