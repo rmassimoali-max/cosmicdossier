@@ -27,8 +27,8 @@ export async function openDevelopmentDeletionConnection(input: {
   }
   if (
     url.protocol !== "postgresql:" ||
-    url.hostname !== "db.umcpchdifhxhxvhnatxo.supabase.co" ||
-    url.username !== "deletion_worker" ||
+    url.hostname !== "aws-1-us-east-2.pooler.supabase.com" ||
+    url.username !== "deletion_worker.umcpchdifhxhxvhnatxo" ||
     !url.password ||
     url.pathname !== "/postgres" ||
     (url.port !== "" && url.port !== "5432") ||

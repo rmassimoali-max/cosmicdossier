@@ -5,7 +5,7 @@ const env = {
   ACCOUNT_DELETION_BACKEND_ENABLED: "true",
   VERCEL_ENV: "preview",
   DELETION_DATABASE_URL:
-    "postgresql://deletion_worker:example@db.umcpchdifhxhxvhnatxo.supabase.co/postgres?sslmode=verify-full",
+    "postgresql://deletion_worker.umcpchdifhxhxvhnatxo:example@aws-1-us-east-2.pooler.supabase.com/postgres?sslmode=verify-full",
 };
 
 describe("development deletion connection", () => {
@@ -23,6 +23,13 @@ describe("development deletion connection", () => {
   test("rejects production and unexpected hosts before connecting", async () => {
     for (const bad of [
       { ...env, VERCEL_ENV: "production" },
+      {
+        ...env,
+        DELETION_DATABASE_URL: env.DELETION_DATABASE_URL.replace(
+          "aws-1-us-east-2.pooler.supabase.com",
+          "aws-0-us-east-2.pooler.supabase.com",
+        ),
+      },
       {
         ...env,
         DELETION_DATABASE_URL: env.DELETION_DATABASE_URL.replace(

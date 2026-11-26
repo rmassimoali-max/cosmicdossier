@@ -11,8 +11,8 @@ if (
     const url = new URL(process.env.DELETION_DATABASE_URL ?? "");
     if (
       url.protocol !== "postgresql:" ||
-      url.hostname !== "db.umcpchdifhxhxvhnatxo.supabase.co" ||
-      url.username !== "deletion_worker" ||
+      url.hostname !== "aws-1-us-east-2.pooler.supabase.com" ||
+      url.username !== "deletion_worker.umcpchdifhxhxvhnatxo" ||
       !url.password ||
       url.pathname !== "/postgres" ||
       url.port !== "5432" ||
