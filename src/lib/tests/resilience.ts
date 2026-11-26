@@ -1,5 +1,5 @@
-// Resilience — capacity to recover from stress, in the style of the
-// Brief Resilience Scale (Smith et al.). Original items.
+// Exploratory resilience reflection with original items, not the validated BRS.
+// New v2 IDs and item count avoid silently reinterpreting old shared answer URLs.
 import type { TestDef } from "./types";
 import { AGREE_5, singleBand } from "./build";
 
@@ -7,64 +7,82 @@ export const RESILIENCE_TEST: TestDef = {
   slug: "resilience",
   name: "Resilience",
   category: "Sensitivity & Emotional Style",
-  tagline: "How quickly you bounce back when life knocks you down.",
+  tagline: "How you adapt, recover, and find support during difficult times.",
   metaDescription:
-    "Measure your ability to recover from stress and setbacks with this free, private resilience test based on brief resilience research.",
+    "Explore coping, adaptability, support, and recovery with this free self-report resilience reflection.",
   whatItMeasures:
-    "This test estimates resilience in its simplest sense: your ability to bounce back and recover after stress, hardship or setbacks.",
+    "This exploratory questionnaire asks about different coping resources: adapting to change, finding next steps, seeking support, managing stress, and recovering from setbacks. It is not a validated resilience scale.",
   background:
-    "Bruce Smith and colleagues created the Brief Resilience Scale in 2008 to measure resilience as recovery itself rather than the resources that support it. Resilience is not fixed — it grows with sleep, support, meaning and practice.",
+    "Research distinguishes recovery after stress from the coping resources that can support it. Smith and colleagues’ Brief Resilience Scale focuses on recovery; this broader original-item reflection is not the BRS and has not been psychometrically validated.",
   citation:
-    "Smith, B. W., et al. (2008). The Brief Resilience Scale: Assessing the ability to bounce back. International Journal of Behavioral Medicine, 15(3), 194–200.",
+    "Background reading only (not this questionnaire’s source): Smith, B. W., et al. (2008). The Brief Resilience Scale: Assessing the ability to bounce back. International Journal of Behavioral Medicine, 15(3), 194–200.",
   minutes: "~2 minutes",
   scale: AGREE_5,
   disclaimer:
-    "Low resilience during a hard season is normal, not a flaw. If you're struggling, reach out to someone you trust or a professional.",
+    "Exploratory self-report only, not a diagnosis, standardized score, or validated psychological test. Results may vary with your circumstances. If you are struggling, consider reaching out for support.",
   items: [
-    { id: "rs1", text: "I tend to bounce back quickly after hard times.", dimension: "resilience" },
     {
-      id: "rs2",
-      text: "I have a hard time making it through stressful events.",
+      id: "rs2_1",
+      text: "When plans change unexpectedly, I can adjust my approach.",
+      dimension: "resilience",
+    },
+    {
+      id: "rs2_2",
+      text: "When I feel overwhelmed, I struggle to identify one manageable next step.",
       dimension: "resilience",
       reverse: true,
     },
     {
-      id: "rs3",
-      text: "It doesn't take me long to recover from a stressful event.",
+      id: "rs2_3",
+      text: "After a setback, I can gradually return to my everyday responsibilities.",
       dimension: "resilience",
     },
     {
-      id: "rs4",
-      text: "It is hard for me to snap back when something bad happens.",
-      dimension: "resilience",
-      reverse: true,
-    },
-    {
-      id: "rs5",
-      text: "I usually come through difficult times with little trouble.",
-      dimension: "resilience",
-    },
-    {
-      id: "rs6",
-      text: "I tend to take a long time to get over setbacks.",
+      id: "rs2_4",
+      text: "I avoid asking for support even when it would help.",
       dimension: "resilience",
       reverse: true,
     },
     {
-      id: "rs7",
-      text: "I can find something to learn even in painful experiences.",
+      id: "rs2_5",
+      text: "I can recognize when rest would help me cope better.",
       dimension: "resilience",
     },
-    { id: "rs8", text: "When plans fall apart, I adapt fairly fast.", dimension: "resilience" },
     {
-      id: "rs9",
-      text: "Small failures can ruin my whole week.",
+      id: "rs2_6",
+      text: "A mistake makes it hard for me to try a different approach.",
       dimension: "resilience",
       reverse: true,
     },
     {
-      id: "rs10",
-      text: "I have people and habits that steady me when things go wrong.",
+      id: "rs2_7",
+      text: "I can identify something useful I learned from a difficult experience.",
+      dimension: "resilience",
+    },
+    {
+      id: "rs2_8",
+      text: "When a problem has no quick solution, I can tolerate some uncertainty.",
+      dimension: "resilience",
+    },
+    {
+      id: "rs2_9",
+      text: "Under stress, I forget coping strategies that normally help me.",
+      dimension: "resilience",
+      reverse: true,
+    },
+    {
+      id: "rs2_10",
+      text: "I know a person or resource I could turn to during a difficult period.",
+      dimension: "resilience",
+    },
+    {
+      id: "rs2_11",
+      text: "I can break a complicated problem into smaller actions.",
+      dimension: "resilience",
+    },
+    {
+      id: "rs2_12",
+      text: "When I am upset, I can usually notice what I am feeling before reacting.",
       dimension: "resilience",
     },
   ],
@@ -72,25 +90,25 @@ export const RESILIENCE_TEST: TestDef = {
     {
       key: "resilience",
       label: "Resilience",
-      blurb: "Speed and ease of recovery after stress.",
+      blurb: "Self-reported coping, adaptation, support, and recovery after stress.",
       bands: [
         {
           min: 0,
           max: 35,
-          label: "Slower recovery",
-          text: "Setbacks currently take a real toll and linger. That's often a signal of depleted reserves rather than weak character — sleep, support and smaller goals rebuild capacity.",
+          label: "Fewer accessible coping resources",
+          text: "Several coping strategies may feel difficult to access right now. Context, support, and energy levels matter; this is not a fixed trait.",
         },
         {
           min: 36,
           max: 65,
-          label: "Steady recovery",
-          text: "You recover from most setbacks in time, though big hits can knock you off balance for a while. Your foundations are workable and can be strengthened.",
+          label: "Mixed coping resources",
+          text: "You report access to some coping strategies, while others may need attention or support.",
         },
         {
           min: 66,
           max: 100,
-          label: "Fast recovery",
-          text: "You bounce back quickly and tend to adapt rather than collapse. Remember that resilience includes asking for help — not only enduring alone.",
+          label: "Many accessible coping resources",
+          text: "You report access to several ways of handling difficulty. That does not mean stress cannot affect you or that you must manage it alone.",
         },
       ],
     },
@@ -98,16 +116,16 @@ export const RESILIENCE_TEST: TestDef = {
   resultLabel: (s) =>
     singleBand(s["resilience"] ?? 50, ["Slower recovery", "Steady recovery", "Fast recovery"]),
   resultSummary: (s) =>
-    `Your resilience score is ${s["resilience"] ?? 50}/100 — a snapshot of how quickly you currently recover from stress.`,
+    `Your exploratory resilience score is ${s["resilience"] ?? 50}/100 — a snapshot of reported coping resources, not a standardized or clinical score.`,
   archetypeNote: (s) =>
     (s["resilience"] ?? 50) >= 66
       ? {
           slugs: ["the-warden", "the-firestarter"],
-          text: "High resilience often resonates with The Warden or The Firestarter — people who stand back up and keep moving.",
+          text: "Reporting many coping resources may resonate with The Warden or The Firestarter in the Cosmic Dossier archetype system.",
         }
       : {
           slugs: ["the-empath", "the-observer"],
-          text: "Slower recovery often resonates with The Empath or The Observer — people who feel and process deeply, and need deliberate recovery time.",
+          text: "Reporting fewer accessible coping resources may resonate with The Empath or The Observer in the Cosmic Dossier archetype system.",
         },
   dossierPatch: (scores) => ({ assessmentResults: { resilience: scores } }),
 };

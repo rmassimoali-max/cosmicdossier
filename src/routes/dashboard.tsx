@@ -2,6 +2,7 @@ import { createFileRoute, Link } from "@tanstack/react-router";
 import { useServerFn } from "@tanstack/react-start";
 import { useEffect, useState } from "react";
 import { getCurrentAccount } from "@/lib/auth.functions";
+import { useSession } from "@/lib/session";
 
 export const Route = createFileRoute("/dashboard")({
   head: () => ({
@@ -17,15 +18,9 @@ export const Route = createFileRoute("/dashboard")({
 const destinations = [
   {
     title: "My Assessments",
-    description: "Explore the test library and continue discovering your personality.",
-    to: "/tests",
-    action: "Browse assessments",
-  },
-  {
-    title: "My Dossiers",
-    description: "Create or update a dossier. Cloud-saved reports are coming in a later release.",
-    to: "/input",
-    action: "Build a dossier",
+    description: "View saved assessment results, restore them to your dossier, or delete them.",
+    to: "/saved-assessments",
+    action: "View saved assessments",
   },
   {
     title: "Relationship Insights",
@@ -43,6 +38,19 @@ const destinations = [
 ] as const;
 
 function DashboardPage() {
+  const session = useSession();
+  const hasDossier = Boolean(session.dossier?.p1);
+  const hasDraft = Boolean(
+    session.p1.name.trim() ||
+    session.p1.dob ||
+    session.p1.birthPlace ||
+    session.p1.mbti ||
+    session.p1.enneagramType ||
+    session.p1.attachment ||
+    session.p1.bigFive ||
+    Object.keys(session.p1.assessmentResults ?? {}).length ||
+    session.p2,
+  );
   const getAccount = useServerFn(getCurrentAccount);
   const [email, setEmail] = useState<string | null>(null);
   const [status, setStatus] = useState<"loading" | "signed-in" | "signed-out" | "error">("loading");
@@ -118,11 +126,45 @@ function DashboardPage() {
           Continue your exploration
         </h2>
         <p className="mt-2 text-sm text-muted-foreground">
-          Your current assessments and reports remain on this device for now. Cloud saving is coming
-          in a future release.
+          Your saved assessments can sync across devices. Dossiers and reports remain on this device
+          for now.
         </p>
         <div className="mt-5 grid gap-4 sm:grid-cols-2">
-          {destinations.map((item) => (
+          {destinations.slice(0, 1).map((item) => (
+            <article key={item.title} className="panel flex flex-col p-6">
+              <h3 className="font-display text-2xl text-foreground">{item.title}</h3>
+              <p className="mt-3 flex-1 text-sm leading-relaxed text-muted-foreground">
+                {item.description}
+              </p>
+              <Link to={item.to} className="mt-5 inline-block text-sm text-primary">
+                {item.action} →
+              </Link>
+            </article>
+          ))}
+
+          <article className="panel flex flex-col p-6">
+            <h3 className="font-display text-2xl text-foreground">My Dossiers</h3>
+            <p className="mt-3 flex-1 text-sm leading-relaxed text-muted-foreground">
+              {hasDossier
+                ? "Your current dossier is available on this device. Cloud-saved dossiers are coming later."
+                : hasDraft
+                  ? "You have a dossier in progress on this device. Continue where you left off."
+                  : "Start your first dossier. Your progress will stay on this device for now."}
+            </p>
+            <Link
+              to={hasDossier ? "/report" : "/input"}
+              className="mt-5 inline-block text-sm text-primary"
+            >
+              {hasDossier
+                ? "Open current dossier"
+                : hasDraft
+                  ? "Continue current dossier"
+                  : "Create your first dossier"}
+              {" →"}
+            </Link>
+          </article>
+
+          {destinations.slice(1).map((item) => (
             <article key={item.title} className="panel flex flex-col p-6">
               <h3 className="font-display text-2xl text-foreground">{item.title}</h3>
               <p className="mt-3 flex-1 text-sm leading-relaxed text-muted-foreground">
