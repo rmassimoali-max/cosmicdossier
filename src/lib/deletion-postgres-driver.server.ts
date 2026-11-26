@@ -46,9 +46,9 @@ export function openDeletionPostgres(env: Record<string, string | undefined>) {
           });
           try {
             const rows = await sql.begin(async (transaction) => {
-            await transaction`set local role deletion_backend`;
-            return await transaction.unsafe<T[]>(statement, bound);
-          });
+              await transaction`set local role deletion_backend`;
+              return await transaction.unsafe<T[]>(statement, bound);
+            });
             return { rows: Array.from(rows) };
           } catch {
             throw new Error("Deletion database operation unavailable.");
