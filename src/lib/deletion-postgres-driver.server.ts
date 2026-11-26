@@ -17,10 +17,11 @@ export function openDeletionPostgres(env: Record<string, string | undefined>) {
         prepare: false,
         connection: {
           statement_timeout: options.statement_timeout,
+          role: "deletion_backend",
         },
       });
       try {
-        await sql`set role deletion_backend`;
+        await sql`select 1`;
       } catch {
         await sql.end({ timeout: 1 }).catch(() => undefined);
         throw new Error("Deletion database connection unavailable.");
@@ -44,7 +45,10 @@ export function openDeletionPostgres(env: Record<string, string | undefined>) {
             throw new Error("Unsupported deletion SQL parameter.");
           });
           try {
-            const rows = await sql.unsafe<T[]>(statement, bound);
+            const rows = await sql.begin(async (transaction) => {
+            await transaction`set local role deletion_backend`;
+            return await transaction.unsafe<T[]>(statement, bound);
+          });
             return { rows: Array.from(rows) };
           } catch {
             throw new Error("Deletion database operation unavailable.");
