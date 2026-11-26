@@ -1,0 +1,31 @@
+name: Generate PostgreSQL dependency lockfile
+
+on:
+  pull_request:
+    branches: [main]
+    paths:
+      - ".github/workflows/generate-postgres-lock.yml"
+
+permissions:
+  contents: read
+
+jobs:
+  generate:
+    if: github.head_ref == 'recovery/account-deletion-staging'
+    runs-on: ubuntu-latest
+    timeout-minutes: 10
+    steps:
+      - uses: actions/checkout@v4
+      - uses: oven-sh/setup-bun@v2
+      - name: Generate dependency files
+        run: |
+          bun add --exact --ignore-scripts postgres@3.4.7
+          bun install --frozen-lockfile --ignore-scripts
+          git diff --check
+      - uses: actions/upload-artifact@v4
+        with:
+          name: postgres-dependency-files
+          path: |
+            package.json
+            bun.lock
+          retention-days: 3
