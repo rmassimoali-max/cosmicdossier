@@ -35,7 +35,8 @@ for file in \
   supabase/migrations/20261124000005_deletion_challenge_delivery_gate.sql \
   supabase/migrations/20261124000006_deletion_backend_role.sql \
   supabase/migrations/20261124000007_deletion_backend_rls.sql \
-  supabase/migrations/20261124000008_idempotent_deletion_activation.sql; do
+  supabase/migrations/20261124000008_idempotent_deletion_activation.sql \
+  supabase/migrations/20261124000009_deletion_session_authorization_storage.sql; do
   psql "$TEST_DATABASE_URL" -X -v ON_ERROR_STOP=1 -f "$file"
 done
 
@@ -50,6 +51,8 @@ echo "Checking single-use verification behavior..."
 psql "$TEST_DATABASE_URL" -X -v ON_ERROR_STOP=1 -f supabase/tests/account_deletion_behavior.sql
 echo "Checking challenge issuance throttling..." 
 psql "$TEST_DATABASE_URL" -X -v ON_ERROR_STOP=1 -f supabase/tests/account_deletion_rate_limit.sql
+echo "Checking persistent session authorization storage..."
+psql "$TEST_DATABASE_URL" -X -v ON_ERROR_STOP=1 -f supabase/tests/deletion_session_storage.sql
 echo "Database security and behavior assertions passed."
 
 echo "Checking concurrent authorization consumption..."
