@@ -57,3 +57,4 @@ echo "Database security and behavior assertions passed."
 
 echo "Checking concurrent authorization consumption..."
 bash scripts/test-deletion-concurrency.sh
+bash scripts/test-deletion-session-concurrency.sh
