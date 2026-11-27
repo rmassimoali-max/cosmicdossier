@@ -1,4 +1,5 @@
-// Temporary read-only diagnostic; never runs in production or other branches.
+// Temporary diagnostic with rollback-only fixtures; restricted to the development preview.
+import { randomBytes } from "node:crypto";
 import postgres from "postgres";
 
 if (
@@ -49,11 +50,42 @@ if (
         and not has_table_privilege(current_user, (select c.oid from pg_catalog.pg_class c join pg_catalog.pg_namespace n on n.oid = c.relnamespace where n.nspname = 'auth' and c.relname = 'users'), 'DELETE')
         and not has_table_privilege(session_user, (select c.oid from pg_catalog.pg_class c join pg_catalog.pg_namespace n on n.oid = c.relnamespace where n.nspname = 'auth' and c.relname = 'users'), 'DELETE') as allowed`;
     });
-    console.log(
-      result[0]?.allowed === true
-        ? "Deletion preview diagnostic: PASS"
-        : "Deletion preview diagnostic: permission check failed",
-    );
+    if (result[0]?.allowed !== true) throw new Error("permissions");
+    console.log("Deletion preview diagnostic: PASS");
+    stage = "storage";
+    const a = randomBytes(32).toString("hex");
+    const b = randomBytes(32).toString("hex");
+    const rollback = new Error("intentional rollback");
+    try {
+      await sql.begin(async (tx) => {
+        await tx`set local role deletion_backend`;
+        const put = async (slot, envelope, ttl) => {
+          const [row] = await tx`select private.put_deletion_session_authorization(${slot}, ${envelope}, ${ttl}) as ok`;
+          return row?.ok;
+        };
+        const take = async (slot) => {
+          const [row] = await tx`select private.take_deletion_session_authorization(${slot}) as value`;
+          return row?.value;
+        };
+        if (!(await put(a, "fixture-a", 240000)) || !(await put(b, "fixture-b", 240000))) {
+          throw new Error("storage write");
+        }
+        if ((await put(a, "invalid", 240001)) !== false) throw new Error("invalid TTL");
+        if ((await take(a)) !== "fixture-a" || (await take(a)) !== null) {
+          throw new Error("single use");
+        }
+        if ((await take(b)) !== "fixture-b") throw new Error("isolation");
+        if (!(await put(a, "expired", 240000))) throw new Error("expiry fixture");
+        await tx`update private.deletion_session_authorizations
+          set expires_at = clock_timestamp() - interval '1 second' where slot = ${a}`;
+        if ((await take(a)) !== null) throw new Error("expiry");
+        throw rollback;
+      });
+      throw new Error("missing rollback");
+    } catch (error) {
+      if (error !== rollback) throw error;
+    }
+    console.log("Deletion preview storage diagnostic: PASS (rolled back)");
   } catch (error) {
     const rawCode = error?.code;
     const code =
