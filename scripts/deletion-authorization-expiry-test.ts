@@ -123,7 +123,11 @@ async function run() {
     console.log("Waiting 310 seconds for the database authorization to expire...");
     await new Promise((resolve) => setTimeout(resolve, 310000));
     if (
-      await consumeAuthenticatedDeletionAuthorization({ ...input, accessToken: token, ...credentials })
+      await consumeAuthenticatedDeletionAuthorization({
+        ...input,
+        accessToken: token,
+        ...credentials,
+      })
     ) {
       throw new Error("Expired authorization accepted.");
     }
