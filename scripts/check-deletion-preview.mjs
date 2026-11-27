@@ -46,8 +46,8 @@ if (
       return tx`select current_user = 'deletion_backend'
         and session_user = 'deletion_worker'
         and has_table_privilege(current_user, 'private.deletion_session_authorizations', 'SELECT')
-        and not has_table_privilege(current_user, 'auth.users', 'DELETE')
-        and not has_table_privilege(session_user, 'auth.users', 'DELETE') as allowed`;
+        and not has_table_privilege(current_user, (select c.oid from pg_catalog.pg_class c join pg_catalog.pg_namespace n on n.oid = c.relnamespace where n.nspname = 'auth' and c.relname = 'users'), 'DELETE')
+        and not has_table_privilege(session_user, (select c.oid from pg_catalog.pg_class c join pg_catalog.pg_namespace n on n.oid = c.relnamespace where n.nspname = 'auth' and c.relname = 'users'), 'DELETE') as allowed`;
     });
     console.log(
       result[0]?.allowed === true

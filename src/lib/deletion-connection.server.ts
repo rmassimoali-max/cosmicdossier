@@ -54,7 +54,7 @@ export async function openDevelopmentDeletionConnection(input: {
       statement_timeout: 5000,
     });
     const result = await db.query<{ allowed: boolean }>(
-      "select current_user = 'deletion_backend' and session_user = 'deletion_worker' and not has_table_privilege(current_user, 'auth.users', 'DELETE') as allowed",
+      "select current_user = 'deletion_backend' and session_user = 'deletion_worker' and not has_table_privilege(current_user, (select c.oid from pg_catalog.pg_class c join pg_catalog.pg_namespace n on n.oid = c.relnamespace where n.nspname = 'auth' and c.relname = 'users'), 'DELETE') as allowed",
       [],
     );
     if (result.rows.length !== 1 || result.rows[0]?.allowed !== true) {
