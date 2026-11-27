@@ -33,3 +33,15 @@ Only after this should a migration and a narrowly scoped adapter be considered. 
 The rollback-only SQL draft remains unapplied. A read-only catalog query against cosmicdev project `umcpchdifhxhxvhnatxo` returned no functions in schema `private` with names matching `%fresh_auth%`. A second read-only query confirmed `anon`, `authenticated`, and `PUBLIC` do not have USAGE on schema `private`; all three have USAGE on schema `public`. This is consistent with keeping the proposed fresh-authentication functions inaccessible until a restricted role is deliberately designed. It does not prove the future functions' effective ACLs, nor does it audit every role, default privilege, inherited membership, or production project.
 
 The PR head at this checkpoint is `ae4d664`; all three workflows passed: CI, deletion database security, and PostgreSQL dependency lockfile. These checks validate repository workflows, not execution of the rollback-only SQL. PR #16 remains open and draft. No schema changes were applied.
+
+## Effective role and function audit (2026-11-27)
+
+Read-only catalog inspection of cosmicdev confirms:
+
+- `deletion_backend`: NOLOGIN, NOINHERIT, not superuser, no CREATEROLE/CREATEDB/BYPASSRLS.
+- `deletion_worker`: LOGIN, NOINHERIT, not superuser, no CREATEROLE/CREATEDB/BYPASSRLS.
+- `deletion_worker` is a member of `deletion_backend` (admin_option false). NOINHERIT prevents automatic privilege inheritance but does not by itself prevent SET ROLE to a granted role. Therefore the worker must be treated as able to assume backend privileges unless a live SET ROLE denial test or membership redesign proves otherwise. Previous direct-table-privilege matrix alone understated effective capability.
+- Existing private deletion functions inspected are SECURITY INVOKER, have empty search_path, and grant EXECUTE to deletion_backend; anon and authenticated cannot execute them. The worker has no direct EXECUTE but membership in backend means effective role switching must be considered.
+- Backend has read/insert/update/delete on private.deletion_session_authorizations; read/insert/update on public account_deletion_authorizations and account_deletion_challenges; no direct privileges on auth.users, auth.sessions, or saved_assessments.
+
+This is a significant least-privilege boundary finding. Do not grant fresh-auth functions or any deletion executor capability to the current backend role until the worker/backend membership model is redesigned and tested. Do not remove membership or alter role settings as part of this audit without explicit change review. Column-level grants, default ACLs and all role memberships remain to be fully inventoried; one attempted default-ACL query was invalid and yielded no evidence.
