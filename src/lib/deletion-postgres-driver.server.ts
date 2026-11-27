@@ -33,6 +33,10 @@ export function openDeletionPostgres(env: Record<string, string | undefined>) {
           // Only the server-owned SQL adapters supply statements.
           // Reject unsupported parameter types rather than coercing arbitrary objects.
           const bound = params.map((value) => {
+            // Challenge expiry is supplied as a Date by the trusted store.
+            if (value instanceof Date && Number.isFinite(value.getTime())) {
+              return value.toISOString();
+            }
             if (
               value === null ||
               typeof value === "string" ||
