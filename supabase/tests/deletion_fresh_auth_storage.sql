@@ -36,7 +36,7 @@ insert into auth.users(id) values
  ('11111111-1111-4111-8111-111111111111'),
  ('22222222-2222-4222-8222-222222222222');
 
-do $$$
+do $$
 begin
   if not has_table_privilege('deletion_fresh_auth_ci','private.deletion_fresh_auth_ci_flows','SELECT')
      or not has_table_privilege('deletion_fresh_auth_ci','private.deletion_fresh_auth_ci_flows','INSERT')
@@ -62,7 +62,7 @@ values
  (repeat('c',64),repeat('d',64),'22222222-2222-4222-8222-222222222222',
   'bbbbbbbb-bbbb-4bbb-8bbb-bbbbbbbbbbbb',clock_timestamp()+interval '5 minutes');
 
-do $$$
+do $$
 declare v_count integer;
 begin
   select count(*) into v_count from private.take_deletion_fresh_auth_ci_flow(repeat('a',64),repeat('x',64));
