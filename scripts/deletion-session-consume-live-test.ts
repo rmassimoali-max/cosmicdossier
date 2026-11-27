@@ -112,6 +112,7 @@ async function run() {
       sender: async (_config, recipient, candidate) => {
         if (recipient !== "deletion-test-a@example.com") throw new Error("Unexpected recipient.");
         code = candidate;
+        return { sent: true };
       },
     });
     if (!issued.sent || !code) throw new Error("Controlled delivery failed.");
