@@ -23,7 +23,10 @@ if (
     }
     url.search = "";
     const ca = process.env.DELETION_DATABASE_CA;
-    if (!ca?.startsWith("-----BEGIN CERTIFICATE-----") || !ca.trimEnd().endsWith("-----END CERTIFICATE-----")) {
+    if (
+      !ca?.startsWith("-----BEGIN CERTIFICATE-----") ||
+      !ca.trimEnd().endsWith("-----END CERTIFICATE-----")
+    ) {
       throw new Error("configuration");
     }
     stage = "connection";

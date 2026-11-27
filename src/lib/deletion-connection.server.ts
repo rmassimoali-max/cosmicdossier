@@ -38,7 +38,10 @@ export async function openDevelopmentDeletionConnection(input: {
     throw new Error("Deletion connection requires the dedicated development identity.");
   }
   const ca = input.env["DELETION_DATABASE_CA"];
-  if (!ca?.startsWith("-----BEGIN CERTIFICATE-----") || !ca.trimEnd().endsWith("-----END CERTIFICATE-----")) {
+  if (
+    !ca?.startsWith("-----BEGIN CERTIFICATE-----") ||
+    !ca.trimEnd().endsWith("-----END CERTIFICATE-----")
+  ) {
     throw new Error("Deletion database CA is not configured.");
   }
   let db: Connection | undefined;
