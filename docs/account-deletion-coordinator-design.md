@@ -26,3 +26,13 @@ Delete account identity and account-owned cloud assessments. Invalidate outstand
 ## Acceptance gates
 
 Test with dedicated disposable accounts only after explicit approval: concurrent requests, expired and replayed proofs, wrong session/account, reauthentication failure, provider timeout before and after deletion, retry after crash, concurrent writes and sign-ins, stale JWTs, cascade verification, unrelated account preservation, cleanup and accurate UI. Verify schema parity and storage inventory separately before production activation. No production migration, Stripe mutation or destructive endpoint is authorized by this document.
+
+## Fresh authentication design (proposal)
+
+Supabase reauthenticate documents sending a nonce, not a standalone verification result suitable for deletion. Do not treat successful delivery as authentication. See https://supabase.com/docs/reference/javascript/auth-reauthenticate .
+
+Prefer a deliberate fresh sign-in for either password or passwordless accounts, followed by the separate deletion email challenge in the newly established session. Require a server-issued, expiring, single-use flow state bound to the original verified account and browser; accept only a provider-verified fresh sign-in for that same account. Do not allow a refresh, arbitrary existing session, client timestamp, or unverified JWT claims to satisfy this requirement. Passwordless callback must be explicitly correlated to the initiated flow; no automatic account creation, account switching, or open redirects. Do not claim two independent factors when both steps rely on the same mailbox. Evaluate existing MFA requirements before accepting either method.
+
+Replacing the current session is preferable to minting a second hidden session solely to check a password. If the chosen implementation leaves a temporary session, revoke that session explicitly and verify cleanup. Supabase signOut defaults to global; local scope is distinct, and existing JWTs remain valid until expiry (https://supabase.com/docs/reference/javascript/auth-signout). No logout behavior changes are authorized here.
+
+Acceptance tests: wrong password, wrong account, stale or refreshed session, expired flow state, reused callback, missing correlation, cross-browser callback, account switching, failed session cleanup, MFA constraints, and correct same-account fresh sign-in. Both passwordless and password paths must pass in development before enabling deletion. Exact provider callback and state storage implementation remains to be reviewed.
