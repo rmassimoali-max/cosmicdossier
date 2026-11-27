@@ -99,6 +99,7 @@ create function private.cleanup_deletion_fresh_auth_ci_flows()
 returns bigint
 language sql security invoker set search_path=''
 as $
+
   with expired as (
     select f.flow_hash from private.deletion_fresh_auth_ci_flows f
     where f.expires_at <= clock_timestamp()
