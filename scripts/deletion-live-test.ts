@@ -21,10 +21,14 @@ async function run() {
     throw new Error("Interactive development environment required.");
   }
   // Read from the controlling terminal with echo disabled; never persist credentials.
-  const password = spawnSync("bash", [
-    "-c",
-    'read -r -s -p "Development account password: " password </dev/tty; printf "\\n" >/dev/tty; printf "%s" "$password"',
-  ], { encoding: "utf8", stdio: ["inherit", "pipe", "inherit"] });
+  const password = spawnSync(
+    "bash",
+    [
+      "-c",
+      'read -r -s -p "Development account password: " password </dev/tty; printf "\\n" >/dev/tty; printf "%s" "$password"',
+    ],
+    { encoding: "utf8", stdio: ["inherit", "pipe", "inherit"] },
+  );
   if (password.status !== 0 || !password.stdout) throw new Error("Login cancelled.");
   const login = await fetch(authUrl + "/auth/v1/token?grant_type=password", {
     method: "POST",
