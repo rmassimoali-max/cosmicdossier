@@ -79,4 +79,87 @@ end;
 $$;
 
 reset role;
+
+-- Cleanup has a separate capability and expiry-limited RLS policies.
+create role deletion_fresh_auth_cleanup_ci nologin noinherit;
+grant usage on schema private to deletion_fresh_auth_cleanup_ci;
+grant select, delete on private.deletion_fresh_auth_ci_flows to deletion_fresh_auth_cleanup_ci;
+create policy deletion_fresh_auth_cleanup_select_ci
+  on private.deletion_fresh_auth_ci_flows for select
+  to deletion_fresh_auth_cleanup_ci using (expires_at <= clock_timestamp());
+create policy deletion_fresh_auth_cleanup_delete_ci
+  on private.deletion_fresh_auth_ci_flows for delete
+  to deletion_fresh_auth_cleanup_ci using (expires_at <= clock_timestamp());
+
+create function private.cleanup_deletion_fresh_auth_ci_flows()
+returns bigint
+language sql security invoker set search_path=''
+as $
+  with expired as (
+    select f.flow_hash from private.deletion_fresh_auth_ci_flows f
+    where f.expires_at <= clock_timestamp()
+    order by f.expires_at,f.flow_hash limit 500 for update skip locked
+  ), removed as (
+    delete from private.deletion_fresh_auth_ci_flows f
+    using expired e where f.flow_hash=e.flow_hash returning 1
+  )
+  select count(*) from removed;
+$;
+revoke all on function private.cleanup_deletion_fresh_auth_ci_flows() from public,anon,authenticated;
+grant execute on function private.cleanup_deletion_fresh_auth_ci_flows() to deletion_fresh_auth_cleanup_ci;
+-- PostgreSQL row locking requires UPDATE privilege. Grant only one column,
+-- without an UPDATE RLS policy; actual row changes remain prohibited.
+grant update(flow_hash) on private.deletion_fresh_auth_ci_flows to deletion_fresh_auth_cleanup_ci;
+
+insert into private.deletion_fresh_auth_ci_flows
+ (flow_hash,browser_hash,user_id,original_session_id,started_at,expires_at)
+select lpad(to_hex(i),64,'0'),repeat('b',64),
+ '11111111-1111-4111-8111-111111111111',
+ 'aaaaaaaa-aaaa-4aaa-8aaa-aaaaaaaaaaaa',
+ clock_timestamp()-interval '9 minutes',clock_timestamp()-interval '1 minute'
+from generate_series(1,501) i;
+
+set local role deletion_fresh_auth_ci;
+do $
+begin
+  if exists(select 1 from private.take_deletion_fresh_auth_ci_flow(lpad('1',64,'0'),repeat('b',64))) then
+    raise exception 'Expired flow consumed';
+  end if;
+  if has_function_privilege(current_user,'private.cleanup_deletion_fresh_auth_ci_flows()','EXECUTE') then
+    raise exception 'Runtime role can execute cleanup';
+  end if;
+end;
+$;
+reset role;
+
+set local role deletion_fresh_auth_cleanup_ci;
+do $
+declare n bigint;
+begin
+  delete from private.deletion_fresh_auth_ci_flows where flow_hash=repeat('c',64);
+  get diagnostics n = row_count;
+  if n <> 0 then raise exception 'Cleanup deleted unexpired flow'; end if;
+  update private.deletion_fresh_auth_ci_flows set flow_hash=repeat('f',64)
+    where flow_hash=lpad('1',64,'0');
+  get diagnostics n = row_count;
+  if n <> 0 then raise exception 'Cleanup updated flow'; end if;
+  if private.cleanup_deletion_fresh_auth_ci_flows() <> 500 then
+    raise exception 'Cleanup did not remove exactly 500 expired flows';
+  end if;
+  if private.cleanup_deletion_fresh_auth_ci_flows() <> 1 then
+    raise exception 'Cleanup did not remove final expired flow';
+  end if;
+end;
+$;
+reset role;
+do $
+begin
+  if (select count(*) from private.deletion_fresh_auth_ci_flows) <> 1
+     or not exists(select 1 from private.deletion_fresh_auth_ci_flows where flow_hash=repeat('c',64)) then
+    raise exception 'Cleanup failed to preserve unexpired flow';
+  end if;
+  raise notice 'PASS: expired flow rejection and bounded isolated cleanup';
+end;
+$;
+
 rollback;
