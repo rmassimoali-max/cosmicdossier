@@ -41,11 +41,36 @@ async function run() {
     headers: { apikey: publishableKey, "Content-Type": "application/json" },
     body: JSON.stringify({ email: env.DELETION_TEST_EMAIL, password: password.stdout }),
   });
+  stage = "independent development login";
+  const secondLogin = await fetch(authUrl + "/auth/v1/token?grant_type=password", {
+    method: "POST",
+    headers: { apikey: publishableKey, "Content-Type": "application/json" },
+    body: JSON.stringify({ email: env.DELETION_TEST_EMAIL, password: password.stdout }),
+  });
   password.stdout = "";
+  if (!secondLogin.ok) throw new Error("Independent login failed.");
+  const secondSession = await secondLogin.json();
+  const secondToken = secondSession.access_token;
+  if (typeof secondToken !== "string" || !secondToken) {
+    throw new Error("Missing independent session.");
+  }
+  stage = "development login";
   if (!login.ok) throw new Error("Development login failed.");
   const session = await login.json();
   const token = session.access_token;
   if (typeof token !== "string" || !token) throw new Error("Missing session.");
+  stage = "independent session verification";
+  const sessionId = (value: string) =>
+    JSON.parse(Buffer.from(value.split(".")[1] ?? "", "base64url").toString()).session_id;
+  if (!sessionId(token) || !sessionId(secondToken) || sessionId(token) === sessionId(secondToken)) {
+    throw new Error("Independent sessions required.");
+  }
+  const secondIdentity = await fetch(authUrl + "/auth/v1/user", {
+    headers: { apikey: publishableKey, Authorization: "Bearer " + secondToken },
+  });
+  if (!secondIdentity.ok || (await secondIdentity.json()).email !== env.DELETION_TEST_EMAIL) {
+    throw new Error("Independent identity verification failed.");
+  }
   stage = "identity verification";
   const response = await fetch(authUrl + "/auth/v1/user", {
     headers: { apikey: publishableKey, Authorization: "Bearer " + token },
@@ -136,10 +161,10 @@ async function run() {
     const otherSlot = createSessionAuthorizationStorage({
       storage: createPostgresDeletionAuthorizationStorage(db),
       key: encryptionKey,
-      sessionToken: token + ":isolated-test-slot",
+      sessionToken: secondToken,
     });
     if ((await otherSlot.take()) !== null) throw new Error("Storage isolation failed.");
-    console.log("Storage slot isolation: PASS");
+    console.log("Independent authenticated session storage isolation: PASS");
     stage = "verification code replay";
     await expectRejected(code);
     console.log("Verification code replay rejection: PASS");
