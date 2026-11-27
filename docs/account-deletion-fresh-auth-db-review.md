@@ -45,3 +45,15 @@ Read-only catalog inspection of cosmicdev confirms:
 - Backend has read/insert/update/delete on private.deletion_session_authorizations; read/insert/update on public account_deletion_authorizations and account_deletion_challenges; no direct privileges on auth.users, auth.sessions, or saved_assessments.
 
 This is a significant least-privilege boundary finding. Do not grant fresh-auth functions or any deletion executor capability to the current backend role until the worker/backend membership model is redesigned and tested. Do not remove membership or alter role settings as part of this audit without explicit change review. Column-level grants, default ACLs and all role memberships remain to be fully inventoried; one attempted default-ACL query was invalid and yielded no evidence.
+
+## Follow-up: effective membership and default privileges (2026-11-27)
+
+Read-only catalog checks established the exact membership options for `deletion_worker` -> `deletion_backend`: `admin_option=false`, `inherit_option=false`, `set_option=true`. Therefore the worker can explicitly SET ROLE to the backend role. `pg_has_role(...,'MEMBER')` is true, `pg_has_role(...,'USAGE')` is false, and direct effective table privilege checks for the worker are false until it switches role. This confirms that the backend privileges are reachable through role switching; the earlier warning is not merely theoretical. Do not treat NOINHERIT as a security boundary against this membership.
+
+The backend is NOLOGIN, NOINHERIT, NOSUPERUSER, NOCREATEROLE, NOCREATEDB and NOBYPASSRLS. The worker is LOGIN with the same non-superuser/non-admin flags. Membership has no admin option, but SET option is enabled.
+
+Function ACL inspection confirms existing private deletion functions are SECURITY INVOKER, use an empty search_path, grant EXECUTE to deletion_backend, and deny anon/authenticated. Since the worker can SET ROLE deletion_backend, it can reach these backend functions after switching roles. These functions currently support the deletion verification lifecycle; they do not grant auth.users deletion.
+
+Default ACL inventory using aclexplode found public-schema defaults for objects created by both postgres and supabase_admin: future tables receive broad table privileges for anon, authenticated and service_role; future sequences receive SELECT/USAGE/UPDATE; future functions receive EXECUTE. No private-schema default ACL entries were returned. These are creator-specific defaults and do not prove existing table access; inspect actual object ACLs and RLS separately. Treat them as a reason to keep fresh-auth objects in private and explicitly revoke/grant narrowly. Do not alter Supabase-wide defaults as part of this feature without separate impact review.
+
+No role settings, memberships, grants, or database objects were changed. All queries were catalog reads only.
