@@ -99,12 +99,32 @@ async function run() {
     const code = prompt("Enter the development verification code:");
     if (!code) throw new Error("Test cancelled.");
     const encryptionKey = Buffer.from(key, "hex");
+    const verify = (candidate: string) =>
+      handlePostgresStoredDeletionVerification({
+        ...input,
+        encryptionKey,
+        request: request({ challengeId: issued.challengeId, code: candidate }),
+      });
+    const expectRejected = async (candidate: string) => {
+      try {
+        await verify(candidate);
+      } catch (error) {
+        if (
+          error instanceof Error &&
+          error.message === "Deletion verification code was invalid, expired, or already used."
+        ) {
+          return;
+        }
+        throw error;
+      }
+      throw new Error("Unexpected verification success.");
+    };
+    if (!/^\d{8}$/.test(code)) throw new Error("Invalid code format.");
+    stage = "incorrect code rejection";
+    await expectRejected((code[0] === "0" ? "1" : "0") + code.slice(1));
+    console.log("Incorrect code rejection: PASS");
     stage = "code verification";
-    const verified = await handlePostgresStoredDeletionVerification({
-      ...input,
-      encryptionKey,
-      request: request({ challengeId: issued.challengeId, code }),
-    });
+    const verified = await verify(code);
     if (!verified.verified) throw new Error("Verification failed.");
     stage = "authorization storage";
     const storage = createSessionAuthorizationStorage({
@@ -112,6 +132,18 @@ async function run() {
       key: encryptionKey,
       sessionToken: token,
     });
+    stage = "storage slot isolation";
+    const otherSlot = createSessionAuthorizationStorage({
+      storage: createPostgresDeletionAuthorizationStorage(db),
+      key: encryptionKey,
+      sessionToken: token + ":isolated-test-slot",
+    });
+    if ((await otherSlot.take()) !== null) throw new Error("Storage isolation failed.");
+    console.log("Storage slot isolation: PASS");
+    stage = "verification code replay";
+    await expectRejected(code);
+    console.log("Verification code replay rejection: PASS");
+    stage = "authorization storage";
     const credentials = await storage.take();
     if (!credentials || (await storage.take()) !== null) {
       throw new Error("Storage single-use check failed.");
@@ -120,6 +152,14 @@ async function run() {
     const consume = () =>
       consumeAuthenticatedDeletionAuthorization({ ...input, accessToken: token, ...credentials });
     if (!(await consume()) || (await consume())) throw new Error("Consumption check failed.");
+    stage = "post-test account verification";
+    const after = await fetch(authUrl + "/auth/v1/user", {
+      headers: { apikey: publishableKey, Authorization: "Bearer " + token },
+    });
+    if (!after.ok || (await after.json()).id !== identity.id) {
+      throw new Error("Account verification failed.");
+    }
+    console.log("Development account still authenticated: PASS");
     console.log("Development authorization lifecycle: PASS. No account deletion invoked.");
   } finally {
     await db.close();
