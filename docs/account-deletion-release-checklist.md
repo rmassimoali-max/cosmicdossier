@@ -29,9 +29,16 @@
 
 ## Operational rules
 
-1. Keep PR #14 as a draft until reviewed. A green Vercel check proves a deployment built, **not** that staged SQL was safely applied or deletion is ready.
+1. Keep PR #16 as a draft until reviewed. A green Vercel check proves a deployment built, **not** that staged SQL was safely applied or deletion is ready.
 2. Run SQL migrations and SQL tests only in the disposable CI database or an explicitly isolated staging Supabase project.
 3. Never use a service-role key or unrestricted database URL in browser code.
 4. Never log or return email codes, raw authorization tokens, HMAC secrets, or connection strings.
 5. A successful authorization consumption does **not** delete an account and must not be presented as a completed deletion.
 6. Require explicit approval before applying migrations or enabling the production deletion endpoint.
+
+## Development verification checkpoint
+
+- CI, restricted worker TLS connection, preview rollback-only storage diagnostics, email delivery, cross-account isolation, session storage isolation, replay rejection, lockout and challenge expiration passed in development. Authorization expiration was reported passing by the owner; terminal output was not retained.
+- Postgres.js 3.4.7 on Bun 1.4.5 emits a negative timeout warning in its reconnect calculation after idle waits. The observed reconnect and subsequent security assertions passed. No driver settings were weakened to suppress it.
+- The staged session consumption entry point takes credentials from encrypted storage for the current access token rather than accepting them from its caller. The lower-level consumption primitive remains account-bound, not independently session-bound. Token refresh can invalidate access to the stored proof; fail closed and restart verification.
+- This checkpoint is not release approval. Fresh reauthentication, final confirmation, destructive coordination, independent review and production activation remain outstanding.
