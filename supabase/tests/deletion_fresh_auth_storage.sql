@@ -98,7 +98,7 @@ create policy deletion_fresh_auth_cleanup_lock_ci
 create function private.cleanup_deletion_fresh_auth_ci_flows()
 returns bigint
 language sql security invoker set search_path=''
-as $
+as $$
 
   with expired as (
     select f.flow_hash from private.deletion_fresh_auth_ci_flows f
@@ -109,7 +109,7 @@ as $
     using expired e where f.flow_hash=e.flow_hash returning 1
   )
   select count(*) from removed;
-$;
+$$;
 revoke all on function private.cleanup_deletion_fresh_auth_ci_flows() from public,anon,authenticated;
 grant execute on function private.cleanup_deletion_fresh_auth_ci_flows() to deletion_fresh_auth_cleanup_ci;
 -- PostgreSQL row locking requires UPDATE privilege. Grant only one column,
