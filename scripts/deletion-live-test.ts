@@ -6,6 +6,8 @@ import { createPostgresDeletionAuthorizationStorage } from "../src/lib/deletion-
 import { createSessionAuthorizationStorage } from "../src/lib/deletion-session-storage.server";
 import { consumeAuthenticatedDeletionAuthorization } from "../src/lib/deletion-authenticated-consume.server";
 
+let stage = "configuration";
+
 async function run() {
   const env = process.env;
   if (env.VERCEL_ENV !== "preview" || env.DELETION_LIVE_TEST !== "true") {
@@ -21,6 +23,7 @@ async function run() {
     throw new Error("Interactive development environment required.");
   }
   // Read from the controlling terminal with echo disabled; never persist credentials.
+  stage = "private password prompt";
   const password = spawnSync(
     "bash",
     [
@@ -30,6 +33,7 @@ async function run() {
     { encoding: "utf8", stdio: ["inherit", "pipe", "inherit"] },
   );
   if (password.status !== 0 || !password.stdout) throw new Error("Login cancelled.");
+  stage = "development login";
   const login = await fetch(authUrl + "/auth/v1/token?grant_type=password", {
     method: "POST",
     headers: { apikey: publishableKey, "Content-Type": "application/json" },
@@ -40,6 +44,7 @@ async function run() {
   const session = await login.json();
   const token = session.access_token;
   if (typeof token !== "string" || !token) throw new Error("Missing session.");
+  stage = "identity verification";
   const response = await fetch(authUrl + "/auth/v1/user", {
     headers: { apikey: publishableKey, Authorization: "Bearer " + token },
   });
@@ -48,6 +53,7 @@ async function run() {
   if (identity.email !== env.DELETION_TEST_EMAIL || !identity.email_confirmed_at) {
     throw new Error("Unexpected test identity.");
   }
+  stage = "database connection";
   const db = await openDeletionPostgres(env);
   if (!db) throw new Error("Development backend disabled.");
   try {
@@ -66,18 +72,22 @@ async function run() {
         headers: { origin, host: "development-test.invalid" },
         body: JSON.stringify(body),
       });
+    stage = "email issuance";
     const issued = await handleDeletionCodeRequest({ ...input, request: request({}) });
     if (!issued.sent) throw new Error("Email request failed.");
     console.log("Verification email requested.");
+    stage = "code prompt";
     const code = prompt("Enter the development verification code:");
     if (!code) throw new Error("Test cancelled.");
     const encryptionKey = Buffer.from(key, "hex");
+    stage = "code verification";
     const verified = await handlePostgresStoredDeletionVerification({
       ...input,
       encryptionKey,
       request: request({ challengeId: issued.challengeId, code }),
     });
     if (!verified.verified) throw new Error("Verification failed.");
+    stage = "authorization storage";
     const storage = createSessionAuthorizationStorage({
       storage: createPostgresDeletionAuthorizationStorage(db),
       key: encryptionKey,
@@ -87,6 +97,7 @@ async function run() {
     if (!credentials || (await storage.take()) !== null) {
       throw new Error("Storage single-use check failed.");
     }
+    stage = "authorization consumption";
     const consume = () =>
       consumeAuthenticatedDeletionAuthorization({ ...input, accessToken: token, ...credentials });
     if (!(await consume()) || (await consume())) throw new Error("Consumption check failed.");
@@ -97,6 +108,6 @@ async function run() {
 }
 
 run().catch(() => {
-  console.error("Development authorization lifecycle failed or cancelled.");
+  console.error(`Development authorization lifecycle failed or cancelled at: ${stage}.`);
   process.exitCode = 1;
 });
