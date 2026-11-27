@@ -36,7 +36,7 @@ insert into auth.users(id) values
  ('11111111-1111-4111-8111-111111111111'),
  ('22222222-2222-4222-8222-222222222222');
 
-do $$
+do $$$
 begin
   if not has_table_privilege('deletion_fresh_auth_ci','private.deletion_fresh_auth_ci_flows','SELECT')
      or not has_table_privilege('deletion_fresh_auth_ci','private.deletion_fresh_auth_ci_flows','INSERT')
@@ -62,7 +62,7 @@ values
  (repeat('c',64),repeat('d',64),'22222222-2222-4222-8222-222222222222',
   'bbbbbbbb-bbbb-4bbb-8bbb-bbbbbbbbbbbb',clock_timestamp()+interval '5 minutes');
 
-do $$
+do $$$
 declare v_count integer;
 begin
   select count(*) into v_count from private.take_deletion_fresh_auth_ci_flow(repeat('a',64),repeat('x',64));
@@ -125,7 +125,7 @@ select lpad(to_hex(i),64,'0'),repeat('b',64),
 from generate_series(1,501) i;
 
 set local role deletion_fresh_auth_ci;
-do $
+do $$
 begin
   if exists(select 1 from private.take_deletion_fresh_auth_ci_flow(lpad('1',64,'0'),repeat('b',64))) then
     raise exception 'Expired flow consumed';
@@ -134,11 +134,11 @@ begin
     raise exception 'Runtime role can execute cleanup';
   end if;
 end;
-$;
+$$;
 reset role;
 
 set local role deletion_fresh_auth_cleanup_ci;
-do $
+do $$
 declare n bigint;
 begin
   delete from private.deletion_fresh_auth_ci_flows where flow_hash=repeat('c',64);
@@ -155,9 +155,9 @@ begin
     raise exception 'Cleanup did not remove final expired flow';
   end if;
 end;
-$;
+$$;
 reset role;
-do $
+do $$
 begin
   if (select count(*) from private.deletion_fresh_auth_ci_flows) <> 1
      or not exists(select 1 from private.deletion_fresh_auth_ci_flows where flow_hash=repeat('c',64)) then
@@ -165,6 +165,6 @@ begin
   end if;
   raise notice 'PASS: expired flow rejection and bounded isolated cleanup';
 end;
-$;
+$$;
 
 rollback;
