@@ -3,7 +3,7 @@ import type { DeletionSqlExecutor } from "./deletion-store.server";
 type Connection = DeletionSqlExecutor & { close(): Promise<void> };
 type Connect = (options: {
   connectionString: string;
-  ssl: { rejectUnauthorized: true };
+  ssl: { rejectUnauthorized: true; ca: string };
   max: number;
   connectionTimeoutMillis: number;
   statement_timeout: number;
@@ -37,11 +37,15 @@ export async function openDevelopmentDeletionConnection(input: {
   ) {
     throw new Error("Deletion connection requires the dedicated development identity.");
   }
+  const ca = input.env["DELETION_DATABASE_CA"];
+  if (!ca?.startsWith("-----BEGIN CERTIFICATE-----") || !ca.trimEnd().endsWith("-----END CERTIFICATE-----")) {
+    throw new Error("Deletion database CA is not configured.");
+  }
   let db: Connection | undefined;
   try {
     db = await input.connect({
       connectionString: url.toString(),
-      ssl: { rejectUnauthorized: true },
+      ssl: { rejectUnauthorized: true, ca },
       max: 1,
       connectionTimeoutMillis: 5000,
       statement_timeout: 5000,

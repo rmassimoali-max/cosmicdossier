@@ -22,9 +22,13 @@ if (
       throw new Error("configuration");
     }
     url.search = "";
+    const ca = process.env.DELETION_DATABASE_CA;
+    if (!ca?.startsWith("-----BEGIN CERTIFICATE-----") || !ca.trimEnd().endsWith("-----END CERTIFICATE-----")) {
+      throw new Error("configuration");
+    }
     stage = "connection";
     sql = postgres(url.toString(), {
-      ssl: { rejectUnauthorized: true },
+      ssl: { rejectUnauthorized: true, ca },
       max: 1,
       connect_timeout: 5,
       prepare: false,
