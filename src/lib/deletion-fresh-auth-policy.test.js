@@ -20,9 +20,9 @@ const verified = {
 
 test("accepts correlated fresh password and email sign-in policy inputs", () => {
   expect(meetsFreshAuthPolicy({ flow, verified, now: 3000 })).toBe(true);
-  expect(meetsFreshAuthPolicy({ flow, verified: { ...verified, method: "email" }, now: 3000 })).toBe(
-    true,
-  );
+  expect(
+    meetsFreshAuthPolicy({ flow, verified: { ...verified, method: "email" }, now: 3000 }),
+  ).toBe(true);
 });
 
 test("rejects wrong account, session, browser, method, timing and assurance", () => {
