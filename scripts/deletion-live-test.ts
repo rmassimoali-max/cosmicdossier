@@ -1,3 +1,5 @@
+import { requireDeletionVerificationPreflight } from "../src/lib/deletion-preflight.server";
+import { sendDeletionVerificationEmail } from "../src/lib/deletion-email.server";
 import { spawnSync } from "node:child_process";
 import { openDeletionPostgres } from "../src/lib/deletion-postgres-driver.server";
 import { handleDeletionCodeRequest } from "../src/lib/deletion-http-request.server";
@@ -72,8 +74,25 @@ async function run() {
         headers: { origin, host: "development-test.invalid" },
         body: JSON.stringify(body),
       });
-    stage = "email issuance";
-    const issued = await handleDeletionCodeRequest({ ...input, request: request({}) });
+    stage = "email preflight";
+    await requireDeletionVerificationPreflight({
+      ...input,
+      method: "POST",
+      origin,
+      host: "development-test.invalid",
+      accessToken: token,
+    });
+    stage = "database challenge creation";
+    const issued = await handleDeletionCodeRequest({
+      ...input,
+      request: request({}),
+      sender: async (config, recipient, code) => {
+        stage = "Resend email transport";
+        const result = await sendDeletionVerificationEmail(config, recipient, code);
+        stage = "database challenge activation";
+        return result;
+      },
+    });
     if (!issued.sent) throw new Error("Email request failed.");
     console.log("Verification email requested.");
     stage = "code prompt";
