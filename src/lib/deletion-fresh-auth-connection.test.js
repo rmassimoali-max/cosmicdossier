@@ -4,7 +4,8 @@ import { openDevelopmentFreshAuthConnection } from "./deletion-fresh-auth-connec
 const env = {
   ACCOUNT_DELETION_FRESH_AUTH_ENABLED: "true",
   VERCEL_ENV: "preview",
-  DELETION_FRESH_AUTH_DATABASE_CA: "-----BEGIN CERTIFICATE-----\nfixture\n-----END CERTIFICATE-----",
+  DELETION_FRESH_AUTH_DATABASE_CA:
+    "-----BEGIN CERTIFICATE-----\nfixture\n-----END CERTIFICATE-----",
   DELETION_FRESH_AUTH_DATABASE_URL:
     "postgresql://deletion_fresh_auth_worker.umcpchdifhxhxvhnatxo:example@aws-1-us-east-2.pooler.supabase.com/postgres?sslmode=verify-full",
 };
@@ -40,7 +41,10 @@ describe("development fresh-auth connection", () => {
       },
       {
         ...env,
-        DELETION_FRESH_AUTH_DATABASE_URL: env.DELETION_FRESH_AUTH_DATABASE_URL.replace("verify-full", "disable"),
+        DELETION_FRESH_AUTH_DATABASE_URL: env.DELETION_FRESH_AUTH_DATABASE_URL.replace(
+          "verify-full",
+          "disable",
+        ),
       },
     ]) {
       let called = false;
@@ -93,14 +97,29 @@ describe("development fresh-auth connection", () => {
 
 test("rejects verification credentials and never falls back to them", async () => {
   for (const bad of [
-    { ...env, DELETION_FRESH_AUTH_DATABASE_URL: undefined, DELETION_DATABASE_URL: env.DELETION_FRESH_AUTH_DATABASE_URL },
-    { ...env, DELETION_FRESH_AUTH_DATABASE_URL: env.DELETION_FRESH_AUTH_DATABASE_URL.replace("deletion_fresh_auth_worker", "deletion_worker") },
+    {
+      ...env,
+      DELETION_FRESH_AUTH_DATABASE_URL: undefined,
+      DELETION_DATABASE_URL: env.DELETION_FRESH_AUTH_DATABASE_URL,
+    },
+    {
+      ...env,
+      DELETION_FRESH_AUTH_DATABASE_URL: env.DELETION_FRESH_AUTH_DATABASE_URL.replace(
+        "deletion_fresh_auth_worker",
+        "deletion_worker",
+      ),
+    },
   ]) {
     let called = false;
-    await expect(openDevelopmentFreshAuthConnection({
-      env: bad,
-      connect: async () => { called = true; throw new Error("unexpected"); },
-    })).rejects.toThrow();
+    await expect(
+      openDevelopmentFreshAuthConnection({
+        env: bad,
+        connect: async () => {
+          called = true;
+          throw new Error("unexpected");
+        },
+      }),
+    ).rejects.toThrow();
     expect(called).toBe(false);
   }
 });
