@@ -60,11 +60,13 @@ if (
       await sql.begin(async (tx) => {
         await tx`set local role deletion_backend`;
         const put = async (slot, envelope, ttl) => {
-          const [row] = await tx`select private.put_deletion_session_authorization(${slot}, ${envelope}, ${ttl}) as ok`;
+          const [row] =
+            await tx`select private.put_deletion_session_authorization(${slot}, ${envelope}, ${ttl}) as ok`;
           return row?.ok;
         };
         const take = async (slot) => {
-          const [row] = await tx`select private.take_deletion_session_authorization(${slot}) as value`;
+          const [row] =
+            await tx`select private.take_deletion_session_authorization(${slot}) as value`;
           return row?.value;
         };
         if (!(await put(a, "fixture-a", 240000)) || !(await put(b, "fixture-b", 240000))) {
