@@ -93,7 +93,7 @@ create policy deletion_fresh_auth_cleanup_delete_ci
 create policy deletion_fresh_auth_cleanup_lock_ci
   on private.deletion_fresh_auth_ci_flows for update
   to deletion_fresh_auth_cleanup_ci using (expires_at <= clock_timestamp())
-  with check (expires_at <= clock_timestamp());
+  with check (false);
 
 create function private.cleanup_deletion_fresh_auth_ci_flows()
 returns bigint
@@ -113,7 +113,7 @@ $$;
 revoke all on function private.cleanup_deletion_fresh_auth_ci_flows() from public,anon,authenticated;
 grant execute on function private.cleanup_deletion_fresh_auth_ci_flows() to deletion_fresh_auth_cleanup_ci;
 -- PostgreSQL row locking requires UPDATE privilege. Grant only one column,
--- without an UPDATE RLS policy; actual row changes remain prohibited.
+-- with an UPDATE policy that permits locking expired rows but rejects all new row versions.
 grant update(flow_hash) on private.deletion_fresh_auth_ci_flows to deletion_fresh_auth_cleanup_ci;
 
 insert into private.deletion_fresh_auth_ci_flows
@@ -148,6 +148,12 @@ begin
     where flow_hash=repeat('c',64);
   get diagnostics n = row_count;
   if n <> 0 then raise exception 'Cleanup updated flow'; end if;
+  begin
+    update private.deletion_fresh_auth_ci_flows set flow_hash=repeat('f',64)
+      where flow_hash=lpad('1',64,'0');
+    raise exception 'Cleanup unexpectedly updated expired flow';
+  exception when insufficient_privilege then null;
+  end;
   if private.cleanup_deletion_fresh_auth_ci_flows() <> 500 then
     raise exception 'Cleanup did not remove exactly 500 expired flows';
   end if;
