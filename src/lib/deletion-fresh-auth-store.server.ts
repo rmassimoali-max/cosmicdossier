@@ -27,7 +27,12 @@ export function createPostgresFreshAuthStore(
       const flowId = randomBytes(32).toString("hex");
       const result = await db.query<{ issued: boolean }>(
         "select private.issue_deletion_fresh_auth_flow($1::text, $2::text, $3::uuid, $4::uuid) as issued",
-        [hash("fresh-auth-flow", flowId), hash("fresh-auth-browser", browserBinding), userId, sessionId],
+        [
+          hash("fresh-auth-flow", flowId),
+          hash("fresh-auth-browser", browserBinding),
+          userId,
+          sessionId,
+        ],
       );
       if (result.rows.length !== 1 || result.rows[0]?.issued !== true) {
         throw new Error("Fresh-auth issuance failed.");
@@ -49,6 +54,7 @@ export function createPostgresFreshAuthStore(
       const row = result.rows[0];
       if (
         result.rows.length !== 1 ||
+        !row ||
         typeof row.user_id !== "string" ||
         !uuid.test(row.user_id) ||
         typeof row.original_session_id !== "string" ||
