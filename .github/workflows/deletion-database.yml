@@ -40,3 +40,6 @@ jobs:
         run: bash scripts/test-deletion-database.sh
       - name: Test isolated fresh-auth storage role and single-use behavior
         run: bash scripts/test-deletion-fresh-auth.sh
+
+      - name: Test concurrent fresh-auth consumption
+        run: bash scripts/test-deletion-fresh-auth-concurrency.sh
