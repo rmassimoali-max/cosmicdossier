@@ -38,3 +38,5 @@ jobs:
         run: psql "$TEST_DATABASE_URL" -X -v ON_ERROR_STOP=1 -f supabase/tests/ci_auth_fixture.sql
       - name: Apply migrations and check security
         run: bash scripts/test-deletion-database.sh
+      - name: Test isolated fresh-auth storage role and single-use behavior
+        run: psql "$TEST_DATABASE_URL" -X -v ON_ERROR_STOP=1 -f supabase/tests/deletion_fresh_auth_storage.sql
