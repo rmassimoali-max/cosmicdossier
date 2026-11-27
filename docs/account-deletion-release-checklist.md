@@ -42,3 +42,7 @@
 - Postgres.js 3.4.7 on Bun 1.4.5 emits a negative timeout warning in its reconnect calculation after idle waits. The observed reconnect and subsequent security assertions passed. No driver settings were weakened to suppress it.
 - The staged session consumption entry point takes credentials from encrypted storage for the current access token rather than accepting them from its caller. The lower-level consumption primitive remains account-bound, not independently session-bound. Token refresh can invalidate access to the stored proof; fail closed and restart verification.
 - This checkpoint is not release approval. Fresh reauthentication, final confirmation, destructive coordination, independent review and production activation remain outstanding.
+
+### Live session consumption verification (2026-11-27)
+
+Owner-provided terminal output for commit `0e68ebf` confirms incorrect code rejection, independent authenticated session rejection, verification code replay rejection, owner session consumption, authorization replay rejection, and continued authentication of the disposable development account. No account deletion was invoked. All three GitHub workflows passed for that commit. The initial runner failed because its controlled sender omitted the delivery acceptance return value; the corrected runner passed. This verifies the session-scoped application entry point, not independent database-level session binding or destructive deletion readiness.
