@@ -17,7 +17,6 @@ export function openDeletionPostgres(env: Record<string, string | undefined>) {
         prepare: false,
         connection: {
           statement_timeout: options.statement_timeout,
-          role: "deletion_backend",
         },
       });
       try {
@@ -46,6 +45,7 @@ export function openDeletionPostgres(env: Record<string, string | undefined>) {
           });
           try {
             const rows = await sql.begin(async (transaction) => {
+              // Switch roles only within the transaction, not at pooler startup.
               await transaction`set local role deletion_backend`;
               return await transaction.unsafe<T[]>(statement, bound);
             });
