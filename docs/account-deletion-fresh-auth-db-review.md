@@ -17,7 +17,7 @@ A narrowly scoped runtime role needs only the minimum schema USAGE, table INSERT
 ## Required disposable-Postgres tests before any grants
 
 1. Function owner and runtime role effective privileges; anon/authenticated/PUBLIC denied.
-2. Runtime role cannot read the table directly, change user IDs, update or truncate rows, access unrelated tables, or invoke cleanup unless explicitly authorized.
+2. Runtime role cannot update or truncate rows, access unrelated tables, or invoke cleanup unless explicitly authorized. Direct SELECT/INSERT/DELETE on its own flow table is inherent in the proposed invoker model; test and document that capability rather than claiming function-only access.
 3. Insert rejects malformed hashes, invalid UUIDs and duplicate flow IDs; issuance rate limits enforced in trusted server layer.
 4. Correct browser hash consumes exactly one row; wrong browser leaves row untouched; expired flow cannot be consumed.
 5. Two concurrent take calls using separate connections yield exactly one row total.
@@ -57,3 +57,13 @@ Function ACL inspection confirms existing private deletion functions are SECURIT
 Default ACL inventory using aclexplode found public-schema defaults for objects created by both postgres and supabase_admin: future tables receive broad table privileges for anon, authenticated and service_role; future sequences receive SELECT/USAGE/UPDATE; future functions receive EXECUTE. No private-schema default ACL entries were returned. These are creator-specific defaults and do not prove existing table access; inspect actual object ACLs and RLS separately. Treat them as a reason to keep fresh-auth objects in private and explicitly revoke/grant narrowly. Do not alter Supabase-wide defaults as part of this feature without separate impact review.
 
 No role settings, memberships, grants, or database objects were changed. All queries were catalog reads only.
+
+## Revised role architecture
+
+Retain the existing verification worker/backend pair without expanding its privileges. Its explicit SET ROLE membership is intentional for the existing driver, not itself a vulnerability. No membership redesign is required merely to introduce a separate service.
+
+Propose a new independent fresh-auth login role and NOLOGIN capability role, with no membership path to or from the existing verification pair. Neither role may own the flow table, bypass RLS, administer roles, or access auth.users, auth.sessions, saved assessments or deletion authorization tables. No credentials or live grants are created by this proposal.
+
+Use SECURITY INVOKER for the initial disposable database prototype. Grant only SELECT, INSERT and DELETE on the dedicated flow table to the capability role, with explicit matching RLS policies. This trusts the server-side database credential with all flow records, including direct reads, inserts and deletes; function predicates alone cannot constrain a compromised credential. No UPDATE or TRUNCATE. A separate cleanup credential cannot enforce expiry-only deletion solely through an invoker function if it has unrestricted DELETE; use an expiry-restricted RLS DELETE policy for cleanup and test its interaction with SELECT policies. The issuance/consumption role still has broader DELETE capability by design. If function-only access becomes mandatory, separately review a narrowly owned SECURITY DEFINER design instead of silently claiming invoker functions provide it.
+
+The permanent deletion executor remains separate and unimplemented. No fresh-auth database role may execute account deletion. The next implementation checkpoint is a disposable PostgreSQL fixture exercising the draft SQL and these privilege boundaries, not another live grant. All three workflows passed on f428950 before this revision.
