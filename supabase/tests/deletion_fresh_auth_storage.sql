@@ -90,6 +90,10 @@ create policy deletion_fresh_auth_cleanup_select_ci
 create policy deletion_fresh_auth_cleanup_delete_ci
   on private.deletion_fresh_auth_ci_flows for delete
   to deletion_fresh_auth_cleanup_ci using (expires_at <= clock_timestamp());
+create policy deletion_fresh_auth_cleanup_lock_ci
+  on private.deletion_fresh_auth_ci_flows for update
+  to deletion_fresh_auth_cleanup_ci using (expires_at <= clock_timestamp())
+  with check (expires_at <= clock_timestamp());
 
 create function private.cleanup_deletion_fresh_auth_ci_flows()
 returns bigint
@@ -140,7 +144,7 @@ begin
   get diagnostics n = row_count;
   if n <> 0 then raise exception 'Cleanup deleted unexpired flow'; end if;
   update private.deletion_fresh_auth_ci_flows set flow_hash=repeat('f',64)
-    where flow_hash=lpad('1',64,'0');
+    where flow_hash=repeat('c',64);
   get diagnostics n = row_count;
   if n <> 0 then raise exception 'Cleanup updated flow'; end if;
   if private.cleanup_deletion_fresh_auth_ci_flows() <> 500 then
