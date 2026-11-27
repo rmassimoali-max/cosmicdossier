@@ -27,3 +27,9 @@ A narrowly scoped runtime role needs only the minimum schema USAGE, table INSERT
 9. Failures are closed: storage errors never produce a fresh-authentication approval.
 
 Only after this should a migration and a narrowly scoped adapter be considered. CI success is not SQL execution evidence. No development or production database change is authorized by this review.
+
+## Development database read-only verification (2026-11-27)
+
+The rollback-only SQL draft remains unapplied. A read-only catalog query against cosmicdev project `umcpchdifhxhxvhnatxo` returned no functions in schema `private` with names matching `%fresh_auth%`. A second read-only query confirmed `anon`, `authenticated`, and `PUBLIC` do not have USAGE on schema `private`; all three have USAGE on schema `public`. This is consistent with keeping the proposed fresh-authentication functions inaccessible until a restricted role is deliberately designed. It does not prove the future functions' effective ACLs, nor does it audit every role, default privilege, inherited membership, or production project.
+
+The PR head at this checkpoint is `ae4d664`; all three workflows passed: CI, deletion database security, and PostgreSQL dependency lockfile. These checks validate repository workflows, not execution of the rollback-only SQL. PR #16 remains open and draft. No schema changes were applied.
