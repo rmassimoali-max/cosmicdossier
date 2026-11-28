@@ -69,3 +69,30 @@ test("storage failure never grants approval", async () => {
   };
   await expect(consumeFreshAuthFlow({ ...input, store })).rejects.toThrow("unavailable");
 });
+
+test("a refreshed token cannot approve deletion even with a new session ID", async () => {
+  const input = fixture();
+  const verified = { ...input.verified, method: "refresh" };
+  expect(await consumeFreshAuthFlow({ ...input, verified })).toBe(false);
+  expect(await consumeFreshAuthFlow(input)).toBe(false);
+});
+
+test("the original session cannot approve deletion", async () => {
+  const input = fixture();
+  const verified = { ...input.verified, sessionId: "old" };
+  expect(await consumeFreshAuthFlow({ ...input, verified })).toBe(false);
+});
+
+test("authentication before the flow began cannot approve deletion", async () => {
+  const input = fixture();
+  const verified = { ...input.verified, authenticatedAt: 999 };
+  expect(await consumeFreshAuthFlow({ ...input, verified })).toBe(false);
+});
+
+test("uncorrelated or insufficient assurance evidence cannot approve deletion", async () => {
+  for (const override of [{ correlated: false }, { assuranceSatisfied: false }]) {
+    const input = fixture();
+    const verified = { ...input.verified, ...override };
+    expect(await consumeFreshAuthFlow({ ...input, verified })).toBe(false);
+  }
+});
