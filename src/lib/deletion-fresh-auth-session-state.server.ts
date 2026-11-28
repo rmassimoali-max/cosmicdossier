@@ -28,18 +28,18 @@ export function createSessionStateReader(db: DeletionSqlExecutor) {
     if (
       result.rows.length !== 1 ||
       !row ||
-      row.session_id !== identity.sessionId ||
-      row.user_id !== identity.userId
+      row["session_id"] !== identity.sessionId ||
+      row["user_id"] !== identity.userId
     ) {
       return null;
     }
-    const createdAt = parseTime(row.created_ms);
-    const lastActivityAt = parseTime(row.refreshed_ms);
-    const notAfter = parseTime(row.expires_ms);
+    const createdAt = parseTime(row["created_ms"]);
+    const lastActivityAt = parseTime(row["refreshed_ms"]);
+    const notAfter = parseTime(row["expires_ms"]);
     if (
       createdAt === null ||
       lastActivityAt === null ||
-      (row.expires_ms !== null && notAfter === null)
+      (row["expires_ms"] !== null && notAfter === null)
     ) {
       return null;
     }
