@@ -26,15 +26,12 @@ export function createPostgresFreshAuthStore(
         throw new Error("Invalid fresh-auth issuance input.");
       }
       const flowId = randomBytes(32).toString("hex");
-      const result = await db.query<{ issued: boolean }>(
-        FRESH_AUTH_ISSUE_SQL,
-        [
-          hash("fresh-auth-flow", flowId),
-          hash("fresh-auth-browser", browserBinding),
-          userId,
-          sessionId,
-        ],
-      );
+      const result = await db.query<{ issued: boolean }>(FRESH_AUTH_ISSUE_SQL, [
+        hash("fresh-auth-flow", flowId),
+        hash("fresh-auth-browser", browserBinding),
+        userId,
+        sessionId,
+      ]);
       if (result.rows.length !== 1 || result.rows[0]?.issued !== true) {
         throw new Error("Fresh-auth issuance failed.");
       }
@@ -47,10 +44,10 @@ export function createPostgresFreshAuthStore(
         original_session_id: string;
         started_ms: string;
         expires_ms: string;
-      }>(
-        FRESH_AUTH_TAKE_SQL,
-        [hash("fresh-auth-flow", flowId), hash("fresh-auth-browser", browserBinding)],
-      );
+      }>(FRESH_AUTH_TAKE_SQL, [
+        hash("fresh-auth-flow", flowId),
+        hash("fresh-auth-browser", browserBinding),
+      ]);
       if (result.rows.length === 0) return null;
       const row = result.rows[0];
       if (

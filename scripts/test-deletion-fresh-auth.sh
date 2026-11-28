@@ -9,7 +9,7 @@ assert draft.count("\nbegin;\n") == 1 and draft.rstrip().endswith("\nrollback;")
 assert test.count("-- FRESH_AUTH_REVIEW_DRAFT") == 1
 core = draft.split("\nbegin;\n", 1)[1].rsplit("\nrollback;", 1)[0]
 import re
-source = Path("src/lib/deletion-fresh-auth-connection.server.ts").read_text()
+source = Path("src/lib/deletion-fresh-auth-sql.server.ts").read_text()
 matches = re.findall(r'"(select current_user = .* as allowed)"', source)
 assert len(matches) == 1
 query = matches[0].removesuffix(" as allowed")

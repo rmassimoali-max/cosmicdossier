@@ -54,10 +54,7 @@ export async function openDevelopmentFreshAuthConnection(input: {
       connectionTimeoutMillis: 5000,
       statement_timeout: 5000,
     });
-    const result = await db.query<{ allowed: boolean }>(
-      FRESH_AUTH_IDENTITY_SQL,
-      [],
-    );
+    const result = await db.query<{ allowed: boolean }>(FRESH_AUTH_IDENTITY_SQL, []);
     if (result.rows.length !== 1 || result.rows[0]?.allowed !== true) {
       throw new Error("Unexpected fresh-auth database identity.");
     }

@@ -9,13 +9,11 @@ export const FRESH_AUTH_TAKE_SQL =
 
 /** Exact statement and parameter-count allowlist; never normalize caller SQL. */
 export function assertFreshAuthSqlAllowed(statement: string, parameterCount: number): void {
-  if (
-    !(
-      (statement === FRESH_AUTH_IDENTITY_SQL && parameterCount === 0) ||
-      (statement === FRESH_AUTH_ISSUE_SQL && parameterCount === 4) ||
-      (statement === FRESH_AUTH_TAKE_SQL && parameterCount === 2)
-    )
-  ) {
+  if (!(
+    (statement === FRESH_AUTH_IDENTITY_SQL && parameterCount === 0) ||
+    (statement === FRESH_AUTH_ISSUE_SQL && parameterCount === 4) ||
+    (statement === FRESH_AUTH_TAKE_SQL && parameterCount === 2)
+  )) {
     throw new Error("Unsupported fresh-auth SQL statement.");
   }
 }
