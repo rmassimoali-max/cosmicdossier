@@ -1,5 +1,8 @@
 import { expect, test } from "bun:test";
-import { meetsPasswordOnlyAssurance, meetsVerifiedPasswordAssurance } from "./deletion-fresh-auth-assurance.server";
+import {
+  meetsPasswordOnlyAssurance,
+  meetsVerifiedPasswordAssurance,
+} from "./deletion-fresh-auth-assurance.server";
 
 test("password-only assurance requires explicit absence of verified factors", () => {
   expect(meetsPasswordOnlyAssurance({ aal: "aal1", hasVerifiedFactors: false })).toBe(true);
