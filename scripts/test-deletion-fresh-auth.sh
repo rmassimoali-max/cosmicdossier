@@ -47,5 +47,16 @@ checks += "grant deletion_backend to deletion_fresh_auth_worker;\n"
 checks += check("false")
 checks += "revoke deletion_backend from deletion_fresh_auth_worker;\n"
 checks += check("true")
+checks += "grant select on auth.users to deletion_fresh_auth_worker;\n"
+checks += check("false")
+checks += "revoke select on auth.users from deletion_fresh_auth_worker;\n"
+checks += "grant execute on function private.cleanup_deletion_fresh_auth_flows() to deletion_fresh_auth_backend;\n"
+checks += check("false")
+checks += "revoke execute on function private.cleanup_deletion_fresh_auth_flows() from deletion_fresh_auth_backend;\n"
+checks += "alter table private.deletion_fresh_auth_flows disable row level security;\n"
+checks += check("false")
+checks += "alter table private.deletion_fresh_auth_flows enable row level security;\n"
+checks += check("true")
+checks += "select 'PASS: fresh-auth connection privilege checks' as result;\n"
 print(test.replace("-- FRESH_AUTH_REVIEW_DRAFT", core + "\n" + checks))
 PY
