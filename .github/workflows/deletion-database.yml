@@ -43,3 +43,5 @@ jobs:
 
       - name: Test concurrent fresh-auth consumption
         run: bash scripts/test-deletion-fresh-auth-concurrency.sh
+      - name: Test isolated session presence reader permissions
+        run: psql "$TEST_DATABASE_URL" -X -v ON_ERROR_STOP=1 -f docs/account-deletion-session-presence-review.sql
