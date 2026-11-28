@@ -13,6 +13,7 @@ const credentialsSchema = z.object({
   password: z.string().min(8).max(128),
 });
 const passwordSchema = z.object({ password: z.string().min(8).max(128) });
+const displayNameSchema = z.object({ displayName: z.string().trim().min(1).max(60) });
 const recoverySchema = z.object({ tokenHash: z.string().min(16).max(2048) });
 const callbackSchema = z.object({
   tokenHash: z.string().min(16).max(2048),
@@ -126,7 +127,7 @@ export const getCurrentAccount = createServerFn({ method: "GET" }).handler(async
   let token = getCookie(ACCESS);
   if (!token) {
     const refresh = getCookie(REFRESH);
-    if (!refresh) return { email: null };
+    if (!refresh) return { email: null, displayName: null };
     try {
       const payload = await authRequest("token?grant_type=refresh_token", {
         refresh_token: refresh,
@@ -140,7 +141,15 @@ export const getCurrentAccount = createServerFn({ method: "GET" }).handler(async
   }
   try {
     const user = await authRequest("user", undefined, token);
-    return { email: typeof user["email"] === "string" ? user["email"] : null };
+    const metadata = user["user_metadata"];
+    const displayName =
+      metadata &&
+      typeof metadata === "object" &&
+      "display_name" in metadata &&
+      typeof metadata.display_name === "string"
+        ? metadata.display_name
+        : null;
+    return { email: typeof user["email"] === "string" ? user["email"] : null, displayName };
   } catch {
     clearTokens();
     return { email: null };
@@ -214,3 +223,108 @@ export const changeRecoveredPassword = createServerFn({ method: "POST" })
     clearTokens();
     return { success: true };
   });
+
+/** Display name is presentation-only metadata, never an authorization claim. */
+export const updateAccountDisplayName = createServerFn({ method: "POST" })
+  .inputValidator((input: unknown) => displayNameSchema.parse(input))
+  .handler(async ({ data }) => {
+    const token = getCookie(ACCESS);
+    if (!token) throw new Error("Please sign in again to update your profile.");
+    const { url, publishableKey } = config();
+    const response = await fetch(`${url}/auth/v1/user`, {
+      method: "PUT",
+      headers: {
+        apikey: publishableKey,
+        Authorization: `Bearer ${token}`,
+        "Content-Type": "application/json",
+      },
+      body: JSON.stringify({ data: { display_name: data.displayName } }),
+      cache: "no-store",
+    });
+    if (!response.ok) throw new Error("Could not update your display name. Please try again.");
+    return { success: true };
+  });
+
+/** Supabase handles confirmation of the new address; do not change local login state early. */
+export const requestAccountEmailChange = createServerFn({ method: "POST" })
+  .inputValidator((input: unknown) => emailSchema.parse(input))
+  .handler(async ({ data }) => {
+    const token = getCookie(ACCESS);
+    if (!token) throw new Error("Please sign in again to change your email.");
+    const { url, publishableKey } = config();
+    const response = await fetch(`${url}/auth/v1/user`, {
+      method: "PUT",
+      headers: {
+        apikey: publishableKey,
+        Authorization: `Bearer ${token}`,
+        "Content-Type": "application/json",
+      },
+      body: JSON.stringify({ email: data.email }),
+      cache: "no-store",
+    });
+    if (!response.ok) {
+      const errorPayload = (await response.json().catch(() => ({}))) as Record<string, unknown>;
+      const code = errorPayload["code"] ?? errorPayload["error_code"];
+      if (code === "email_exists") {
+        throw new Error("That email address cannot be used. It may already belong to an account.");
+      }
+      if (code === "over_email_send_rate_limit" || response.status === 429) {
+        throw new Error("Too many email requests. Please wait before trying again.");
+      }
+      if (response.status === 401 || response.status === 403) {
+        throw new Error("Your session may have expired. Please sign in again.");
+      }
+      throw new Error("Could not request an email change. Please try again later.");
+    }
+    return { requested: true };
+  });
+
+/**
+ * Verify a password against the currently signed-in account, without granting
+ * account-deletion permission or changing the active session.
+ * A successful check is informational only until a separate, short-lived,
+ * single-use deletion authorization flow is implemented.
+ */
+export const previewVerifyDeletionPassword = createServerFn({ method: "POST" })
+  .inputValidator((input: unknown) => passwordSchema.parse(input))
+  .handler(async ({ data }) => {
+    const currentToken = getCookie(ACCESS);
+    if (!currentToken) throw new Error("Please sign in again.");
+    const current = await authRequest("user", undefined, currentToken);
+    const userId = current["id"];
+    const email = current["email"];
+    if (typeof userId !== "string" || typeof email !== "string") {
+      throw new Error("Could not verify your current account.");
+    }
+    // Do not call saveTokens: a password check must not replace auth cookies.
+    const verified = await authRequest("token?grant_type=password", {
+      email,
+      password: data.password,
+    });
+    const checkedToken = verified["access_token"];
+    if (typeof checkedToken !== "string") {
+      throw new Error("Password verification failed.");
+    }
+    const checkedUser = await authRequest("user", undefined, checkedToken);
+    if (checkedUser["id"] !== userId) {
+      throw new Error("Password verification failed.");
+    }
+    return { verified: true, deletionEnabled: false };
+  });
+
+/**
+ * Ask Supabase to send a fresh reauthentication code to the signed-in user.
+ * This does not validate the code or authorize account deletion.
+ */
+export const requestDeletionReauthenticationCode = createServerFn({
+  method: "POST",
+}).handler(async () => {
+  const token = getCookie(ACCESS);
+  if (!token) throw new Error("Please sign in again.");
+  const user = await authRequest("user", undefined, token);
+  if (typeof user["id"] !== "string" || typeof user["email"] !== "string") {
+    throw new Error("Please sign in again.");
+  }
+  await authRequest("reauthenticate", undefined, token);
+  return { requested: true, deletionEnabled: false };
+});

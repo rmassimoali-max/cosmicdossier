@@ -1,0 +1,51 @@
+name: Deletion database security
+
+on:
+  pull_request:
+    branches: [main]
+  workflow_dispatch:
+
+permissions:
+  contents: read
+
+jobs:
+  deletion-database:
+    name: Staged deletion SQL security checks
+    runs-on: ubuntu-latest
+    timeout-minutes: 10
+    services:
+      postgres:
+        image: postgres:17
+        env:
+          POSTGRES_USER: postgres
+          POSTGRES_PASSWORD: postgres
+          POSTGRES_DB: postgres
+        ports:
+          - 5432:5432
+        options: >-
+          --health-cmd "pg_isready -U postgres"
+          --health-interval 5s
+          --health-timeout 5s
+          --health-retries 10
+    env:
+      TEST_DATABASE_URL: postgresql://postgres:postgres@127.0.0.1:5432/postgres
+    steps:
+      - name: Check out repository
+        uses: actions/checkout@v4
+      - name: Install PostgreSQL client
+        run: sudo apt-get update && sudo apt-get install -y postgresql-client
+      - name: Initialize disposable Auth schema fixture
+        run: psql "$TEST_DATABASE_URL" -X -v ON_ERROR_STOP=1 -f supabase/tests/ci_auth_fixture.sql
+      - name: Apply migrations and check security
+        run: bash scripts/test-deletion-database.sh
+      - name: Test isolated fresh-auth storage role and single-use behavior
+        run: bash scripts/test-deletion-fresh-auth.sh
+
+      - name: Test concurrent fresh-auth consumption
+        run: bash scripts/test-deletion-fresh-auth-concurrency.sh
+      - name: Test isolated session presence reader permissions
+        run: psql "$TEST_DATABASE_URL" -X -v ON_ERROR_STOP=1 -f docs/account-deletion-session-presence-review.sql
+      - name: Test staged fresh-auth rate limit policy
+        run: psql "$TEST_DATABASE_URL" -X -v ON_ERROR_STOP=1 -f docs/sql/deletion-fresh-auth-rate-review.sql
+      - name: Test concurrent fresh-auth rate reservations
+        run: bash scripts/test-deletion-fresh-auth-rate-concurrency.sh

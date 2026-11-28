@@ -1,5 +1,8 @@
 import { createFileRoute, Link, notFound, useNavigate } from "@tanstack/react-router";
 import { useMemo, useState } from "react";
+import { useServerFn } from "@tanstack/react-start";
+import { getCurrentAccount } from "@/lib/auth.functions";
+import { saveAssessment } from "@/lib/saved-assessments.functions";
 import { StarField } from "@/components/cosmic/StarField";
 import { Bar, CButton, SectionTitle } from "@/components/cosmic/ui";
 import { Button } from "@/components/ui/button";
@@ -61,6 +64,27 @@ function TestPage() {
 
 function TestFlow({ test, r, person }: { test: TestDef; r: string | undefined; person: 1 | 2 }) {
   const navigate = useNavigate();
+  const getAccount = useServerFn(getCurrentAccount);
+  const save = useServerFn(saveAssessment);
+  const [saveStatus, setSaveStatus] = useState<"idle" | "saving" | "saved" | "error" | "sign-in">(
+    "idle",
+  );
+
+  const saveToAccount = async () => {
+    if (!scores || !test.dossierPatch || saveStatus === "saving") return;
+    setSaveStatus("saving");
+    try {
+      const account = await getAccount();
+      if (!account.email) {
+        setSaveStatus("sign-in");
+        return;
+      }
+      await save({ data: { assessmentSlug: test.slug, displayLabel: test.name, scores } });
+      setSaveStatus("saved");
+    } catch {
+      setSaveStatus("error");
+    }
+  };
 
   const sharedAnswers = useMemo(
     () => (r ? decodeAnswers(test.items, r, test.scale) : null),
@@ -107,9 +131,11 @@ function TestFlow({ test, r, person }: { test: TestDef; r: string | undefined; p
       const sourceName =
         test.slug === "big-five"
           ? "Mini-IPIP · 20 items"
-          : test.slug === "attachment-style"
-            ? "Library Attachment · two dimensions"
-            : test.name;
+          : test.slug === "resilience"
+            ? "Exploratory Resilience Reflection · v2 (12 original items)"
+            : test.slug === "attachment-style"
+              ? "Library Attachment · two dimensions"
+              : test.name;
       setSession((s) =>
         person === 2
           ? {
@@ -247,6 +273,8 @@ function TestFlow({ test, r, person }: { test: TestDef; r: string | undefined; p
             added={added}
             onShare={() => void share()}
             onAdd={addToDossier}
+            saveStatus={saveStatus}
+            onSave={() => void saveToAccount()}
             onRetake={() => {
               setAnswers({});
               setPhase("quiz");
@@ -318,6 +346,8 @@ function Results({
   onShare,
   onAdd,
   onRetake,
+  saveStatus,
+  onSave,
 }: {
   test: TestDef;
   scores: Record<string, number>;
@@ -327,6 +357,8 @@ function Results({
   onShare: () => void;
   onAdd: () => void;
   onRetake: () => void;
+  saveStatus: "idle" | "saving" | "saved" | "error" | "sign-in";
+  onSave: () => void;
 }) {
   const label = test.resultLabel?.(scores);
   const summary = test.resultSummary?.(scores);
@@ -439,6 +471,39 @@ function Results({
           </div>
         </div>
       ) : null}
+
+      <div className="panel p-6">
+        <h3 className="font-display text-xl text-foreground">Keep this result</h3>
+        <p className="mt-2 text-sm text-muted-foreground">
+          Save to your account to access this assessment on other devices. The free results and Add
+          to Dossier option remain available without saving.
+        </p>
+        <button
+          type="button"
+          disabled={saveStatus === "saving" || saveStatus === "saved"}
+          onClick={onSave}
+          className="mt-4 rounded-full border border-primary px-5 py-2 text-sm text-primary disabled:opacity-50"
+        >
+          {saveStatus === "saving"
+            ? "Saving…"
+            : saveStatus === "saved"
+              ? "Saved to account"
+              : "Save to my assessments"}
+        </button>
+        {saveStatus === "sign-in" ? (
+          <p className="mt-3 text-sm text-muted-foreground">
+            <Link to="/sign-in" className="text-primary">
+              Sign in
+            </Link>{" "}
+            to save this result.
+          </p>
+        ) : null}
+        {saveStatus === "error" ? (
+          <p role="alert" className="mt-3 text-sm text-destructive">
+            Could not save this result. Please try again.
+          </p>
+        ) : null}
+      </div>
 
       <div className="panel p-6 sm:p-8">
         <p className="tracking-cosmic text-[0.65rem] text-primary/80">THE DOSSIER CONNECTION</p>
