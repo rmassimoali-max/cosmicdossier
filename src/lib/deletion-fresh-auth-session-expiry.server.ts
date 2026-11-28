@@ -9,7 +9,8 @@ export function meetsSessionExpiryPolicy(input: {
   inactivityTimeoutMs: number | null;
   singleSessionPolicySatisfied: boolean;
 }): boolean {
-  const { now, createdAt, lastActivityAt, notAfter, maximumLifetimeMs, inactivityTimeoutMs } = input;
+  const { now, createdAt, lastActivityAt, notAfter, maximumLifetimeMs, inactivityTimeoutMs } =
+    input;
   const validTime = (value: number) => Number.isSafeInteger(value) && value > 0;
   if (
     !validTime(now) ||
