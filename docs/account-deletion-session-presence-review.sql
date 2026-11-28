@@ -17,7 +17,7 @@ grant select (id, user_id) on auth.sessions to deletion_session_presence_reader;
 
 -- Verify the exact query shape used by the staged adapter.
 set local role deletion_session_presence_reader;
-do $
+do $$
 begin
   if not exists (
     select 1 from auth.sessions
@@ -44,7 +44,7 @@ begin
   exception when insufficient_privilege then null;
   end;
 end
-$;
+$$;
 reset role;
 
 do $$
