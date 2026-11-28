@@ -20,7 +20,12 @@ test("binding is random and cookie is restricted to HTTPS and same-site requests
 
 test("missing, malformed and duplicate bindings are rejected", () => {
   const cookie = "__Host-deletion-fresh-auth=" + "a".repeat(64);
-  for (const header of ["", "other=abc", "__Host-deletion-fresh-auth=abc", cookie + "; " + cookie]) {
+  for (const header of [
+    "",
+    "other=abc",
+    "__Host-deletion-fresh-auth=abc",
+    cookie + "; " + cookie,
+  ]) {
     expect(readFreshAuthBrowserBinding(header)).toBeNull();
   }
   expect(readFreshAuthBrowserBinding("other=abc; " + cookie)).toBe("a".repeat(64));
