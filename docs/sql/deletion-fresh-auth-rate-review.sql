@@ -38,7 +38,7 @@ create index on private.deletion_fresh_auth_attempts (attempted_at, attempt_id);
 create function private.cleanup_deletion_fresh_auth_attempts()
 returns bigint
 language sql security invoker set search_path = ''
-as $
+as $$
   with expired as (
     select attempt_id from private.deletion_fresh_auth_attempts
     where attempted_at < statement_timestamp() - interval '1 hour'
@@ -50,7 +50,7 @@ as $
     returning 1
   )
   select count(*) from removed;
-$;
+$$;
 revoke all on function private.cleanup_deletion_fresh_auth_attempts()
   from public, anon, authenticated;
 
@@ -84,7 +84,7 @@ begin
   end if;
 end;
 $$;
-do $
+do $$
 begin
   insert into private.deletion_fresh_auth_attempts (user_id, attempted_at)
     select '33333333-3333-4333-8333-333333333333', clock_timestamp() - interval '2 hours'
@@ -100,5 +100,5 @@ begin
     raise exception 'Cleanup removed active history';
   end if;
 end;
-$;
+$$;
 rollback;
