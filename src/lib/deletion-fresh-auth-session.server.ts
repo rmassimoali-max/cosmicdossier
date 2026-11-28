@@ -8,9 +8,7 @@ const uuid = /^[0-9a-f]{8}-[0-9a-f]{4}-[0-9a-f]{4}-[0-9a-f]{4}-[0-9a-f]{12}$/i;
  * Supabase must validate the exact token before its claims are inspected.
  * This is not proof of recent authentication or sufficient assurance.
  */
-async function resolveVerifiedSessionClaims(
-  input: Parameters<typeof resolveDeletionIdentity>[0],
-) {
+async function resolveVerifiedSessionClaims(input: Parameters<typeof resolveDeletionIdentity>[0]) {
   const identity = await resolveDeletionIdentity(input);
   const parts = input.accessToken.split(".");
   if (parts.length !== 3 || !parts.every((part) => /^[A-Za-z0-9_-]+$/.test(part))) {
