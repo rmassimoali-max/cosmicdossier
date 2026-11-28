@@ -1,3 +1,4 @@
+import { readVerifiedFactorState } from "./deletion-fresh-auth-factors.server";
 import { requireVerifiedDeletionIdentity } from "./deletion-identity.server";
 
 /**
@@ -5,7 +6,7 @@ import { requireVerifiedDeletionIdentity } from "./deletion-identity.server";
  * user IDs, email addresses, or decoded JWT claims.
  * This helper is server-only and does not initiate deletion.
  */
-export async function resolveDeletionIdentity(input: {
+export async function resolveDeletionAccountEvidence(input: {
   authUrl: string;
   publishableKey: string;
   accessToken: string;
@@ -36,6 +37,7 @@ export async function resolveDeletionIdentity(input: {
       Authorization: `Bearer ${accessToken}`,
     },
     cache: "no-store",
+    redirect: "error",
   });
   if (!response.ok) {
     throw new Error("Could not verify your current account.");
@@ -44,5 +46,16 @@ export async function resolveDeletionIdentity(input: {
   if (!payload || typeof payload !== "object" || Array.isArray(payload)) {
     throw new Error("Could not verify your current account.");
   }
-  return requireVerifiedDeletionIdentity(payload as Record<string, unknown>);
+  const account = payload as Record<string, unknown>;
+  return {
+    ...requireVerifiedDeletionIdentity(account),
+    hasVerifiedFactors: readVerifiedFactorState(account["factors"]),
+  };
+}
+
+export async function resolveDeletionIdentity(
+  input: Parameters<typeof resolveDeletionAccountEvidence>[0],
+) {
+  const { userId, verifiedEmail } = await resolveDeletionAccountEvidence(input);
+  return { userId, verifiedEmail };
 }
