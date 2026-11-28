@@ -1,5 +1,8 @@
 import { expect, test } from "bun:test";
-import { resolveFreshAuthOriginalSession } from "./deletion-fresh-auth-session.server";
+import {
+  resolveFreshAuthOriginalSession,
+  resolveFreshAuthPasswordEvidence,
+} from "./deletion-fresh-auth-session.server";
 
 const userId = "11111111-1111-4111-8111-111111111111";
 const sessionId = "22222222-2222-4222-8222-222222222222";
@@ -39,4 +42,30 @@ test("original session rejects mismatched, missing and expired claims", async ()
   for (const claims of [{ sub: "other" }, { session_id: null }, { exp: 0 }]) {
     await expect(resolveFreshAuthOriginalSession(fixture(claims))).rejects.toThrow();
   }
+});
+
+test("password evidence uses verified authentication time, not token issuance time", async () => {
+  const timestamp = Math.floor(Date.now() / 1000) - 30;
+  const input = fixture({
+    amr: [{ method: "password", timestamp }],
+    iat: timestamp + 20,
+  });
+  expect(await resolveFreshAuthPasswordEvidence(input)).toEqual({
+    userId,
+    sessionId,
+    authenticatedAt: timestamp * 1000,
+    method: "password",
+  });
+});
+
+test("password evidence rejects provider denial and missing or future events", async () => {
+  const timestamp = Math.floor(Date.now() / 1000);
+  const amr = [{ method: "password", timestamp }];
+  await expect(resolveFreshAuthPasswordEvidence(fixture({ amr }, 401))).rejects.toThrow();
+  await expect(resolveFreshAuthPasswordEvidence(fixture())).rejects.toThrow();
+  await expect(
+    resolveFreshAuthPasswordEvidence(
+      fixture({ amr: [{ method: "password", timestamp: timestamp + 600 }] }),
+    ),
+  ).rejects.toThrow();
 });

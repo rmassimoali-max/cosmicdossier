@@ -1,3 +1,4 @@
+import { readFreshAuthPasswordEvent } from "./deletion-fresh-auth-amr.server";
 import { resolveDeletionIdentity } from "./deletion-auth.server";
 
 const uuid = /^[0-9a-f]{8}-[0-9a-f]{4}-[0-9a-f]{4}-[0-9a-f]{4}-[0-9a-f]{12}$/i;
@@ -7,7 +8,7 @@ const uuid = /^[0-9a-f]{8}-[0-9a-f]{4}-[0-9a-f]{4}-[0-9a-f]{4}-[0-9a-f]{12}$/i;
  * Supabase must validate the exact token before its claims are inspected.
  * This is not proof of recent authentication or sufficient assurance.
  */
-export async function resolveFreshAuthOriginalSession(
+async function resolveVerifiedSessionClaims(
   input: Parameters<typeof resolveDeletionIdentity>[0],
 ) {
   const identity = await resolveDeletionIdentity(input);
@@ -38,5 +39,24 @@ export async function resolveFreshAuthOriginalSession(
   ) {
     throw new Error("Invalid authentication session.");
   }
-  return { userId: identity.userId, sessionId };
+  return { userId: identity.userId, sessionId, claims };
+}
+
+export async function resolveFreshAuthOriginalSession(
+  input: Parameters<typeof resolveDeletionIdentity>[0],
+) {
+  const { userId, sessionId } = await resolveVerifiedSessionClaims(input);
+  return { userId, sessionId };
+}
+
+/** Candidate evidence only; liveness, correlation and assurance remain separate gates. */
+export async function resolveFreshAuthPasswordEvidence(
+  input: Parameters<typeof resolveDeletionIdentity>[0],
+) {
+  const { userId, sessionId, claims } = await resolveVerifiedSessionClaims(input);
+  const authenticatedAt = readFreshAuthPasswordEvent(claims["amr"]);
+  if (authenticatedAt === null || authenticatedAt > Date.now()) {
+    throw new Error("Invalid password authentication evidence.");
+  }
+  return { userId, sessionId, authenticatedAt, method: "password" as const };
 }
