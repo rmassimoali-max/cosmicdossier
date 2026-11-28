@@ -1,3 +1,4 @@
+import { FRESH_AUTH_ISSUE_SQL, FRESH_AUTH_TAKE_SQL } from "./deletion-fresh-auth-sql.server";
 import { createHmac, randomBytes } from "node:crypto";
 import type { FreshAuthFlowStore } from "./deletion-fresh-auth-consume.server";
 import type { DeletionSqlExecutor } from "./deletion-store.server";
@@ -26,7 +27,7 @@ export function createPostgresFreshAuthStore(
       }
       const flowId = randomBytes(32).toString("hex");
       const result = await db.query<{ issued: boolean }>(
-        "select private.issue_deletion_fresh_auth_flow($1::text, $2::text, $3::uuid, $4::uuid) as issued",
+        FRESH_AUTH_ISSUE_SQL,
         [
           hash("fresh-auth-flow", flowId),
           hash("fresh-auth-browser", browserBinding),
@@ -47,7 +48,7 @@ export function createPostgresFreshAuthStore(
         started_ms: string;
         expires_ms: string;
       }>(
-        "select user_id, original_session_id, floor(extract(epoch from started_at)*1000)::text as started_ms, floor(extract(epoch from expires_at)*1000)::text as expires_ms from private.take_deletion_fresh_auth_flow($1::text, $2::text)",
+        FRESH_AUTH_TAKE_SQL,
         [hash("fresh-auth-flow", flowId), hash("fresh-auth-browser", browserBinding)],
       );
       if (result.rows.length === 0) return null;
