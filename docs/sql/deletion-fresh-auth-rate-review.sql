@@ -1,6 +1,7 @@
 -- REVIEW ONLY. Disposable PostgreSQL CI only; never apply to a live project.
 begin;
 create table private.deletion_fresh_auth_attempts (
+  attempt_id bigint generated always as identity primary key,
   user_id uuid not null,
   attempted_at timestamptz not null
 );
@@ -26,11 +27,31 @@ begin
     select count(*) from private.deletion_fresh_auth_attempts
     where user_id = p_user_id and attempted_at > v_now - interval '1 hour'
   ) >= 5 then return false; end if;
-  insert into private.deletion_fresh_auth_attempts values (p_user_id, v_now);
+  insert into private.deletion_fresh_auth_attempts (user_id, attempted_at) values (p_user_id, v_now);
   return true;
 end;
 $$;
 revoke all on function private.reserve_deletion_fresh_auth_attempt(uuid)
+  from public, anon, authenticated;
+
+create index on private.deletion_fresh_auth_attempts (attempted_at, attempt_id);
+create function private.cleanup_deletion_fresh_auth_attempts()
+returns bigint
+language sql security invoker set search_path = ''
+as $
+  with expired as (
+    select attempt_id from private.deletion_fresh_auth_attempts
+    where attempted_at < statement_timestamp() - interval '1 hour'
+    order by attempted_at, attempt_id
+    limit 500 for update skip locked
+  ), removed as (
+    delete from private.deletion_fresh_auth_attempts a
+    using expired e where a.attempt_id = e.attempt_id
+    returning 1
+  )
+  select count(*) from removed;
+$;
+revoke all on function private.cleanup_deletion_fresh_auth_attempts()
   from public, anon, authenticated;
 
 -- Owner-only synthetic tests. Runtime role grants and cleanup remain separate.
@@ -47,7 +68,7 @@ begin
   end if;
   update private.deletion_fresh_auth_attempts set attempted_at = clock_timestamp() - interval '2 minutes'
     where user_id = a;
-  insert into private.deletion_fresh_auth_attempts
+  insert into private.deletion_fresh_auth_attempts (user_id, attempted_at)
     select a, clock_timestamp() - make_interval(mins => n) from generate_series(3, 6) n;
   if private.reserve_deletion_fresh_auth_attempt(a) is distinct from false then
     raise exception 'Hourly limit failed';
@@ -63,4 +84,21 @@ begin
   end if;
 end;
 $$;
+do $
+begin
+  insert into private.deletion_fresh_auth_attempts (user_id, attempted_at)
+    select '33333333-3333-4333-8333-333333333333', clock_timestamp() - interval '2 hours'
+    from generate_series(1, 501);
+  if private.cleanup_deletion_fresh_auth_attempts() <> 500 then
+    raise exception 'Cleanup batch limit failed';
+  end if;
+  if private.cleanup_deletion_fresh_auth_attempts() <> 6 then
+    raise exception 'Remaining expired attempts not removed';
+  end if;
+  if private.cleanup_deletion_fresh_auth_attempts() <> 0
+    or (select count(*) from private.deletion_fresh_auth_attempts) <> 2 then
+    raise exception 'Cleanup removed active history';
+  end if;
+end;
+$;
 rollback;

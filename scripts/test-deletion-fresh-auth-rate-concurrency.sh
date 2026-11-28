@@ -4,7 +4,7 @@ set -euo pipefail
 tmp=$(mktemp -d)
 sql() { psql "$TEST_DATABASE_URL" -X -v ON_ERROR_STOP=1 -Atq -c "$1"; }
 cleanup() {
-  sql "drop function if exists private.reserve_deletion_fresh_auth_attempt(uuid); drop table if exists private.deletion_fresh_auth_attempts; drop owned by deletion_fresh_auth_rate_ci; drop role if exists deletion_fresh_auth_rate_ci;" >/dev/null
+  sql "drop function if exists private.cleanup_deletion_fresh_auth_attempts(); drop function if exists private.reserve_deletion_fresh_auth_attempt(uuid); drop table if exists private.deletion_fresh_auth_attempts; drop owned by deletion_fresh_auth_rate_ci; drop role if exists deletion_fresh_auth_rate_ci;" >/dev/null
   rm -rf "$tmp"
 }
 python3 - <<'PY' | psql "$TEST_DATABASE_URL" -X -v ON_ERROR_STOP=1
@@ -15,6 +15,7 @@ print("""
 create role deletion_fresh_auth_rate_ci nologin noinherit;
 grant usage on schema private to deletion_fresh_auth_rate_ci;
 grant select, insert on private.deletion_fresh_auth_attempts to deletion_fresh_auth_rate_ci;
+grant usage on sequence private.deletion_fresh_auth_attempts_attempt_id_seq to deletion_fresh_auth_rate_ci;
 create policy rate_access on private.deletion_fresh_auth_attempts to deletion_fresh_auth_rate_ci using (true) with check (true);
 grant execute on function private.reserve_deletion_fresh_auth_attempt(uuid) to deletion_fresh_auth_rate_ci;
 commit;
